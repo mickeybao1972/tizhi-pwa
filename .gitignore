@@ -1,0 +1,23 @@
+# PWA source files - DO NOT include in git
+# (only deploy the built PWA files to GitHub)
+*.zip
+*.png
+*.jpg
+*.gif
+*.svg
+*.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Agent workspace files
+.consolidate-state.json
+.openclaw/
+.research/
+skills/
+memory/
+
+# Environment files
+.env
+.env.*

@@ -1,0 +1,939 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>四诊体质自测系统</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --p: #4A7C59; --pl: #6B9E7A; --pd: #3A6147;
+  --a: #C49A6C; --al: #D4B58A;
+  --bg: #F8F4EE; --card: #FFF; --txt: #2C2C2C; --tl: #6B6B6B;
+  --brd: #E0D8CC; --shd: 0 4px 24px rgba(74,124,89,0.12);
+  --r: 16px;
+}
+body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--bg); color:var(--txt); min-height:100vh; }
+.page { display:none; min-height:100vh; padding:24px 16px; }
+.page.active { display:flex; flex-direction:column; align-items:center; justify-content:center; animation:fadeIn .45s ease; }
+.page.active.showing-report { justify-content:flex-start; padding-top:24px; padding-bottom:60px; }
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.badge { background:linear-gradient(135deg,var(--p),var(--pl)); color:#fff; font-size:12px; padding:6px 18px; border-radius:20px; letter-spacing:2px; margin-bottom:20px; }
+.ctitle { font-size:clamp(28px,6vw,42px); font-weight:700; color:var(--pd); text-align:center; line-height:1.3; margin-bottom:4px; }
+.ctitle span { color:var(--a); }
+.csub { color:var(--tl); font-size:13px; text-align:center; margin-bottom:28px; }
+.cbox { background:var(--card); border-radius:var(--r); padding:22px; max-width:500px; width:100%; box-shadow:var(--shd); margin-bottom:28px; }
+.cbox h3 { font-size:14px; color:var(--p); margin-bottom:12px; }
+.steps { list-style:none; }
+.steps li { display:flex; align-items:center; gap:10px; padding:7px 0; font-size:13px; border-bottom:1px solid var(--brd); }
+.steps li:last-child { border:none; }
+.sn { width:26px; height:26px; border-radius:50%; background:var(--p); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; flex-shrink:0; }
+.sn.wz { background:#5B8DB8; } .sn.wm { background:#9B7BB8; } .sn.cx { background:#B87B5B; } .sn.rp { background:var(--a); }
+.disc { background:#FFF8F0; border:1px solid var(--al); border-radius:12px; padding:12px; font-size:11px; color:#8B6914; line-height:1.6; }
+.btn { display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,var(--p),var(--pl)); color:#fff; border:none; padding:13px 32px; border-radius:40px; font-size:15px; font-weight:600; cursor:pointer; transition:all .3s; box-shadow:0 4px 16px rgba(74,124,89,0.3); }
+.btn:hover { transform:translateY(-2px); }
+.btn-accent { background:linear-gradient(135deg,var(--a),var(--al)); box-shadow:0 4px 16px rgba(196,154,108,0.3); }
+
+/* Test header */
+.thdr { background:var(--card); width:100%; padding:14px 16px; position:sticky; top:0; z-index:10; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+.pbar { margin-bottom:8px; }
+.plabel { display:flex; justify-content:space-between; font-size:11px; color:var(--tl); margin-bottom:4px; }
+.pbar-track { height:5px; background:var(--brd); border-radius:3px; overflow:hidden; }
+.pbar-fill { height:100%; background:linear-gradient(90deg,var(--p),var(--a)); border-radius:3px; transition:width .4s; }
+.mtag { display:inline-flex; align-items:center; gap:4px; font-size:11px; padding:3px 12px; border-radius:20px; color:#fff; background:var(--p); }
+.mtag.wz { background:#5B8DB8; } .mtag.wm { background:#9B7BB8; } .mtag.cx { background:#B87B5B; }
+.qa { width:100%; max-width:560px; margin:28px auto; }
+.qnum { font-size:12px; color:var(--tl); margin-bottom:6px; }
+.qtext { font-size:clamp(16px,3.5vw,20px); font-weight:600; line-height:1.5; margin-bottom:8px; }
+.qsub { font-size:13px; color:var(--tl); line-height:1.6; margin-bottom:22px; }
+.opts { display:flex; flex-direction:column; gap:8px; }
+.opt { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--card); border:2px solid var(--brd); border-radius:12px; cursor:pointer; transition:all .2s; font-size:14px; }
+.opt:hover { border-color:var(--pl); background:#F0F7F2; }
+.opt.selected { border-color:var(--p); background:linear-gradient(135deg,#EFF7F1,#E4F0E8); }
+.opt.selected .oc { background:var(--p); border-color:var(--p); }
+.oc { width:20px; height:20px; border-radius:50%; border:2px solid var(--brd); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+.opt.selected .oc::after { content:''; width:8px; height:8px; border-radius:50%; background:#fff; }
+.olbl { flex:1; }
+.nav { position:fixed; bottom:0; left:0; right:0; background:var(--card); border-top:1px solid var(--brd); padding:10px 16px; display:flex; gap:10px; z-index:20; max-width:600px; margin:0 auto; }
+.nav button { flex:1; padding:11px; border-radius:10px; font-size:14px; font-weight:600; border:none; cursor:pointer; transition:all .2s; }
+.np { background:var(--bg); color:var(--txt); border:2px solid var(--brd) !important; }
+.np:hover { border-color:var(--p)!important; color:var(--p); }
+.nn { background:var(--p); color:#fff; }
+.nn:hover { background:var(--pd); }
+.nn:disabled { background:#ccc; cursor:not-allowed; }
+
+/* Report */
+.rp { padding-top:20px; padding-bottom:40px; }
+.rhd { width:100%; max-width:100%; text-align:center; margin-bottom:20px; }
+.rhd h1 { font-size:20px; color:var(--pd); margin-bottom:4px; }
+.rhd p { font-size:12px; color:var(--tl); }
+.rc { background:var(--card); border-radius:var(--r); box-shadow:var(--shd); padding:24px 20px; width:100%; max-width:100%; margin-bottom:14px; }
+.rbadge { display:inline-block; background:linear-gradient(135deg,var(--p),var(--pl)); color:#fff; font-size:10px; padding:3px 12px; border-radius:20px; margin-bottom:12px; letter-spacing:1px; }
+.rname { font-size:clamp(26px,6vw,34px); font-weight:800; color:var(--pd); margin-bottom:4px; }
+.rtype { font-size:13px; color:var(--a); font-weight:600; margin-bottom:6px; }
+.rdesc { font-size:13px; color:var(--tl); line-height:1.7; margin-bottom:16px; }
+.st { width:100%; border-collapse:collapse; font-size:12px; }
+.st th { text-align:left; padding:6px 8px; color:var(--tl); border-bottom:2px solid var(--brd); }
+.st td { padding:6px 8px; border-bottom:1px solid var(--brd); }
+.sbw { display:flex; align-items:center; gap:6px; }
+.sb { flex:1; height:5px; background:#eee; border-radius:3px; overflow:hidden; }
+.sbf { height:100%; border-radius:3px; }
+.sv { font-size:11px; color:var(--tl); min-width:30px; text-align:right; }
+.hr td { font-weight:600; color:var(--pd); background:#F0F7F2; }
+
+.zc { background:var(--card); border-radius:var(--r); padding:18px 20px; width:100%; margin-bottom:14px; }
+.zt { font-size:13px; font-weight:700; color:var(--p); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.zt::before { content:''; width:3px; height:14px; background:var(--a); border-radius:2px; }
+.ztags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.ztag { padding:5px 12px; background:#F0F7F2; border:1px solid var(--pl); border-radius:20px; font-size:12px; color:var(--pd); }
+.zd { font-size:12px; color:var(--tl); line-height:1.7; }
+
+.sg { width:100%; display:grid; gap:10px; margin-bottom:14px; grid-template-columns:1fr; }
+@media(min-width:480px){ .sg{grid-template-columns:1fr 1fr 1fr;} }
+.sc { background:var(--card); border-radius:var(--r); padding:16px; box-shadow:0 2px 10px rgba(0,0,0,0.05); }
+.si { font-size:22px; margin-bottom:6px; }
+.stl { font-size:12px; font-weight:700; color:var(--p); margin-bottom:6px; }
+.sitems { list-style:none; display:flex; flex-wrap:wrap; gap:4px; }
+.sitems li { background:#F8F4EE; border:1px solid var(--brd); border-radius:6px; padding:3px 10px; font-size:11px; color:var(--txt); }
+.sitems li:nth-child(odd) { background:#EFF7F1; border-color:var(--pl); color:var(--pd); }
+
+.dbox { background:#FFF8F0; border:1px solid var(--al); border-radius:var(--r); padding:14px 18px; width:100%; font-size:11px; color:#8B6914; line-height:1.7; margin-bottom:20px; }
+.rb { display:flex; align-items:center; justify-content:center; gap:6px; background:linear-gradient(135deg,var(--a),var(--al)); color:#fff; border:none; padding:12px 32px; border-radius:40px; font-size:14px; font-weight:600; cursor:pointer; box-shadow:0 4px 16px rgba(196,154,108,0.3); transition:all .3s; margin:0 auto 40px; }
+
+/* 开发者署名区 */
+.devsig { width:auto; max-width:480px; margin:24px auto 8px; padding:14px 18px; background:rgba(74,124,89,0.06); border:1px solid rgba(74,124,89,0.18); border-radius:12px; text-align:center; font-size:12px; color:var(--tl); line-height:1.7; }
+.devsig .ds-name { color:var(--pd); font-weight:600; font-size:13px; margin:0 4px; }
+.devsig .ds-ver { display:inline-block; padding:1px 8px; margin-left:6px; background:var(--p); color:#fff; border-radius:10px; font-size:10px; font-weight:600; letter-spacing:0.3px; vertical-align:1px; }
+.devsig .ds-mail { color:var(--pd); text-decoration:none; border-bottom:1px dashed rgba(58,97,71,0.4); }
+.devsig .ds-mail:hover { border-bottom-style:solid; }
+.devsig .ds-meta { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:4px; font-size:11px; color:#999; }
+.devsig .ds-meta span { display:inline-flex; align-items:center; gap:3px; }
+
+/* 九宫格体质对照图 */
+.ncgrid-wrap { width:100%; max-width:680px; margin:28px auto 12px; background:var(--card); border-radius:var(--r); padding:20px 16px; box-shadow:var(--shd); }
+.ncgrid-title { text-align:center; font-size:15px; font-weight:600; color:var(--pd); margin-bottom:6px; letter-spacing:0.5px; }
+.ncgrid-sub { text-align:center; font-size:11px; color:var(--tl); margin-bottom:14px; }
+.ncgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+@media (max-width:480px){ .ncgrid { grid-template-columns:repeat(2,1fr); } }
+.nccard { position:relative; padding:10px 8px 8px; border:1.5px solid var(--brd); border-radius:10px; text-align:center; transition:all .25s; }
+.nccard .nc-icon { font-size:22px; line-height:1; margin-bottom:2px; }
+.nccard .nc-name { font-size:12px; font-weight:700; color:var(--pd); margin:2px 0 4px; }
+.nccard .nc-tags { display:flex; flex-wrap:wrap; justify-content:center; gap:3px; }
+.nccard .nc-tag { font-size:9.5px; padding:1px 5px; background:rgba(74,124,89,0.08); color:#5C5C5C; border-radius:8px; line-height:1.4; }
+.nccard.match { box-shadow:0 3px 12px rgba(74,124,89,0.35); transform:scale(1.03); }
+.nccard .nc-match { font-size:10px; color:var(--p); font-weight:700; margin:1px 0 0; }
+.nccard.weak { opacity:0.55; filter:grayscale(40%); }
+.nc-w { font-size:9px; color:var(--tl); margin:1px 0 2px; }
+.nccard .nc-rank { position:absolute; top:-6px; left:-6px; min-width:18px; height:18px; padding:0 5px; background:var(--p); color:#fff; border-radius:9px; font-size:10px; font-weight:700; line-height:18px; box-shadow:0 2px 6px rgba(74,124,89,0.4); }
+
+/* 用户信息表单 */
+.userform { width:100%; max-width:480px; margin:0 auto 20px; padding:16px; background:var(--card); border-radius:var(--r); box-shadow:var(--shd); }
+.userform h4 { font-size:14px; color:var(--pd); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+.uf-row { display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.uf-row .ufg { flex:1; min-width:120px; }
+.ufg label { display:block; font-size:11px; color:var(--tl); margin-bottom:4px; }
+.ufg input, .ufg select { width:100%; padding:8px 10px; border:1px solid var(--brd); border-radius:8px; font-size:13px; background:#fff; }
+.ufg input:focus, .ufg select:focus { outline:none; border-color:var(--p); box-shadow:0 0 0 2px rgba(74,124,89,0.1); }
+
+/* 历史记录列表（报告页内嵌） */
+.hist-section { width:100%; max-width:560px; margin:16px auto 8px; }
+.hist-title { font-size:13px; font-weight:600; color:var(--pd); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.hist-scroll { max-height:320px; overflow-y:auto; border-radius:var(--r); }
+.hist-scroll::-webkit-scrollbar { width:4px; }
+.hist-scroll::-webkit-scrollbar-thumb { background:var(--brd); border-radius:4px; }
+.hist-row { display:grid; grid-template-columns:90px 1fr; gap:8px; padding:10px 12px; background:var(--card); border-bottom:1px solid var(--brd); align-items:start; }
+.hist-row:last-child { border-bottom:none; }
+.hist-row .hr-name { font-size:13px; font-weight:600; color:var(--pd); }
+.hist-row .hr-date { font-size:10px; color:var(--tl); }
+.hist-row .hr-result { font-size:12px; color:var(--p); font-weight:600; }
+.hist-row .hr-tip { font-size:11px; color:var(--tl); line-height:1.4; }
+.hist-empty-row { text-align:center; padding:16px; color:var(--tl); font-size:12px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ 封面 ═══ -->
+<div id="p0" class="page active">
+ <div id="cover-section" style="display:flex;flex-direction:column;align-items:center;width:100%">
+  <div style="width:auto;max-width:480px">
+    <div class="badge">中医体质评估</div>
+    <div class="ctitle">四诊体质<span>自测系统</span></div>
+    <div class="csub">基于国标《中医体质分类与判定》(ZY/T 001.1-1994)</div>
+  </div>
+  <div class="cbox" style="max-width:480px;width:auto">
+    <h3>📋 测试流程</h3>
+    <ul class="steps">
+      <li><div class="sn wz">1</div><div class="step-text">望诊模块 <small style="color:var(--tl)">舌象·面色 共4题·约1分钟</small></div></li>
+      <li><div class="sn wm">2</div><div class="step-text">闻诊模块 <small style="color:var(--tl)">口气·痰音·气息·体味 共4题·约1分钟</small></div></li>
+      <li><div class="sn">3</div><div class="step-text">问诊模块 <small style="color:var(--tl)">61道题·约8分钟（国标完整版）</small></div></li>
+      <li><div class="sn cx">4</div><div class="step-text">切诊模块 <small style="color:var(--tl)">脉象主观分类 共1题·约30秒</small></div></li>
+      <li><div class="sn rp">5</div><div class="step-text">报告生成 <small style="color:var(--tl)">体质判定·脏腑倾向·养生建议</small></div></li>
+    </ul>
+    <div class="disc" style="margin-top:10px">⚠ 本测评为中医体质参考，不作为疾病诊断与治疗依据。</div>
+  </div>
+
+  <!-- 用户信息表单 -->
+  <div class="userform" style="max-width:480px;width:auto">
+    <h4>📝 受测者信息</h4>
+    <div class="uf-row">
+      <div class="ufg" style="flex:2">
+        <label>姓名</label>
+        <input type="text" id="uf-name" placeholder="请输入姓名">
+      </div>
+      <div class="ufg">
+        <label>性别</label>
+        <select id="uf-gender">
+          <option value="">请选择</option>
+          <option value="男">男</option>
+          <option value="女">女</option>
+        </select>
+      </div>
+    </div>
+    <div class="uf-row">
+      <div class="ufg">
+        <label>年龄</label>
+        <input type="number" id="uf-age" placeholder="岁" min="1" max="120">
+      </div>
+      <div class="ufg" style="flex:2">
+        <label>联系电话</label>
+        <input type="tel" id="uf-phone" placeholder="手机号">
+      </div>
+    </div>
+    <div class="uf-row">
+      <div class="ufg" style="flex:1">
+        <label>地址</label>
+        <input type="text" id="uf-address" placeholder="省市区/街道">
+      </div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="start()" style="max-width:480px;justify-content:center;width:auto;margin:0 auto">开始测评 →</button>
+ </div>
+
+  <div id="report-section" style="display:none;width:100%;max-width:760px">
+    <div class="rhd"><h1>🧘 体质评估报告</h1><p>依据《中医体质分类与判定》国标运算</p></div>
+
+    <div class="rc">
+      <div class="rbadge">🏷 体质判定</div>
+      <div class="rname" id="rn"></div>
+      <div class="rtype" id="rrt"></div>
+      <div class="rdesc" id="rd"></div>
+      <table class="st"><thead><tr><th>体质类型</th><th>转化分</th><th>分布</th><th>判定</th></tr></thead><tbody id="stb"></tbody></table>
+    </div>
+
+    <div class="zc">
+      <div class="zt">脏腑功能倾向参考</div>
+      <div class="ztags" id="ztags"></div>
+      <div class="zd" id="zd"></div>
+    </div>
+
+    <div class="sg" id="sg"></div>
+
+    <div class="ncgrid-wrap">
+      <div class="ncgrid-title">🌿 中医九大体质对照图</div>
+      <div class="ncgrid-sub">标有 <span style="color:var(--p);font-weight:700">✓</span> 为您的判定结果；数字标签代表主体质排名</div>
+      <div class="ncgrid" id="ncgrid"></div>
+    </div>
+
+    <div class="dbox">⚠ 本测评为中医体质参考，不作为疾病诊断与治疗依据。报告中的体质分类、脏腑倾向及养生建议仅供参考，不能替代专业中医诊疗。如有明显不适，请咨询中医师或前往医疗机构就诊。</div>
+
+    <button class="rb" onclick="restart()">🔄 重新测试</button>
+  </div>
+
+  <div class="hist-section" style="max-width:480px;width:auto">
+    <div class="hist-title">📋 历史记录</div>
+    <div class="hist-scroll" id="rh-list"></div>
+  </div>
+
+  <div class="devsig">
+    <div>
+      ✍️ 设计开发：<span class="ds-name">鲍永英</span>
+      <span class="ds-ver">V1.0测试版</span>
+    </div>
+    <div style="margin-top:4px">
+      📧 联系邮箱：<a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
+    </div>
+    <div class="ds-meta">
+      <span>📅 2026.7.20</span>
+      <span>🌿 中医体质评估</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 测试 ═══ -->
+<div id="p1" class="page test-page">
+  <div class="thdr">
+    <div class="pbar">
+      <div class="plabel">
+        <span id="mt" class="mtag">问诊模块</span>
+        <span id="pt">1 / 69</span>
+      </div>
+      <div class="pbar-track"><div id="pf" class="pbar-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="qa">
+    <div class="qnum" id="qn"></div>
+    <div class="qtext" id="qt"></div>
+    <div class="qsub" id="qs"></div>
+    <div class="opts" id="qo"></div>
+  </div>
+  <div class="nav">
+    <button class="np" id="bp" onclick="prev()" disabled>← 上一题</button>
+    <button class="nn" id="bn" onclick="next()">下一题 →</button>
+  </div>
+
+  <div class="devsig" style="margin-top:auto;margin-bottom:0;max-width:480px">
+    <span class="ds-name">鲍永英</span> 作品 · V1.0测试版 · 2026.7.20 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// 题库：69题（问诊 60 + 望诊 4 + 闻诊 4 + 切诊 1）
+// ═══════════════════════════════════════════════════════════
+const Q = [
+  // ════════════════════════════════════
+  // 望诊（自评版 4题）
+  // ════════════════════════════════════
+  { m:'望诊', id:'WZ_TC_01', t:'您舌头的颜色接近哪种？', s:'对着镜子观察自然光下的舌色', rev:false, g:'望诊', o:[
+    {v:1,l:'淡红（正常）'},{v:2,l:'淡白（偏白色）'},{v:3,l:'红（偏红色）'},{v:4,l:'绛红（深红色）'},{v:5,l:'紫暗（偏紫偏暗）'}
+  ] },
+  { m:'望诊', id:'WZ_TC_02', t:'您舌苔的厚薄程度？', s:'对着镜子伸出舌头观察苔层', rev:false, g:'望诊', o:[
+    {v:1,l:'薄白苔（正常薄苔）'},{v:2,l:'白厚腻（厚而发白）'},{v:3,l:'黄腻（厚而发黄）'},{v:4,l:'少苔/无苔（光滑无苔）'},{v:5,l:'剥苔（有缺损区域）'}
+  ] },
+  { m:'望诊', id:'WZ_TS_01', t:'您舌体的大小和齿痕？', s:'伸出舌头看舌边缘是否有牙齿印', rev:false, g:'望诊', o:[
+    {v:1,l:'大小适中、无齿痕'},{v:2,l:'偏胖大、有轻微齿痕'},{v:3,l:'胖大明显、齿痕深'},{v:4,l:'偏瘦小'},{v:5,l:'瘦小有裂纹'}
+  ] },
+  { m:'望诊', id:'WZ_FC_01', t:'您的面色（脸部肤色）？', s:'自然光下观察整个脸颊颜色', rev:false, g:'望诊', o:[
+    {v:1,l:'红黄隐隐/明润（正常）'},{v:2,l:'萎黄/苍白'},{v:3,l:'潮红（两颧尤明显）'},{v:4,l:'晦暗/黧黑'},{v:5,l:'油光/满面通红'}
+  ] },
+
+  // ════════════════════════════════════
+  // 闻诊（自评版 4题）
+  // ════════════════════════════════════
+  { m:'闻诊', id:'WM_OH_01', t:'您觉得自己的口气（口腔气味）怎么样？', s:'可呼口气到手掌闻一下', rev:false, g:'闻诊', o:[
+    {v:1,l:'无明显气味（正常）'},{v:2,l:'轻微气味'},{v:3,l:'有口臭/异味'},{v:4,l:'有明显酸腐味'},{v:5,l:'腐臭味明显'}
+  ] },
+  { m:'闻诊', id:'WM_PH_01', t:'您感觉自己的呼吸声音？', s:'安静状态下感受', rev:false, g:'闻诊', o:[
+    {v:1,l:'均匀调畅（正常）'},{v:2,l:'稍微气粗或气短'},{v:3,l:'呼吸急促/气粗有力'},{v:4,l:'呼吸微弱/气短声低'},{v:5,l:'喘促/气不得续'}
+  ] },
+  { m:'闻诊', id:'WM_SB_01', t:'您说话的声音？', s:'回忆自己日常说话音量', rev:false, g:'闻诊', o:[
+    {v:1,l:'声音洪亮清晰（正常）'},{v:2,l:'声音偏低/中气不足'},{v:3,l:'声音低弱/说话费力'},{v:4,l:'声低断续/有气无力'},{v:5,l:'声音嘶哑/难出声'}
+  ] },
+  { m:'闻诊', id:'WM_BO_01', t:'您身体的气味（体味）？', s:'沐浴后或一天结束时感受', rev:false, g:'闻诊', o:[
+    {v:1,l:'无明显体味（正常）'},{v:2,l:'有轻微体味'},{v:3,l:'体味偏重/有汗臭味'},{v:4,l:'有明显异味'},{v:5,l:'腥臭味/异味很重'}
+  ] },
+
+  // ════════════════════════════════════
+  // 问诊（国标完整版60题 + 附加1题）
+  // ════════════════════════════════════
+  // — 平和质(8题, 6题*为平和质逆向计分) —
+  { m:'问诊', id:'WQ_001', t:'您精力充沛吗？', s:'运动、进食、工作不易疲劳', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_002', t:'您容易疲乏吗？', s:'日常活动后感觉疲劳', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_003', t:'您说话声音低弱无力吗？', s:'感觉说话费劲', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_004', t:'您感到闷闷不乐、情绪低沉吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_005', t:'您比一般人耐受不了寒冷吗？', s:'冬天的寒冷、夏天的冷空调、电扇等', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_006', t:'您能适应外界自然和社会环境的变化吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_007', t:'您容易失眠吗？', s:'入睡困难、易醒、多梦', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_008', t:'您容易忘事（健忘）吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  // — 气虚质(8题, 含疲乏WQ_002、声音WQ_003、感冒WQ_012、虚汗WQ_014) —
+  { m:'问诊', id:'WQ_009', t:'您容易气短（呼吸短促，接不上气）吗？', s:'稍微活动就感觉气不够用', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_010', t:'您容易心慌吗？', s:'心跳不规律或感觉心跳很快', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_011', t:'您容易头晕或站起时眩晕吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_012', t:'您比别人容易感冒吗？', s:'一年内反复感冒多次', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_013', t:'您喜欢安静、懒得说话吗？', s:'感觉说话费劲', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_014', t:'您活动量稍大就容易出虚汗吗？', s:'比常人出汗多，或不动也出汗', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  // — 阳虚质(7题, 含怕冷WQ_005、感冒WQ_012) —
+  { m:'问诊', id:'WQ_015', t:'您手脚发凉吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_016', t:'您胃脘部、背部或腰膝部感觉怕冷吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_017', t:'您感到怕冷、衣服比别人穿得多吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_018', t:'您吃（喝）凉的东西会感到不舒服或者怕吃（喝）凉的吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_019', t:'您受凉或吃（喝）凉的东西后，容易腹泻、拉肚子吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  // — 阴虚质(8题, 含虚汗WQ_014) —
+  { m:'问诊', id:'WQ_020', t:'您感到手脚心发热吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_021', t:'您感觉身体、脸上发热吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_022', t:'您皮肤或口唇干吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_023', t:'您口唇的颜色比一般人红吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_024', t:'您容易便秘或大便干燥吗？', s:'羊屎状、排便费力', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_025', t:'您面部两颧潮红或偏红吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_026', t:'您感到眼睛干涩吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  // — 痰湿质(8题) —
+  { m:'问诊', id:'WQ_027', t:'您感到胸闷或腹部胀满吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_028', t:'您感到身体沉重不轻松或不爽快吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_029', t:'您腹部胀满松软吗？', s:'腹部脂肪厚、软塌', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_030', t:'您有额部油脂分泌多的现象吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_031', t:'您上眼睑比别人肿吗？', s:'上眼睑有轻微隆起现象', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_032', t:'您嘴里有黏黏的感觉吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_033', t:'您平时痰多，特别是感到咽喉部总有痰堵着吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_034', t:'您舌苔厚腻或有舌苔厚厚的感觉吗？', s:'自己可观察到', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  // — 湿热质(7题, 分性别) —
+  { m:'问诊', id:'WQ_035', t:'您面部或鼻部有油腻感或者油光发亮吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_036', t:'您脸上容易生痤疮或皮肤容易生疮疖吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_037', t:'您感到口苦或嘴里有异味吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_038', t:'您大便黏滞不爽、有解不尽的感觉吗？', s:'马桶冲不干净', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_039', t:'您小便时尿道有发热感、尿色浓（深）吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_040', t:'您带下色黄（白带颜色发黄）吗？（限女性回答）', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_041', t:'您的阴囊潮湿吗？（限男性回答）', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  // — 血瘀质(7题, 含健忘WQ_008) —
+  { m:'问诊', id:'WQ_042', t:'您的皮肤在不知不觉中会出现青紫瘀斑（皮下出血）吗？', s:'无外伤情况下', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_043', t:'您的两颧部有细微红丝（毛细血管扩张）吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_044', t:'您身体上有疼痛吗？', s:'刺痛或固定位置的疼痛', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_045', t:'您面色晦黯或容易出现褐斑吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_046', t:'您容易出现黑眼圈吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_047', t:'您口唇颜色偏黯吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  // — 气郁质(7题, 含闷闷不乐WQ_004) —
+  { m:'问诊', id:'WQ_048', t:'您精神紧张、焦虑不安吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_049', t:'您多愁善感、感情脆弱吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_050', t:'您容易感到害怕或受到惊吓吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_051', t:'您胁肋部或乳房胀痛吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_052', t:'您无缘无故叹气吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_053', t:'您咽喉部有异物感，且吐之不出、咽之不下吗？', s:'梅核气', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  // — 特禀质(7题+附加) —
+  { m:'问诊', id:'WQ_054', t:'您没有感冒也会打喷嚏吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_055', t:'您没有感冒也会鼻塞、流鼻涕吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_056', t:'您有因季节变化、温度变化或异味等原因而咳喘的现象吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_057', t:'您容易过敏吗？', s:'药物、食物、气味、花粉、季节交替时等', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_058', t:'您的皮肤起荨麻疹（风团、风疹块、风疙瘩）吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_059', t:'您的皮肤因过敏出现过紫癜（紫红色瘀点、瘀斑）吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_060', t:'您的皮肤一抓就红，并出现抓痕吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+  { m:'问诊', id:'WQ_061', t:'您的家人（父母/兄弟姐妹）有过敏性疾病史吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'无'},{v:2,l:'有1人'},{v:3,l:'有2人'},{v:4,l:'有3人'},{v:5,l:'3人以上'}] },
+
+  // ════════════════════════════════════
+  // 切诊（自评版 1题）
+  // ════════════════════════════════════
+  { m:'切诊', id:'CX_PULSE', t:'请选择最符合您自身脉象的选项（如有不确定，请选\u201c跳过\u201d）', s:'若您无法自行判断脉象，建议跳过此模块，仅依靠前三大模块（问/望/闻）即可获得参考报告。', rev:false, g:'切诊', o:[
+    {v:1, l:'浮脉', pulse:'WQ_P_01', desc:'轻触即得，跳动有力但位置偏浅，重按减弱'},
+    {v:2, l:'沉脉', pulse:'WQ_P_02', desc:'需用力按压至骨节上方才能触及脉搏'},
+    {v:3, l:'迟脉', pulse:'WQ_P_03', desc:'脉搏跳动缓慢，每分钟少于60次'},
+    {v:4, l:'数脉', pulse:'WQ_P_04', desc:'脉搏跳动快速，每分钟超过90次'},
+    {v:5, l:'细脉', pulse:'WQ_P_05', desc:'脉搏细如丝线，指下感觉细小虚弱'},
+    {v:6, l:'滑脉', pulse:'WQ_P_06', desc:'脉搏如珠滚动，圆滑流利，节律均匀'},
+    {v:7, l:'涩脉', pulse:'WQ_P_07', desc:'脉搏往来艰涩，不流利，时有一止'},
+    {v:0, l:'不确定/跳过', pulse:'WQ_P_00', desc:'您没有脉诊基础，跳过此项'},
+  ] }
+];
+
+// ═══════════════════════════════════════════════════════════
+// 配置
+// ═══════════════════════════════════════════════════════════
+const GC = { // Group Config
+  '平和质':{ids:['WQ_001','WQ_002','WQ_003','WQ_004','WQ_005','WQ_006','WQ_007','WQ_008'],type:'ph',n:8,
+    rev:['WQ_002','WQ_003','WQ_004','WQ_005','WQ_007','WQ_008']},
+  '气虚质':{ids:['WQ_002','WQ_003','WQ_009','WQ_010','WQ_011','WQ_012','WQ_013','WQ_014'],type:'pp',n:8},
+  '阳虚质':{ids:['WQ_005','WQ_012','WQ_015','WQ_016','WQ_017','WQ_018','WQ_019'],type:'pp',n:7},
+  '阴虚质':{ids:['WQ_014','WQ_020','WQ_021','WQ_022','WQ_023','WQ_024','WQ_025','WQ_026'],type:'pp',n:8},
+  '痰湿质':{ids:['WQ_027','WQ_028','WQ_029','WQ_030','WQ_031','WQ_032','WQ_033','WQ_034'],type:'pp',n:8},
+  '湿热质':{ids:['WQ_035','WQ_036','WQ_037','WQ_038','WQ_039','WQ_040','WQ_041'],type:'pp',n:7},
+  '血瘀质':{ids:['WQ_008','WQ_042','WQ_043','WQ_044','WQ_045','WQ_046','WQ_047'],type:'pp',n:7},
+  '气郁质':{ids:['WQ_004','WQ_048','WQ_049','WQ_050','WQ_051','WQ_052','WQ_053'],type:'pp',n:7},
+  '特禀质':{ids:['WQ_054','WQ_055','WQ_056','WQ_057','WQ_058','WQ_059','WQ_060','WQ_061'],type:'pp',n:8},
+};
+
+// 望闻切修正规则
+const MOD = {
+  'WZ_TC_01': {2:{'气虚质':2,'阳虚质':2}, 3:{'阴虚质':1}, 4:{'阴虚质':2}, 5:{'血瘀质':2}},
+  'WZ_TC_02': {2:{'痰湿质':2}, 3:{'湿热质':2}, 4:{'湿热质':3,'痰湿质':1}, 5:{'阴虚质':2}},
+  'WZ_TS_01': {2:{'气虚质':2,'痰湿质':1}, 3:{'阴虚质':2}, 4:{'阴虚质':1}, 5:{'血瘀质':2}},
+  'WZ_FC_01': {2:{'气虚质':1}, 3:{'阴虚质':1}, 4:{'血瘀质':1}, 5:{'湿热质':2}},
+  'WM_OH_01': {3:{'湿热质':1}, 4:{'痰湿质':1}, 5:{'湿热质':2}},
+  'WM_PH_01': {3:{'痰湿质':1}, 4:{'阴虚质':1}, 5:{'阴虚质':1}},
+  'WM_SB_01': {2:{'气虚质':1}, 3:{'气虚质':1,'阳虚质':1}, 5:{'气郁质':1}},
+  'WM_BO_01': {3:{'痰湿质':1,'湿热质':1}, 4:{'湿热质':1}, 5:{'湿热质':2}},
+  'WQ_P_01':  {1:{'气虚质':1}},
+  'WQ_P_02':  {1:{'阳虚质':1}},
+  'WQ_P_03':  {1:{'阳虚质':1,'气虚质':1}},
+  'WQ_P_04':  {1:{'阴虚质':1,'湿热质':1}},
+  'WQ_P_05':  {1:{'气虚质':1,'阴虚质':1}},
+  'WQ_P_06':  {1:{'痰湿质':1}},
+  'WQ_P_07':  {1:{'血瘀质':1,'气郁质':1}},
+};
+
+// 五脏映射
+const ZF = {
+  '气虚质':{organs:['脾','肺'],desc:'脾主运化偏弱（消化吸收差、腹胀、食少）；肺主卫外偏弱（易感冒、自汗）'},
+  '阳虚质':{organs:['肾','脾'],desc:'肾阳温煦偏弱（畏寒、腰膝酸冷、夜尿多）；脾阳温煦偏弱（完谷不化、腹泻）'},
+  '阴虚质':{organs:['肾','肺','心'],desc:'肾阴涵养偏弱（腰酸、耳鸣、失眠）；肺阴滋燥偏弱（干咳、咽干）；心阴涵养偏弱（心烦、盗汗）'},
+  '痰湿质':{organs:['脾','肺'],desc:'脾失健运偏弱（水湿内停、肥胖、倦怠）；肺宣降失常偏弱（痰多、胸闷、咳嗽）'},
+  '湿热质':{organs:['肝','胆','脾'],desc:'肝胆湿热偏盛（口苦、胁痛、烦躁）；脾胃湿热偏盛（腹胀、便黏、口臭）'},
+  '血瘀质':{organs:['心','肝'],desc:'心脉瘀阻偏盛（心悸、胸痛）；肝血瘀阻偏盛（胁痛、面色晦暗、情志抑郁）'},
+  '气郁质':{organs:['肝','脾'],desc:'肝气郁结偏盛（胁胀、情绪抑郁、梅核气）；肝脾不和偏盛（腹胀、纳差、叹息）'},
+  '特禀质':{organs:['肺','脾','肾'],desc:'肺卫不固偏盛（过敏性鼻炎、哮喘、皮疹）；脾肾不固偏盛（先天禀赋不足、免疫低下）'},
+  '平和质':{organs:[],desc:'脏腑功能协调，未见明显偏颇倾向。继续保持均衡生活方式。'},
+};
+
+const CD = {
+  '气虚质':'元气不足，以疲乏、气短、自汗为主要特征。表现为体力不足、容易疲劳、说话声音低弱，容易感冒。',
+  '阳虚质':'阳气不足，以畏寒怕冷、手足不温为主要特征。表现为怕冷喜暖、精神不振，容易腹泻，夜尿偏多。',
+  '阴虚质':'阴液亏虚，以口燥咽干、手足心热为主要特征。表现为口干舌燥、喜冷饮、失眠多梦，大便偏干。',
+  '痰湿质':'水湿内停，以体形肥胖、腹部肥满为主要特征。表现为身体沉重、痰多胸闷、舌苔厚腻，大便黏滞。',
+  '湿热质':'湿热内蕴，以面垢长痘、口苦苔黄为主要特征。表现为面部油腻、口苦异味、大便黏滞、小便黄赤。',
+  '血瘀质':'气血瘀滞，以肤色晦暗、固定位置刺痛为主要特征。表现为面色暗沉、身体固定位置刺痛、舌下静脉曲张。',
+  '气郁质':'气机郁结，以情绪抑郁、胸胁胀闷为主要特征。表现为情绪低落、焦虑易怒、胁肋胀痛、咽部异物感。',
+  '特禀质':'先天禀赋不足，以过敏易感为主要特征。容易患过敏性疾病，如鼻炎、哮喘、皮疹等。',
+  '平和质':'气血阴阳平衡，脏腑功能协调，是健康理想的体质状态。继续保持良好的生活方式。',
+};
+
+const SG = { // 养生建议
+  '气虚质':{icon:'🥗',di:'山药、黄芪、党参、红枣、鸡肉、牛肉',li:'早睡早起，避免过度劳累，午间小憩',ex:'太极拳、八段锦、散步等温和运动'},
+  '阳虚质':{icon:'🔥',di:'羊肉、桂圆、生姜、红糖、核桃、板栗',li:'早睡晚起，避寒保暖，腰腹和足部保暖',ex:'上午运动，晒背驱寒，艾灸关元、命门穴'},
+  '阴虚质':{icon:'💧',di:'银耳、百合、莲子、梨、蜂蜜、枸杞',li:'早睡早起，戒熬夜，午间养阴',ex:'太极拳、静坐冥想、游泳等舒缓运动'},
+  '痰湿质':{icon:'🌊',di:'薏仁、赤小豆、冬瓜、白萝卜、芹菜、绿茶',li:'规律作息，适量运动出汗，忌久坐',ex:'快走、跑步、八段锦、爬山等有氧运动'},
+  '湿热质':{icon:'☀️',di:'苦瓜、绿豆、莲子心、菊花茶、芹菜、冬瓜',li:'早睡早起，戒辛辣油腻，戒酒',ex:'快走、游泳、骑行，适度出汗排湿'},
+  '血瘀质':{icon:'💜',di:'黑木耳、山楂、洋葱、玫瑰花茶、红葡萄酒',li:'规律作息，心情舒畅，避寒凉',ex:'太极拳、瑜伽、舞蹈，促进气血运行'},
+  '气郁质':{icon:'🌸',di:'玫瑰花茶、陈皮、茉莉花茶、柑橘类、萝卜',li:'规律作息，睡前泡脚，听舒缓音乐',ex:'户外运动、太极拳、舞蹈，疏解肝气'},
+  '特禀质':{icon:'🛡️',di:'避免已知过敏原，山药、薏仁、红枣',li:'保持环境清洁，规律作息，增强免疫力',ex:'适度运动，循序渐进，避免过度疲劳'},
+  '平和质':{icon:'✨',di:'均衡饮食，五谷为主，多蔬果',li:'顺应自然，起居有常，饮食有节',ex:'坚持运动，保持身心愉悦'},
+};
+
+// ═══════════════════════════════════════════════════════════
+// 状态
+// ═══════════════════════════════════════════════════════════
+let idx = 0;
+let ans = {}; // id -> selected value
+
+// ═══ 页面切换 ═══
+function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function start(){idx=0;ans={};show('p1');renderQ();}
+function showReport(){
+  genReport();
+  document.getElementById('cover-section').style.display='none';
+  document.getElementById('report-section').style.display='block';
+  document.getElementById('p0').classList.add('showing-report');
+  show('p0');
+  renderReportHistory();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function restart(){
+  if (currentUser) {
+    ['uf-name','uf-age','uf-phone','uf-address'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = currentUser[id.replace('uf-','')] || '';
+    });
+    const sel = document.getElementById('uf-gender');
+    if (sel && currentUser.gender && currentUser.gender !== '-') {
+      sel.value = currentUser.gender;
+    }
+  }
+  document.getElementById('cover-section').style.display='flex';
+  document.getElementById('report-section').style.display='none';
+  document.getElementById('p0').classList.remove('showing-report');
+  show('p0');
+  renderReportHistory();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ═══ 渲染题目 ═══
+function renderQ(){
+  const q=Q[idx], total=Q.length;
+  // 性别相关题目自动跳过：女性跳过阴囊潮湿，男性跳过带下
+  const user=getUserInfo();
+  if(q.id==='WQ_040'||q.id==='WQ_041'){
+    const g=(user&&user.gender)?user.gender:(document.getElementById('uf-gender')?.value||'');
+    if((q.id==='WQ_040'&&g!=='女')||(q.id==='WQ_041'&&g!=='男')){
+      ans[q.id]=1; idx++; renderQ(); return;
+    }
+  }
+  const mt=document.getElementById('mt');
+  const mc={
+    '问诊':'', '望诊':'wz', '闻诊':'wm', '切诊':'cx'
+  };
+  mt.textContent=q.m+'模块';
+  mt.className='mtag'+(mc[q.m]?' '+mc[q.m]:'');
+  document.getElementById('pt').textContent=(idx+1)+' / '+total;
+  document.getElementById('pf').style.width=((idx+1)/total*100)+'%';
+  document.getElementById('qn').innerHTML='<b>'+q.m+'</b> 第 '+(idx+1)+' 题'+' · '+(q.g==='平和质'?'平和质 · '+q.o[0].l+'→'+q.o[4].l:q.g!=='切诊'?q.g:'');
+  document.getElementById('qt').textContent=q.t;
+  document.getElementById('qs').textContent=q.s||'';
+  const el=document.getElementById('qo');el.innerHTML='';
+
+  if(q.m==='切诊'){
+    // 单题多选：7脉+跳过
+    q.o.forEach(o=>{
+      const sel=ans[q.id]===o.v;
+      const d=document.createElement('div');
+      d.className='opt'+(sel?' selected':'');
+      d.onclick=()=>select(q.id,o.v);
+      d.innerHTML=`<div class="oc"></div><div class="olbl"><div style="font-weight:600;color:var(--pd)">${o.l}</div><div style="font-size:11px;color:var(--tl);margin-top:2px">${o.desc||''}</div></div>`;
+      el.appendChild(d);
+    });
+  }else{
+    q.o.forEach(o=>{
+      const sel=ans[q.id]===o.v;
+      const d=document.createElement('div');
+      d.className='opt'+(sel?' selected':'');
+      d.onclick=()=>select(q.id,o.v);
+      d.innerHTML=`<div class="oc"></div><div class="olbl">${o.l}</div>`;
+      el.appendChild(d);
+    });
+  }
+
+  document.getElementById('bp').disabled=idx===0;
+  const isLast=idx===total-1;
+  const bn=document.getElementById('bn');
+  bn.textContent=isLast?'查看结果 →':'下一题 →';
+  bn.disabled=ans[q.id]===undefined;
+}
+
+function select(id,v){ans[id]=v;renderQ();}
+function prev(){if(idx>0){idx--;renderQ();}}
+function next(){
+  if(idx<Q.length-1){idx++;renderQ();}
+  else {showReport();}
+}
+
+// ═══════════════════════════════════════════════════════════
+// 评分算法
+// ═══════════════════════════════════════════════════════════
+
+// 阶段1：原始分
+function rawScore(g){
+  const c=GC[g]; if(!c) return 0;
+  let sum=0;
+  c.ids.forEach(id=>{
+    const v=ans[id]; if(v===undefined) return;
+    if(c.rev && c.rev.includes(id)) sum+=(6-v); // 逆向计分：1→5,5→1
+    else sum+=v;
+  });
+  return sum;
+}
+
+// 阶段1：转化分（国标公式）
+// 平和质: 转化分 = (逆向后原始分-8) / 32 * 100
+// 偏颇体质: 转化分 = (原始分-条目数) / (条目数×4) * 100
+function convScore(g){
+  const c=GC[g]; if(!c) return 0;
+  const raw=rawScore(g);
+  if(g==='平和质') return Math.round((raw-c.n)/(c.n*4)*100); // 国标: (raw-8)/32*100
+  return Math.round((raw-c.n)/(c.n*4)*100);
+}
+
+// 阶段2：修正分
+function calcMod(){
+  const mods={};
+  Object.keys(GC).forEach(k=>mods[k]=0);
+
+  // 望诊修正
+  ['WZ_TC_01','WZ_TC_02','WZ_TS_01','WZ_FC_01'].forEach(qid=>{
+    const v=ans[qid]; if(!v) return;
+    const r=MOD[qid]; if(!r||!r[v]) return;
+    Object.entries(r[v]).forEach(([g,d])=>{mods[g]=(mods[g]||0)+d;});
+  });
+
+  // 闻诊
+  ['WM_OH_01','WM_PH_01','WM_SB_01','WM_BO_01'].forEach(qid=>{
+    const v=ans[qid]; if(!v) return;
+    const r=MOD[qid]; if(!r||!r[v]) return;
+    Object.entries(r[v]).forEach(([g,d])=>{mods[g]=(mods[g]||0)+d;});
+  });
+
+  // 切诊（从选中的脉象中查找修正映射）
+  if(ans['CX_PULSE']){
+    const pulseQ=Q.find(qq=>qq.id==='CX_PULSE');
+    const sel=pulseQ && pulseQ.o.find(o=>o.v===ans['CX_PULSE']);
+    if(sel && sel.pulse && sel.pulse!=='WQ_P_00'){
+      const r=MOD[sel.pulse]; if(r&&r[1]) Object.entries(r[1]).forEach(([g,d])=>{mods[g]=(mods[g]||0)+d;});
+    }
+  }
+
+  // 上限±8
+  Object.keys(mods).forEach(k=>{mods[k]=Math.max(-8,Math.min(8,mods[k]));});
+  return mods;
+}
+
+// 最终得分
+function finalScores(){
+  const s={};
+  Object.keys(GC).forEach(k=>s[k]=convScore(k));
+  const mods=calcMod();
+  Object.keys(s).forEach(k=>{
+    s[k]=Math.max(0,Math.min(100,Math.round(s[k]+(mods[k]||0))));
+  });
+  return s;
+}
+
+// 阶段3：体质判定
+function judge(s){
+  const ph=s['平和质']||0;
+  const pp={}; Object.keys(GC).forEach(k=>{if(k!=='平和质')pp[k]=s[k];});
+  const maxPP=Math.max(...Object.values(pp));
+  const topPP=Object.keys(pp).find(k=>pp[k]===maxPP);
+
+  // === 国标判定 ===
+  // 平和质判定
+  let phJudge = '否';
+  if(ph>=60 && Object.values(pp).every(v=>v<30)) phJudge = '是';
+  else if(ph>=60 && Object.values(pp).every(v=>v<40)) phJudge = '基本是';
+
+  // 偏颇质判定
+  const ppJudges = {};
+  Object.keys(pp).forEach(k=>{
+    if(pp[k]>=40) ppJudges[k]='是';
+    else if(pp[k]>=30) ppJudges[k]='倾向是';
+    else ppJudges[k]='否';
+  });
+
+  // 最终体质结论
+  const yesOnes = Object.keys(pp).filter(k=>ppJudges[k]==='是').sort((a,b)=>pp[b]-pp[a]);
+  const倾向 = Object.keys(pp).filter(k=>ppJudges[k]==='倾向是');
+
+  let name='平和质', type='平和体质', desc='';
+
+  if(phJudge==='是' && yesOnes.length===0){
+    name='平和质'; type='是'; desc='气血阴阳平衡，脏腑功能协调。继续保持良好生活方式。';
+  }else if(phJudge==='基本是' && yesOnes.length===0){
+    name='平和质（倾向偏颇）'; type='基本是'; desc='基本处于平衡状态，部分偏颇倾向，注意观察。';
+  }else if(yesOnes.length>=2 && (pp[yesOnes[0]]-pp[yesOnes[1]])<15){
+    name=yesOnes[0]+'+'+yesOnes[1]; type='复合体质'; desc=CD[yesOnes[0]]+' 同时伴有'+CD[yesOnes[1]];
+  }else if(yesOnes.length>0){
+    name=yesOnes[0]; type='偏颇体质'; desc=CD[yesOnes[0]];
+  }else if(倾向.length>0){
+    name=倾向[0]; type='倾向偏颇'; desc='转化分在30-39分之间，有'+倾向[0]+'倾向，建议适当调养。';
+  }else{
+    name='平和质'; type='否（偏颇转化分均<30）'; desc='虽未达平和质标准，但各偏颇体质倾向不明显。';
+  }
+
+  return {name,type,desc,ppJudges,phJudge,s,topPP};
+}
+
+// ═══ 生成报告 ═══
+// 九宫格布局 + 修正后的五行归属（参考用户红色标注）
+// 左列=气郁木／血瘀土 │ 上中=阳虚火 │ 右中=特禀金 │ 下中=阴虚水
+const GRID=[
+  {k:'气郁质', w:'木', icon:'🌧', tags:['神情抑郁','胸闷叹气','咽部异物','敏感多虑','优柔寡断']},
+  {k:'阳虚质', w:'火', icon:'❄', tags:['手足不温','怕冷喜暖','喜热饮食','小便清长','大便溏薄']},
+  {k:'湿热质', w:'土', icon:'🔥', tags:['面油生痤','口苦口干','小便短黄','大便黏滞','舌苔黄腻']},
+  {k:'气虚质', w:'木', icon:'⛰', tags:['容易疲乏','声音低弱','易出汗','容易感冒','舌淡有齿痕']},
+  {k:'平和质', w:'土', icon:'☯', tags:['体形匀称','面色润泽','精力充沛','耐受寒热','二便调畅']},
+  {k:'特禀质', w:'金', icon:'🌸', tags:['过敏体质','易哮喘','易荨麻疹','易过敏','先天异常']},
+  {k:'血瘀质', w:'土', icon:'🩸', tags:['面色晦暗','易生瘀斑','唇色紫暗','舌质紫暗','肤色暗沉']},
+  {k:'阴虚质', w:'水', icon:'🌙', tags:['手足心热','口燥咽干','喜冷饮','大便干燥','舌红少津']},
+  {k:'痰湿质', w:'金', icon:'💧', tags:['腹部肥满','口黏腻','痰多胸闷','面油多汗','舌苔白腻']},
+];
+
+function genReport(){
+  const S=finalScores();
+  const j=judge(S);
+
+  // 排序显示
+  const sorted=Object.entries(S).sort((a,b)=>b[1]-a[1]);
+
+  document.getElementById('rn').textContent=j.name;
+  document.getElementById('rrt').textContent=j.type+' · 转化分最高：'+sorted[0][0]+'（'+sorted[0][1]+'分）';
+  document.getElementById('rd').textContent=j.desc;
+
+  const tbody=document.getElementById('stb'); tbody.innerHTML='';
+  sorted.forEach(([name,score])=>{
+    const isTop=name===j.name||(j.name.includes('+')&&j.name.includes(name));
+    const tr=document.createElement('tr'); if(isTop)tr.className='hr';
+    // 判定
+    let judgeLabel='';
+    if(name==='平和质') judgeLabel=j.phJudge;
+    else judgeLabel=j.ppJudges[name]||'';
+    const barColor=score>=60?'#4A7C59':score>=40?'#C49A6C':'#ccc';
+    tr.innerHTML=`<td>${name}</td><td>${score}</td><td><div class="sbw"><div class="sb"><div class="sbf" style="width:${score}%;background:${barColor}"></div></div><span class="sv">${score}</span></div></td><td style="font-size:11px">${judgeLabel}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // 五脏
+  let mainName=j.name;
+  if(mainName.includes('+')){
+    // 复合体质：取第一个作为五脏参考
+    mainName=j.name.split('+')[0];
+  }
+  const zfInfo=ZF[mainName]||ZF['平和质'];
+  const tagsEl=document.getElementById('ztags');
+  tagsEl.innerHTML=zfInfo.organs.length>0
+    ? zfInfo.organs.map(o=>`<span class="ztag">🫁 ${o}</span>`).join('')
+    : '<span class="ztag" style="background:#EFF7F1;border-color:#4A7C59;color:#4A7C59">✓ 脏腑协调</span>';
+  document.getElementById('zd').textContent=zfInfo.desc;
+
+  // 养生
+  const sug=SG[mainName]||SG['平和质'];
+  const grid=document.getElementById('sg');
+  grid.innerHTML=[
+    {icon:'🥗',title:'饮食·药膳',items:sug.di},
+    {icon:'🌙',title:'作息·调摄',items:sug.li},
+    {icon:'🏃',title:'运动·导引',items:sug.ex},
+  ].map(c=>`<div class="sc"><div class="si">${c.icon}</div><div class="stl">${c.title}</div><ul class="sitems">${c.items.split('、').map(i=>`<li>${i.trim()}</li>`).join('')}</ul></div>`).join('');
+
+  // 九宫格体质对照图
+  const matched=[];
+  if(j.name && j.name!=='无'){
+    j.name.split('+').forEach(n=>{if(n.trim()) matched.push(n.trim());});
+  }
+  Object.entries(S).forEach(([n,s])=>{
+    if(n!=='平和质' && s>=40 && !matched.includes(n)) matched.push(n);
+  });
+  if(!matched.length) matched.push('平和质');
+
+  const rankMap={};
+  sorted.forEach(([n],i)=>{ rankMap[n]=i+1; });
+
+  const ncgrid=document.getElementById('ncgrid');
+  ncgrid.innerHTML=GRID.map(g=>{
+    const isMatch=matched.includes(g.k);
+    const rank=rankMap[g.k];
+    const hasRank=rank<=3 && S[g.k]>=40;
+    const cls=isMatch?'match':(S[g.k]<30?'weak':'');
+    // 五行底色（匹配时不覆盖match高亮，由match样式主导）
+    // 五行底色：木绿、火红、土黄、金白、水黑
+    const wm=g.w==='木'?'rgba(76,175,80,0.18)':
+              g.w==='火'?'rgba(244,67,54,0.14)':
+              g.w==='土'?'rgba(255,193,7,0.16)':
+              g.w==='金'?'rgba(210,210,210,0.35)':
+              'rgba(0,0,0,0.10)';
+    const wbd=g.w==='木'?'#4CAF50':
+               g.w==='火'?'#F44336':
+               g.w==='土'?'#FFC107':
+               g.w==='金'?'#C0C0C0':
+               '#333333';
+    const wtx=g.w==='木'?'#2E7D32':
+              g.w==='火'?'#C62828':
+              g.w==='土'?'#E65100':
+              g.w==='金'?'#424242':
+              '#000000';
+    const cardStyle=`background:${wm};border-color:${wbd};color:${wtx}`;
+    return `<div class="nccard ${cls}" style="${cardStyle}">
+      ${hasRank?`<span class="nc-rank">${rank}</span>`:''}
+      <div class="nc-icon">${g.icon}</div>
+      <div class="nc-name">${g.k}</div>
+      <div class="nc-w">${g.w}行</div>
+      ${isMatch?`<div class="nc-match">✔</div>`:''}
+      <div class="nc-tags">${g.tags.map(t=>`<span class="nc-tag">${t}</span>`).join('')}</div>
+    </div>`;
+  }).join('');
+
+  // 保存到本地存储
+  saveRecord(j, S);
+  renderReportHistory();
+}
+
+// ═══ 本地数据库功能 ═══
+const DB_KEY = 'tcm_records';
+let currentUser = null;
+
+function restoreLastUser() {
+  const records = getRecords();
+  if (records.length === 0) return;
+  const last = records[0].user;
+  currentUser = last;
+  ['name','gender','age','phone','address'].forEach(f => {
+    const el = document.getElementById('uf-' + f);
+    if (!el) return;
+    if (f === 'gender') {
+      if (last[f] && last[f] !== '-') el.value = last[f];
+    } else {
+      el.value = last[f] && last[f] !== '-' ? last[f] : '';
+    }
+  });
+}
+
+function getUserInfo() {
+  return {
+    name: document.getElementById('uf-name')?.value?.trim() || '匿名',
+    gender: document.getElementById('uf-gender')?.value || '-',
+    age: document.getElementById('uf-age')?.value || '-',
+    phone: document.getElementById('uf-phone')?.value?.trim() || '-',
+    address: document.getElementById('uf-address')?.value?.trim() || '-'
+  };
+}
+
+function saveRecord(judgeResult, scores) {
+  const user = getUserInfo();
+  currentUser = user;
+  const record = {
+    id: Date.now(),
+    date: new Date().toLocaleString('zh-CN'),
+    user: user,
+    result: judgeResult.name,
+    resultType: judgeResult.type,
+    description: judgeResult.desc,
+    scores: scores
+  };
+  
+  let records = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+  records.unshift(record);
+  // 最多保留100条
+  if (records.length > 100) records = records.slice(0, 100);
+  localStorage.setItem(DB_KEY, JSON.stringify(records));
+}
+
+function getRecords() {
+  return JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+}
+
+function deleteRecord(id) {
+  let records = getRecords();
+  records = records.filter(r => r.id !== id);
+  localStorage.setItem(DB_KEY, JSON.stringify(records));
+  renderHistory();
+}
+
+function clearAllRecords() {
+  if (confirm('确定要清空所有历史记录吗？此操作不可恢复。')) {
+    localStorage.removeItem(DB_KEY);
+    renderHistory();
+  }
+}
+
+function _download(url, filename) {
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.href = url;
+  a.download = filename;
+  a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+  document.body.removeChild(a);
+}
+
+function exportJSON() {
+  const records = getRecords();
+  if (records.length === 0) { alert('暂无记录可导出'); return; }
+  const blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' });
+  _download(URL.createObjectURL(blob), '体质记录_' + new Date().toISOString().slice(0,10) + '.json');
+}
+
+function exportCSV() {
+  const records = getRecords();
+  if (records.length === 0) { alert('暂无记录可导出'); return; }
+  const headers = ['日期','姓名','性别','年龄','电话','地址','体质结果','结果类型','平和质','气虚质','阳虚质','阴虚质','痰湿质','湿热质','血瘀质','气郁质','特禀质'];
+  const rows = records.map(r => [
+    r.date, r.user.name, r.user.gender, r.user.age,
+    r.user.phone, r.user.address, r.result, r.resultType,
+    r.scores['平和质']||0, r.scores['气虚质']||0, r.scores['阳虚质']||0,
+    r.scores['阴虚质']||0, r.scores['痰湿质']||0, r.scores['湿热质']||0,
+    r.scores['血瘀质']||0, r.scores['气郁质']||0, r.scores['特禀质']||0
+  ]);
+  const csv = [headers.join(','), ...rows.map(r => r.map(v => '"'+v+'"').join(',')).join('')].join('\n');
+  const blob = new Blob(["\uFEFF"+csv], { type: 'text/csv;charset=utf-8' });
+  _download(URL.createObjectURL(blob), '体质记录_' + new Date().toISOString().slice(0,10) + '.csv');
+}
+function renderReportHistory() {
+  const container = document.getElementById('rh-list');
+  if (!container) return;
+  const records = getRecords().slice(0, 10);
+  if (records.length === 0) {
+    container.innerHTML = '<div class="hist-empty-row">暂无历史记录</div>';
+    return;
+  }
+  container.innerHTML = records.map(r => `
+    <div class="hist-row">
+      <div>
+        <div class="hr-name">${r.user.name}</div>
+        <div class="hr-date">${r.date.split(' ')[0]}</div>
+      </div>
+      <div>
+        <div class="hr-result">🌿 ${r.result}</div>
+        <div class="hr-tip">${r.description || ''}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+restoreLastUser();
+renderReportHistory();
+</script>
+
+</body>
+</html>
