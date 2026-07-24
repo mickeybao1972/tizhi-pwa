@@ -242,7 +242,7 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
   </div>
 
   <div class="hist-section" style="max-width:480px;width:auto">
-    <div class="hist-title">📋 历史记录</div>
+    <div class="hist-title">📋 我的记录</div>
     <div class="hist-scroll" id="rh-list"></div>
   </div>
 
@@ -847,12 +847,27 @@ function showReportFromRecord(record){
 // ═══ 本地数据库功能 ═══
 const DB_KEY = 'tcm_records';
 let currentUser = null;
+let currentUserId = null; // 当前用户唯一标识
+
+// 生成用户唯一标识（基于姓名+电话的简单哈希）
+function genUserId(user) {
+  const str = (user.name || '') + (user.phone || '') + (user.gender || '');
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return 'user_' + Math.abs(hash).toString(36);
+}
 
 function restoreLastUser() {
   const records = getRecords();
   if (records.length === 0) return;
   const last = records[0].user;
+  const lastUserId = records[0].userId;
   currentUser = last;
+  currentUserId = lastUserId;
   ['name','gender','age','phone','address'].forEach(f => {
     const el = document.getElementById('uf-' + f);
     if (!el) return;
@@ -901,9 +916,12 @@ async function syncToCloud(record) {
 function saveRecord(judgeResult, scores) {
   const user = getUserInfo();
   currentUser = user;
+  currentUserId = genUserId(user); // 更新当前用户标识
+  
   const record = {
     id: Date.now(),
     date: new Date().toLocaleString('zh-CN'),
+    userId: currentUserId, // 用户唯一标识
     user: user,
     result: judgeResult.name,
     resultType: judgeResult.type,
@@ -921,7 +939,18 @@ function saveRecord(judgeResult, scores) {
   return record;
 }
 
+// 获取当前用户的记录（仅返回匹配 userId 的记录）
 function getRecords() {
+  const allRecords = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+  // 如果有当前用户标识，只返回该用户的记录
+  if (currentUserId) {
+    return allRecords.filter(r => r.userId === currentUserId);
+  }
+  return allRecords;
+}
+
+// 获取所有记录（用于管理功能）
+function getAllRecords() {
   return JSON.parse(localStorage.getItem(DB_KEY) || '[]');
 }
 
