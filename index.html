@@ -141,7 +141,8 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
 .hist-scroll { max-height:320px; overflow-y:auto; border-radius:var(--r); }
 .hist-scroll::-webkit-scrollbar { width:4px; }
 .hist-scroll::-webkit-scrollbar-thumb { background:var(--brd); border-radius:4px; }
-.hist-row { display:grid; grid-template-columns:90px 1fr; gap:8px; padding:10px 12px; background:var(--card); border-bottom:1px solid var(--brd); align-items:start; }
+.hist-row { display:grid; grid-template-columns:90px 1fr; gap:8px; padding:10px 12px; background:var(--card); border-bottom:1px solid var(--brd); align-items:start; cursor:pointer; transition:background .15s; }
+.hist-row:hover { background:#EFF7F1; }
 .hist-row:last-child { border-bottom:none; }
 .hist-row .hr-name { font-size:13px; font-weight:600; color:var(--pd); }
 .hist-row .hr-date { font-size:10px; color:var(--tl); }
@@ -714,7 +715,12 @@ const GRID=[
 function genReport(){
   const S=finalScores();
   const j=judge(S);
+  renderReportUI(S, j);
+  saveRecord(j, S);
+  renderReportHistory();
+}
 
+function renderReportUI(S, j){
   // 排序显示
   const sorted=Object.entries(S).sort((a,b)=>b[1]-a[1]);
 
@@ -726,7 +732,6 @@ function genReport(){
   sorted.forEach(([name,score])=>{
     const isTop=name===j.name||(j.name.includes('+')&&j.name.includes(name));
     const tr=document.createElement('tr'); if(isTop)tr.className='hr';
-    // 判定
     let judgeLabel='';
     if(name==='平和质') judgeLabel=j.phJudge;
     else judgeLabel=j.ppJudges[name]||'';
@@ -735,12 +740,8 @@ function genReport(){
     tbody.appendChild(tr);
   });
 
-  // 五脏
   let mainName=j.name;
-  if(mainName.includes('+')){
-    // 复合体质：取第一个作为五脏参考
-    mainName=j.name.split('+')[0];
-  }
+  if(mainName.includes('+')) mainName=j.name.split('+')[0];
   const zfInfo=ZF[mainName]||ZF['平和质'];
   const tagsEl=document.getElementById('ztags');
   tagsEl.innerHTML=zfInfo.organs.length>0
@@ -748,7 +749,6 @@ function genReport(){
     : '<span class="ztag" style="background:#EFF7F1;border-color:#4A7C59;color:#4A7C59">✓ 脏腑协调</span>';
   document.getElementById('zd').textContent=zfInfo.desc;
 
-  // 养生
   const sug=SG[mainName]||SG['平和质'];
   const grid=document.getElementById('sg');
   grid.innerHTML=[
@@ -757,14 +757,9 @@ function genReport(){
     {icon:'🏃',title:'运动·导引',items:sug.ex},
   ].map(c=>`<div class="sc"><div class="si">${c.icon}</div><div class="stl">${c.title}</div><ul class="sitems">${c.items.split('、').map(i=>`<li>${i.trim()}</li>`).join('')}</ul></div>`).join('');
 
-  // 九宫格体质对照图
   const matched=[];
-  if(j.name && j.name!=='无'){
-    j.name.split('+').forEach(n=>{if(n.trim()) matched.push(n.trim());});
-  }
-  Object.entries(S).forEach(([n,s])=>{
-    if(n!=='平和质' && s>=40 && !matched.includes(n)) matched.push(n);
-  });
+  if(j.name && j.name!=='无') j.name.split('+').forEach(n=>{if(n.trim()) matched.push(n.trim());});
+  Object.entries(S).forEach(([n,s])=>{if(n!=='平和质' && s>=40 && !matched.includes(n)) matched.push(n);});
   if(!matched.length) matched.push('平和质');
 
   const rankMap={};
@@ -776,8 +771,6 @@ function genReport(){
     const rank=rankMap[g.k];
     const hasRank=rank<=3 && S[g.k]>=40;
     const cls=isMatch?'match':(S[g.k]<30?'weak':'');
-    // 五行底色（匹配时不覆盖match高亮，由match样式主导）
-    // 五行底色：木绿、火红、土黄、金白、水黑
     const wm=g.w==='木'?'rgba(76,175,80,0.18)':
               g.w==='火'?'rgba(244,67,54,0.14)':
               g.w==='土'?'rgba(255,193,7,0.16)':
@@ -803,10 +796,19 @@ function genReport(){
       <div class="nc-tags">${g.tags.map(t=>`<span class="nc-tag">${t}</span>`).join('')}</div>
     </div>`;
   }).join('');
+}
 
-  // 保存到本地存储
-  saveRecord(j, S);
-  renderReportHistory();
+function showReportFromRecord(record){
+  const j={name:record.result,type:record.resultType,desc:record.description};
+  // 重建平和质/偏颇体质判定标签
+  j.phJudge='';
+  j.ppJudges={};
+  renderReportUI(record.scores, j);
+  document.getElementById('cover-section').style.display='none';
+  document.getElementById('report-section').style.display='block';
+  document.getElementById('p0').classList.add('showing-report');
+  show('p0');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 // ═══ 本地数据库功能 ═══
@@ -917,8 +919,8 @@ function renderReportHistory() {
     container.innerHTML = '<div class="hist-empty-row">暂无历史记录</div>';
     return;
   }
-  container.innerHTML = records.map(r => `
-    <div class="hist-row">
+  container.innerHTML = records.map((r, i) => `
+    <div class="hist-row" onclick="showReportFromRecord(getRecords()[${i}])" style="cursor:pointer">
       <div>
         <div class="hr-name">${r.user.name}</div>
         <div class="hr-date">${r.date.split(' ')[0]}</div>
