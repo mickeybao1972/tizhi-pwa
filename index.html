@@ -212,7 +212,7 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
  </div>
 
   <div id="report-section" style="display:none;width:100%;max-width:760px">
-    <div class="rhd"><h1>🧘 体质评估报告</h1><p>依据《中医体质分类与判定》国标运算</p></div>
+    <div class="rhd"><h1>🧘 体质评估报告</h1><p>依据《中医体质分类与判定》国标运算</p><div id="sync-status" style="font-size:12px;color:var(--tl);margin-top:8px;opacity:0;transition:opacity 0.3s"></div></div>
 
     <div class="rc">
       <div class="rbadge">🏷 体质判定</div>
@@ -712,12 +712,45 @@ const GRID=[
   {k:'痰湿质', w:'金', icon:'💧', tags:['腹部肥满','口黏腻','痰多胸闷','面油多汗','舌苔白腻']},
 ];
 
-function genReport(){
+async function genReport(){
   const S=finalScores();
   const j=judge(S);
   renderReportUI(S, j);
-  saveRecord(j, S);
+  
+  // 保存到本地并同步到云端
+  const record = saveRecord(j, S);
   renderReportHistory();
+  
+  // 显示同步状态
+  showSyncStatus('syncing');
+  const syncResult = await syncToCloud(record);
+  showSyncStatus(syncResult.success ? 'success' : 'offline');
+}
+
+// 显示同步状态
+function showSyncStatus(status) {
+  const statusEl = document.getElementById('sync-status');
+  if (!statusEl) return;
+  
+  const icons = {
+    syncing: '⏳',
+    success: '✅',
+    offline: '💾'
+  };
+  const texts = {
+    syncing: '同步中...',
+    success: '已同步到云端',
+    offline: '已保存到本地'
+  };
+  
+  statusEl.innerHTML = `${icons[status]} ${texts[status]}`;
+  statusEl.style.opacity = '1';
+  
+  if (status === 'success' || status === 'offline') {
+    setTimeout(() => {
+      statusEl.style.opacity = '0.6';
+    }, 2000);
+  }
 }
 
 function renderReportUI(S, j){
@@ -841,6 +874,30 @@ function getUserInfo() {
   };
 }
 
+// ═══ 云端同步配置 ═══
+const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzIFWFSSBsii5EfkzmV9U-niBwKAu8BmunDxDx9qOF6jRdKdubKTvsj_aoc0zGycTRjaw/exec';
+
+async function syncToCloud(record) {
+  try {
+    const response = await fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(record)
+    });
+    const result = await response.json();
+    if (result.success) {
+      console.log('✅ 云端同步成功');
+      return { success: true };
+    } else {
+      console.warn('⚠️ 云端同步失败:', result.error);
+      return { success: false, error: result.error };
+    }
+  } catch (err) {
+    console.warn('⚠️ 网络错误，云端同步失败:', err.message);
+    return { success: false, error: err.message };
+  }
+}
+
 function saveRecord(judgeResult, scores) {
   const user = getUserInfo();
   currentUser = user;
@@ -859,6 +916,9 @@ function saveRecord(judgeResult, scores) {
   // 最多保留100条
   if (records.length > 100) records = records.slice(0, 100);
   localStorage.setItem(DB_KEY, JSON.stringify(records));
+  
+  // 返回 record 供调用者使用
+  return record;
 }
 
 function getRecords() {
