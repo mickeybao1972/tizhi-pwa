@@ -1135,7 +1135,7 @@ function handleHash() {
     renderHistoryPage();
   }
   else if (h === '#pDISC') { document.getElementById('pDISC').classList.add('active'); }
-  else { document.getElementById('p-cover').classList.add('active'); }
+  else { document.getElementById('p0').classList.add('active'); }
 }
 handleHash();
 </script>
@@ -1760,7 +1760,7 @@ function closeHistModal() {
   <!-- 历史记录页 -->
   <div id="p-history" class="page">
     <div class="hist-page-hd">
-      <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p-cover').classList.add('active');" style="float:right;background:none;border:none;cursor:pointer;font-size:20px;color:var(--tl);padding:4px 8px">✕</button>
+      <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p0').classList.add('active');" style="float:right;background:none;border:none;cursor:pointer;font-size:20px;color:var(--tl);padding:4px 8px">✕</button>
       <h2>📋 测试历史记录</h2>
       <p>保留最近 20 条记录</p>
     </div>
