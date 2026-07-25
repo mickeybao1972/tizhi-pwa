@@ -309,7 +309,7 @@ function toggleLang(){
     <div class="csub" data-i18n="cover_sub">基于国标《中医体质分类与判定》(ZY/T 001.1-1994)</div>
   </div>
   <div class="cbox" style="max-width:480px;width:auto">
-    <h3> data-i18n="flow_title">📋 测试流程</h3>
+    <h3 data-i18n="flow_title">📋 测试流程</h3>
     <ul class="steps">
       <li><div class="sn wz">1</div><div class="step-text"><span data-i18n="flow_wz">望诊模块</span> <small style="color:var(--tl)" data-i18n="flow_wz_s">舌象·面色 共4题·约1分钟</small></div></li>
       <li><div class="sn wm">2</div><div class="step-text"><span data-i18n="flow_wm">闻诊模块</span> <small style="color:var(--tl)" data-i18n="flow_wm_s">口气·痰音·气息·体味 共4题·约1分钟</small></div></li>
@@ -317,12 +317,12 @@ function toggleLang(){
       <li><div class="sn cx">4</div><div class="step-text"><span data-i18n="flow_cx">切诊模块</span> <small style="color:var(--tl)" data-i18n="flow_cx_s">脉象主观分类 共1题·约30秒</small></div></li>
       <li><div class="sn rp">5</div><div class="step-text"><span data-i18n="flow_rp">报告生成</span> <small style="color:var(--tl)" data-i18n="flow_rp_s">体质判定·脏腑倾向·养生建议</small></div></li>
     </ul>
-    <div class="disc" style="margin-top:10px"> data-i18n="cover_note">⚠ 本测评为中医体质参考，不作为疾病诊断与治疗依据。</div>
+    <div class="disc" data-i18n="cover_note">⚠ 本测评为中医体质参考，不作为疾病诊断与治疗依据。</div>
   </div>
 
   <!-- 用户信息表单 -->
   <div class="userform" style="max-width:480px;width:auto">
-    <h4> data-i18n="form_title">📝 受测者信息</h4>
+    <h4 data-i18n="form_title">📝 受测者信息</h4>
     <div class="uf-row">
       <div class="ufg" style="flex:2">
         <label data-i18n="lbl_name">姓名</label>
@@ -374,10 +374,10 @@ function toggleLang(){
  </div>
 
   <div id="report-section" style="display:none;width:100%;max-width:760px">
-    <div class="rhd"><h1> data-i18n="report_title">🧘 体质评估报告</h1><p data-i18n="report_sub">依据《中医体质分类与判定》国标运算</p><div id="sync-status" style="font-size:12px;color:var(--tl);margin-top:8px;opacity:0;transition:opacity 0.3s"></div></div>
+    <div class="rhd"><h1 data-i18n="report_title">🧘 体质评估报告</h1><p data-i18n="report_sub">依据《中医体质分类与判定》国标运算</p><div id="sync-status" style="font-size:12px;color:var(--tl);margin-top:8px;opacity:0;transition:opacity 0.3s"></div></div>
 
     <div class="rc">
-      <div class="rbadge"> data-i18n="r_badge">🏷 体质判定</div>
+      <div class="rbadge" data-i18n="r_badge">🏷 体质判定</div>
       <div class="rname" id="rn"></div>
       <div class="rtype" id="rrt"></div>
       <div class="rdesc" id="rd"></div>
@@ -393,18 +393,18 @@ function toggleLang(){
     <div class="sg" id="sg"></div>
 
     <div class="ncgrid-wrap">
-      <div class="ncgrid-title"> data-i18n="r_grid_title">🌿 中医九大体质对照图</div>
-      <div class="ncgrid-sub"> data-i18n="r_grid_sub">标有 <span style="color:var(--p);font-weight:700">✓</span> 为您的判定结果；数字标签代表主体质排名</div>
+      <div class="ncgrid-title" data-i18n="r_grid_title">🌿 中医九大体质对照图</div>
+      <div class="ncgrid-sub" data-i18n="r_grid_sub">标有 <span style="color:var(--p);font-weight:700">✓</span> 为您的判定结果；数字标签代表主体质排名</div>
       <div class="ncgrid" id="ncgrid"></div>
     </div>
 
-    <div class="dbox"> data-i18n="disclaimer">⚠ 本测评为中医体质参考，不作为疾病诊断与治疗依据。报告中的体质分类、脏腑倾向及养生建议仅供参考，不能替代专业中医诊疗。如有明显不适，请咨询中医师或前往医疗机构就诊。</div>
+    <div class="dbox" data-i18n="disclaimer">⚠ 本测评为中医体质参考，不作为疾病诊断与治疗依据。报告中的体质分类、脏腑倾向及养生建议仅供参考，不能替代专业中医诊疗。如有明显不适，请咨询中医师或前往医疗机构就诊。</div>
 
-    <button class="rb" onclick="restart()"> data-i18n="btn_retake">🔄 重新测试</button>
+    <button class="rb" onclick="restart()" data-i18n="btn_retake">🔄 重新测试</button>
   </div>
 
   <div class="hist-section" style="max-width:480px;width:auto">
-    <div class="hist-title"> data-i18n="hist_mine">📋 我的记录</div>
+    <div class="hist-title" data-i18n="hist_mine">📋 我的记录</div>
     <div class="hist-scroll" id="rh-list"></div>
   </div>
 
@@ -418,7 +418,7 @@ function toggleLang(){
     </div>
     <div class="ds-meta">
       <span>📅 2026.07.23</span>
-      <span> data-i18n="dev_meta">🌿 中医体质评估</span>
+      <span data-i18n="dev_meta">🌿 中医体质评估</span>
     </div>
   </div>
 </div>
@@ -1389,20 +1389,20 @@ handleHash();
       <button class="nn" id="disc-bn" onclick="discNext()">下一题 →</button>
     </div>
     <div class="devsig" style="margin-top:auto;margin-bottom:0;max-width:480px">
-      <span style="font-size:12px;color:#8B6914;font-weight:600"> data-i18n="disc_credit">🐯 DISC性格测试</span> · 基于行为风格理论 · 2026.7.25
+      <span style="font-size:12px;color:#8B6914;font-weight:600" data-i18n="disc_credit">🐯 DISC性格测试</span> · 基于行为风格理论 · 2026.7.25
     </div>
   </div>
 
   <!-- DISC报告 -->
   <div class="pageDISC disc-report" id="disc-page-report" style="display:none">
     <div class="disc-rhd">
-      <h1> data-i18n="disc_rpt_title">🐯 DISC性格报告</h1>
+      <h1 data-i18n="disc_rpt_title">🐯 DISC性格报告</h1>
       <p data-i18n="disc_rpt_sub">基于DISC行为风格测试 · 2026.7.25</p>
     </div>
     <div class="disc-result-card" id="disc-result-card"></div>
     <div class="disc-char-cards" id="disc-char-cards"></div>
     <div class="disc-bar-wrap">
-      <div class="disc-bar-title"> data-i18n="disc_bar_title">🔬 DISC四象限分布图</div>
+      <div class="disc-bar-title" data-i18n="disc_bar_title">🔬 DISC四象限分布图</div>
       <div id="disc-bar-chart"></div>
       <div class="disc-bar-legend">
         <div class="disc-legend-item"><div class="disc-legend-dot" style="background:#E67E22"></div>支配(D)</div>
@@ -1412,8 +1412,8 @@ handleHash();
       </div>
     </div>
     <div class="disc-advice" id="disc-advice"></div>
-    <button class="rb" onclick="discRestart()" style="margin:0 auto 20px"> data-i18n="disc_retake">🔄 重新测试</button>
-    <button class="rb btn-history" onclick="showHistoryPage()" style="margin:0 auto 8px;font-size:13px;padding:9px 24px;background:linear-gradient(135deg,#6B5B95,#8B7FB5);box-shadow:0 4px 12px rgba(107,91,149,0.2);color:#fff"> data-i18n="disc_view_hist">📋 查看历史记录</button>
+    <button class="rb" onclick="discRestart()" style="margin:0 auto 30px;font-size:13px;padding:9px 24px" data-i18n="disc_retake">🔄 重新测试</button>
+    <button class="rb btn-history" onclick="showHistoryPage()" style="margin:0 auto 30px;font-size:13px;padding:9px 24px" data-i18n="disc_view_hist">📋 查看历史记录</button>
     <button class="rb" onclick="backToHome()" style="margin:0 auto 30px;font-size:13px;padding:9px 24px" data-i18n="disc_back">← 返回体质测试</button>
     <div class="dbox" style="max-width:500px;margin:0 auto" data-i18n="disc_disclaimer">
       ⚠ DISC是行为风格参考工具，不对应能力高低或人品优劣。每种类型都有独特价值，有效沟通需要理解并尊重彼此的风格差异。
@@ -1871,7 +1871,7 @@ function closeHistModal() {
   <div id="p-history" class="page">
     <div class="hist-page-hd">
       <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p0').classList.add('active');" style="float:right;background:none;border:none;cursor:pointer;font-size:20px;color:var(--tl);padding:4px 8px;margin-right:56px">✕</button>
-      <h2> data-i18n="hist_title">📋 测试历史记录</h2>
+      <h2 data-i18n="hist_title">📋 测试历史记录</h2>
       <p data-i18n="hist_keep">保留最近 20 条记录</p>
     </div>
     <div id="hist-all-list"></div>
