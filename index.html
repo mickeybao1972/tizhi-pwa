@@ -188,6 +188,8 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
 .hist-row .hr-tip { font-size:11px; color:var(--tl); line-height:1.4; }
 .hist-empty-row { text-align:center; padding:16px; color:var(--tl); font-size:12px; }
 </style>
+<link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4A7C59">
 </head>
 <body>
 
@@ -1770,5 +1772,8 @@ function closeHistModal() {
     <div id="hist-modal-body"></div>
     <button id="hist-modal-close" onclick="closeHistModal()">关闭</button>
   </div>
+<script>
+if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(e){console.log('SW',e);}); }); }
+</script>
 </body>
 </html>
