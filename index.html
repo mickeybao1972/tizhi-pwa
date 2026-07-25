@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -187,98 +187,205 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
 .hist-row .hr-result { font-size:12px; color:var(--p); font-weight:600; }
 .hist-row .hr-tip { font-size:11px; color:var(--tl); line-height:1.4; }
 .hist-empty-row { text-align:center; padding:16px; color:var(--tl); font-size:12px; }
+#langToggle{position:fixed;top:10px;right:10px;z-index:9999;background:rgba(74,124,89,.92);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.2);font-family:inherit}
+#langToggle:active{transform:scale(.95)}
 </style>
 <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#4A7C59">
 </head>
 <body>
+<button id="langToggle" onclick="toggleLang()" aria-label="Language switch"><span id="langToggleLabel">EN</span></button>
+<script>
+/* i18n: 中英文切换 (界面与导航，题目保持中文) */
+const I18N = {
+  zh: {},
+  en: {
+    app_badge:'TCM Constitution Assessment',
+    cover_title:'Four-Examination Self-Test System',
+    cover_sub:'Based on the national standard Classification and Determination of TCM Constitution (ZY/T 001.1-1994)',
+    flow_title:'Test Flow',
+    flow_wz:'Observation', flow_wz_s:'Tongue and complexion - 4 questions - about 1 min',
+    flow_wm:'Smell and Sound', flow_wm_s:'Breath, phlegm, odor - 4 questions - about 1 min',
+    flow_wq:'Inquiry', flow_wq_s:'61 questions - about 8 min (full standard version)',
+    flow_cx:'Pulse', flow_cx_s:'Subjective pulse typing - 1 question - about 30 sec',
+    flow_rp:'Report', flow_rp_s:'Constitution determination, organ tendency, wellness advice',
+    cover_note:'This assessment is for TCM constitution reference only and is not a basis for disease diagnosis or treatment.',
+    form_title:'Subject Information',
+    lbl_name:'Name', lbl_gender:'Gender', lbl_age:'Age', lbl_phone:'Phone', lbl_address:'Address',
+    ph_name:'Enter name', ph_age:'years', ph_phone:'Mobile number', ph_address:'City or street',
+    opt_select:'Please select', opt_male:'Male', opt_female:'Female',
+    btn_start:'Start Assessment ->',
+    other_tools:'Other Tools',
+    btn_disc:'DISC Personality Test - 5 Animal Types',
+    btn_history:'Test History',
+    report_title:'Constitution Assessment Report',
+    report_sub:'Computed per the national standard for TCM Constitution Classification',
+    r_badge:'Constitution Determination',
+    r_organ_title:'Zang-Fu (Organ) Tendency',
+    r_grid_title:'Nine Constitution Comparison',
+    r_grid_sub:'? marks your result; numbers show the main constitution ranking',
+    btn_retake:'Retake',
+    hist_mine:'My Records',
+    dev_designed:'Designed by: ', dev_contact:'Contact: ', dev_meta:'TCM Constitution Assessment',
+    disclaimer:'This assessment is for TCM constitution reference only and is not a basis for disease diagnosis or treatment. The constitution classification, organ tendency, and wellness advice are for reference only and cannot replace professional TCM diagnosis and treatment. If you have obvious discomfort, please consult a TCM practitioner or visit a medical institution.',
+    hist_title:'Test History', hist_keep:'Keeps the latest 20 records', hist_empty:'No test records yet',
+    btn_prev:'<- Previous', btn_next:'Next ->', btn_result:'View Result ->',
+    disc_badge:'DISC Behavior Style Test', disc_title:'Personality Self-Test', disc_sub:'Understand your style through 5 animals',
+    disc_note:'Based on DISC behavior style theory - 30 questions - about 3 min\nFor workplace communication, team building, and interpersonal understanding',
+    disc_start:'Start Test ->', disc_back:'<- Back to Constitution Test',
+    disc_mtag:'DISC Personality Test', disc_prev:'<- Previous', disc_next:'Next ->', disc_view:'View Result ->',
+    disc_rpt_title:'DISC Personality Report', disc_rpt_sub:'Based on DISC Behavior Style Test - 2026.7.25',
+    disc_bar_title:'DISC Four-Quadrant Distribution', disc_retake:'Retake', disc_view_hist:'View History',
+    disc_disclaimer:'DISC is a behavior style reference tool and does not indicate ability or character. Each type has unique value; effective communication requires understanding and respecting different styles.',
+    disc_credit:'DISC Personality Test',
+    th_type:'Constitution', th_score:'Conversion Score', th_dist:'Distribution', th_judge:'Determination',
+    sync_syncing:'Syncing...', sync_success:'Synced to cloud', sync_offline:'Saved locally'
+  }
+};
+const I18N_ZH = {
+  hist_empty:'暂无测试记录',
+  btn_prev:'← 上一题', btn_next:'下一题 →', btn_result:'查看结果 →',
+  disc_next:'下一题 →', disc_view:'查看结果 →', disc_prev:'← 上一题',
+  sync_syncing:'同步中...', sync_success:'已同步到云端', sync_offline:'已保存到本地'
+};
+const MODULE_EN = {'问诊':'Inquiry','望诊':'Observation','闻诊':'Smell and Sound','切诊':'Pulse'};
+let LANG = localStorage.getItem('lang') || 'zh';
+function i18nPick(k){
+  if(LANG==='en' && I18N.en[k]!=null) return I18N.en[k];
+  if(I18N_ZH[k]!=null) return I18N_ZH[k];
+  return k;
+}
+var _i18nInited=false;
+function initI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    if(!el.getAttribute('data-i18n-zh')) el.setAttribute('data-i18n-zh', el.textContent);
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+    if(!el.getAttribute('data-i18n-ph-zh')) el.setAttribute('data-i18n-ph-zh', el.placeholder||'');
+  });
+  _i18nInited=true;
+}
+function refreshLang(){
+  if(!_i18nInited) initI18n();
+  document.documentElement.lang = (LANG==='en')?'en':'zh-CN';
+  document.title = (LANG==='en') ? 'Constitution & DISC Self-Assessment' : '四诊体质·DISC性格自测系统';
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var k=el.getAttribute('data-i18n');
+    el.textContent = (LANG==='en') ? i18nPick(k) : el.getAttribute('data-i18n-zh');
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+    var k=el.getAttribute('data-i18n-ph');
+    el.placeholder = (LANG==='en') ? i18nPick(k) : el.getAttribute('data-i18n-ph-zh');
+  });
+  var lbl=document.getElementById('langToggleLabel');
+  if(lbl) lbl.textContent = (LANG==='zh')?'EN':'中';
+  rerenderCurrent();
+}
+function rerenderCurrent(){
+  try{
+    if(document.getElementById('p1') && document.getElementById('p1').classList.contains('active')) renderQ();
+    if(document.getElementById('pDISC') && document.getElementById('pDISC').classList.contains('active')){
+      var t=document.getElementById('disc-page-test'), r=document.getElementById('disc-page-report');
+      if(t && t.style.display==='flex') discRenderQ();
+      else if(r && r.style.display==='flex') discRenderReport();
+    }
+    if(document.getElementById('p-history') && document.getElementById('p-history').classList.contains('active')) renderHistoryPage();
+  }catch(e){ console.log('rerenderCurrent',e); }
+}
+function toggleLang(){
+  LANG = (LANG==='zh')?'en':'zh';
+  localStorage.setItem('lang', LANG);
+  refreshLang();
+}
+</script>
+
 
 <!-- ═══ 封面 ═══ -->
 <div id="p0" class="page active">
  <div id="cover-section" style="display:flex;flex-direction:column;align-items:center;width:100%">
   <div style="width:auto;max-width:480px">
     <div class="badge">中医体质评估</div>
-    <div class="ctitle">四诊体质<span>自测系统</span></div>
-    <div class="csub">基于国标《中医体质分类与判定》(ZY/T 001.1-1994)</div>
+    <div class="ctitle" data-i18n="cover_title">四诊体质自测系统</div>
+    <div class="csub" data-i18n="cover_sub">基于国标《中医体质分类与判定》(ZY/T 001.1-1994)</div>
   </div>
   <div class="cbox" style="max-width:480px;width:auto">
-    <h3>📋 测试流程</h3>
+    <h3> data-i18n="flow_title">📋 测试流程</h3>
     <ul class="steps">
-      <li><div class="sn wz">1</div><div class="step-text">望诊模块 <small style="color:var(--tl)">舌象·面色 共4题·约1分钟</small></div></li>
-      <li><div class="sn wm">2</div><div class="step-text">闻诊模块 <small style="color:var(--tl)">口气·痰音·气息·体味 共4题·约1分钟</small></div></li>
-      <li><div class="sn">3</div><div class="step-text">问诊模块 <small style="color:var(--tl)">61道题·约8分钟（国标完整版）</small></div></li>
-      <li><div class="sn cx">4</div><div class="step-text">切诊模块 <small style="color:var(--tl)">脉象主观分类 共1题·约30秒</small></div></li>
-      <li><div class="sn rp">5</div><div class="step-text">报告生成 <small style="color:var(--tl)">体质判定·脏腑倾向·养生建议</small></div></li>
+      <li><div class="sn wz">1</div><div class="step-text"><span data-i18n="flow_wz">望诊模块</span> <small style="color:var(--tl)" data-i18n="flow_wz_s">舌象·面色 共4题·约1分钟</small></div></li>
+      <li><div class="sn wm">2</div><div class="step-text"><span data-i18n="flow_wm">闻诊模块</span> <small style="color:var(--tl)" data-i18n="flow_wm_s">口气·痰音·气息·体味 共4题·约1分钟</small></div></li>
+      <li><div class="sn">3</div><div class="step-text"><span data-i18n="flow_wq">问诊模块</span> <small style="color:var(--tl)" data-i18n="flow_wq_s">61道题·约8分钟（国标完整版）</small></div></li>
+      <li><div class="sn cx">4</div><div class="step-text"><span data-i18n="flow_cx">切诊模块</span> <small style="color:var(--tl)" data-i18n="flow_cx_s">脉象主观分类 共1题·约30秒</small></div></li>
+      <li><div class="sn rp">5</div><div class="step-text"><span data-i18n="flow_rp">报告生成</span> <small style="color:var(--tl)" data-i18n="flow_rp_s">体质判定·脏腑倾向·养生建议</small></div></li>
     </ul>
-    <div class="disc" style="margin-top:10px">⚠ 本测评为中医体质参考，不作为疾病诊断与治疗依据。</div>
+    <div class="disc" style="margin-top:10px"> data-i18n="cover_note">⚠ 本测评为中医体质参考，不作为疾病诊断与治疗依据。</div>
   </div>
 
   <!-- 用户信息表单 -->
   <div class="userform" style="max-width:480px;width:auto">
-    <h4>📝 受测者信息</h4>
+    <h4> data-i18n="form_title">📝 受测者信息</h4>
     <div class="uf-row">
       <div class="ufg" style="flex:2">
-        <label>姓名</label>
-        <input type="text" id="uf-name" placeholder="请输入姓名">
+        <label data-i18n="lbl_name">姓名</label>
+        <input type="text" id="uf-name" placeholder="请输入姓名" data-i18n-ph="ph_name">
       </div>
       <div class="ufg">
-        <label>性别</label>
+        <label data-i18n="lbl_gender">性别</label>
         <select id="uf-gender">
-          <option value="">请选择</option>
-          <option value="男">男</option>
-          <option value="女">女</option>
+          <option value="" data-i18n="opt_select">请选择</option>
+          <option value="男" data-i18n="opt_male">男</option>
+          <option value="女" data-i18n="opt_female">女</option>
         </select>
       </div>
     </div>
     <div class="uf-row">
       <div class="ufg">
-        <label>年龄</label>
-        <input type="number" id="uf-age" placeholder="岁" min="1" max="120">
+        <label data-i18n="lbl_age">年龄</label>
+        <input type="number" id="uf-age" placeholder="岁" data-i18n-ph="ph_age" min="1" max="120">
       </div>
       <div class="ufg" style="flex:2">
-        <label>联系电话</label>
-        <input type="tel" id="uf-phone" placeholder="手机号">
+        <label data-i18n="lbl_phone">联系电话</label>
+        <input type="tel" id="uf-phone" placeholder="手机号" data-i18n-ph="ph_phone">
       </div>
     </div>
     <div class="uf-row">
       <div class="ufg" style="flex:1">
-        <label>地址</label>
-        <input type="text" id="uf-address" placeholder="省市区/街道">
+        <label data-i18n="lbl_address">地址</label>
+        <input type="text" id="uf-address" placeholder="省市区/街道" data-i18n-ph="ph_address">
       </div>
     </div>
   </div>
 
-  <button class="btn" onclick="start()" style="max-width:480px;justify-content:center;width:auto;margin:0 auto 10px">开始测评 →</button>
+  <button class="btn" onclick="start()" style="max-width:480px;justify-content:center;width:auto;margin:0 auto 10px" data-i18n="btn_start">开始测评 →</button>
 
   <!-- DISC入口 -->
   <div style="width:auto;max-width:480px;margin:10px auto 0">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
       <div style="flex:1;height:1px;background:var(--brd)"></div>
-      <span style="font-size:11px;color:var(--tl);letter-spacing:1px">其它工具</span>
+      <span style="font-size:11px;color:var(--tl);letter-spacing:1px" data-i18n="other_tools">其它工具</span>
       <div style="flex:1;height:1px;background:var(--brd)"></div>
     </div>
-    <button class="btn btn-disc" onclick="startDISC()" style="max-width:480px;justify-content:center;width:100%;font-size:14px;padding:11px 24px">
+    <button class="btn btn-disc" onclick="startDISC()" style="max-width:480px;justify-content:center;width:100%;font-size:14px;padding:11px 24px" data-i18n="btn_disc">
       🐯 DISC性格测试 · 5种动物类型
     </button>
-    <button class="btn btn-history" onclick="showHistoryPage()" style="max-width:480px;justify-content:center;width:100%;font-size:14px;padding:10px 24px;margin-top:8px;background:linear-gradient(135deg,#6B5B95,#8B7FB5);box-shadow:0 4px 16px rgba(107,91,149,0.2);color:#fff">
+    <button class="btn btn-history" onclick="showHistoryPage()" style="max-width:480px;justify-content:center;width:100%;font-size:14px;padding:10px 24px;margin-top:8px;background:linear-gradient(135deg,#6B5B95,#8B7FB5);box-shadow:0 4px 16px rgba(107,91,149,0.2);color:#fff" data-i18n="btn_history">
       📋 测试历史记录
     </button>
   </div>
  </div>
 
   <div id="report-section" style="display:none;width:100%;max-width:760px">
-    <div class="rhd"><h1>🧘 体质评估报告</h1><p>依据《中医体质分类与判定》国标运算</p><div id="sync-status" style="font-size:12px;color:var(--tl);margin-top:8px;opacity:0;transition:opacity 0.3s"></div></div>
+    <div class="rhd"><h1> data-i18n="report_title">🧘 体质评估报告</h1><p data-i18n="report_sub">依据《中医体质分类与判定》国标运算</p><div id="sync-status" style="font-size:12px;color:var(--tl);margin-top:8px;opacity:0;transition:opacity 0.3s"></div></div>
 
     <div class="rc">
-      <div class="rbadge">🏷 体质判定</div>
+      <div class="rbadge"> data-i18n="r_badge">🏷 体质判定</div>
       <div class="rname" id="rn"></div>
       <div class="rtype" id="rrt"></div>
       <div class="rdesc" id="rd"></div>
-      <table class="st"><thead><tr><th>体质类型</th><th>转化分</th><th>分布</th><th>判定</th></tr></thead><tbody id="stb"></tbody></table>
+      <table class="st"><thead><tr><th data-i18n="th_type">体质类型</th><th data-i18n="th_score">转化分</th><th data-i18n="th_dist">分布</th><th data-i18n="th_judge">判定</th></tr></thead><tbody id="stb"></tbody></table>
     </div>
 
     <div class="zc">
-      <div class="zt">脏腑功能倾向参考</div>
+      <div class="zt" data-i18n="r_organ_title">脏腑功能倾向参考</div>
       <div class="ztags" id="ztags"></div>
       <div class="zd" id="zd"></div>
     </div>
@@ -286,32 +393,32 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
     <div class="sg" id="sg"></div>
 
     <div class="ncgrid-wrap">
-      <div class="ncgrid-title">🌿 中医九大体质对照图</div>
-      <div class="ncgrid-sub">标有 <span style="color:var(--p);font-weight:700">✓</span> 为您的判定结果；数字标签代表主体质排名</div>
+      <div class="ncgrid-title"> data-i18n="r_grid_title">🌿 中医九大体质对照图</div>
+      <div class="ncgrid-sub"> data-i18n="r_grid_sub">标有 <span style="color:var(--p);font-weight:700">✓</span> 为您的判定结果；数字标签代表主体质排名</div>
       <div class="ncgrid" id="ncgrid"></div>
     </div>
 
-    <div class="dbox">⚠ 本测评为中医体质参考，不作为疾病诊断与治疗依据。报告中的体质分类、脏腑倾向及养生建议仅供参考，不能替代专业中医诊疗。如有明显不适，请咨询中医师或前往医疗机构就诊。</div>
+    <div class="dbox"> data-i18n="disclaimer">⚠ 本测评为中医体质参考，不作为疾病诊断与治疗依据。报告中的体质分类、脏腑倾向及养生建议仅供参考，不能替代专业中医诊疗。如有明显不适，请咨询中医师或前往医疗机构就诊。</div>
 
-    <button class="rb" onclick="restart()">🔄 重新测试</button>
+    <button class="rb" onclick="restart()"> data-i18n="btn_retake">🔄 重新测试</button>
   </div>
 
   <div class="hist-section" style="max-width:480px;width:auto">
-    <div class="hist-title">📋 我的记录</div>
+    <div class="hist-title"> data-i18n="hist_mine">📋 我的记录</div>
     <div class="hist-scroll" id="rh-list"></div>
   </div>
 
   <div class="devsig">
     <div>
-      ✍️ 设计开发：<span class="ds-name">鲍永英</span>
+      ✍️ <span data-i18n="dev_designed">设计开发：</span><span class="ds-name">鲍永英</span>
       <span class="ds-ver">V2.0测试版</span>
     </div>
     <div style="margin-top:4px">
-      📧 联系邮箱：<a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
+      📧 <span data-i18n="dev_contact">联系邮箱：</span><a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
     </div>
     <div class="ds-meta">
       <span>📅 2026.07.23</span>
-      <span>🌿 中医体质评估</span>
+      <span> data-i18n="dev_meta">🌿 中医体质评估</span>
     </div>
   </div>
 </div>
@@ -334,7 +441,7 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
     <div class="opts" id="qo"></div>
   </div>
   <div class="nav">
-    <button class="np" id="bp" onclick="prev()" disabled>← 上一题</button>
+    <button class="np" id="bp" onclick="prev()" disabled data-i18n="btn_prev">← 上一题</button>
     <button class="nn" id="bn" onclick="next()">下一题 →</button>
   </div>
 
@@ -594,11 +701,11 @@ function renderQ(){
   const mc={
     '问诊':'', '望诊':'wz', '闻诊':'wm', '切诊':'cx'
   };
-  mt.textContent=q.m+'模块';
+  const modLabel=(LANG==='en')?(MODULE_EN[q.m]||q.m):q.m; mt.textContent=modLabel+(LANG==='en'?'':'模块');
   mt.className='mtag'+(mc[q.m]?' '+mc[q.m]:'');
   document.getElementById('pt').textContent=(idx+1)+' / '+total;
   document.getElementById('pf').style.width=((idx+1)/total*100)+'%';
-  document.getElementById('qn').innerHTML='<b>'+q.m+'</b> 第 '+(idx+1)+' 题'+' · '+(q.g==='平和质'?'平和质 · '+q.o[0].l+'→'+q.o[4].l:q.g!=='切诊'?q.g:'');
+  let qnExtra=''; if(q.g==='平和质') qnExtra=' · '+'平和质 · '+q.o[0].l+'→'+q.o[4].l; else if(q.g && q.g!=='切诊') qnExtra=' · '+q.g; document.getElementById('qn').innerHTML='<b>'+modLabel+'</b> '+(LANG==='en'?('Q '+(idx+1)):('第 '+(idx+1)+' 题'))+qnExtra;
   document.getElementById('qt').textContent=q.t;
   document.getElementById('qs').textContent=q.s||'';
   const el=document.getElementById('qo');el.innerHTML='';
@@ -627,7 +734,7 @@ function renderQ(){
   document.getElementById('bp').disabled=idx===0;
   const isLast=idx===total-1;
   const bn=document.getElementById('bn');
-  bn.textContent=isLast?'查看结果 →':'下一题 →';
+  bn.textContent=isLast?(LANG==='en'?'View Result ->':'查看结果 →'):(LANG==='en'?'Next ->':'下一题 →');
   bn.disabled=ans[q.id]===undefined;
 }
 
@@ -793,9 +900,9 @@ function showSyncStatus(status) {
     offline: '💾'
   };
   const texts = {
-    syncing: '同步中...',
-    success: '已同步到云端',
-    offline: '已保存到本地'
+    syncing: i18nPick('sync_syncing'),
+    success: i18nPick('sync_success'),
+    offline: i18nPick('sync_offline')
   };
   
   statusEl.innerHTML = `${icons[status]} ${texts[status]}`;
@@ -1137,6 +1244,7 @@ function handleHash() {
   else if (h === '#pDISC') { document.getElementById('pDISC').classList.add('active'); }
   else { document.getElementById('p0').classList.add('active'); }
 }
+refreshLang();
 handleHash();
 </script>
 
@@ -1208,14 +1316,16 @@ handleHash();
 .disc-advice-icon { font-size:18px; flex-shrink:0; }
 .disc-advice-text { font-size:12px; color:var(--tl); line-height:1.6; }
 .disc-advice-text strong { color:var(--pd); }
+#langToggle{position:fixed;top:10px;right:10px;z-index:9999;background:rgba(74,124,89,.92);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.2);font-family:inherit}
+#langToggle:active{transform:scale(.95)}
 </style>
 
 <div id="pDISC" class="page">
   <!-- DISC封面 -->
   <div class="pageDISC disc-cover" id="disc-page-cover">
-    <div class="badge">DISC行为风格测试</div>
-    <div class="ctitle" style="margin-bottom:10px">性格<span>自测系统</span></div>
-    <div class="csub" style="margin-bottom:24px">用5种动物读懂你的行为风格</div>
+    <div class="badge" data-i18n="disc_badge">DISC行为风格测试</div>
+    <div class="ctitle" style="margin-bottom:10px" data-i18n="disc_title">性格自测系统</div>
+    <div class="csub" style="margin-bottom:24px" data-i18n="disc_sub">用5种动物读懂你的行为风格</div>
     <div class="disc-types">
       <div class="dtype">
         <div class="di">🐯</div>
@@ -1248,14 +1358,14 @@ handleHash();
         <div class="dd">&nbsp;</div>
       </div>
     </div>
-    <div class="disc-note">
+    <div class="disc-note" data-i18n="disc_note">
       本测试基于DISC行为风格理论，共30题，约3分钟完成<br>
       适合职场沟通、团队建设、人际了解参考使用
     </div>
-    <button class="btn btn-disc" onclick="discStartTest()" style="max-width:300px;justify-content:center;width:100%">
+    <button class="btn btn-disc" onclick="discStartTest()" style="max-width:300px;justify-content:center;width:100%" data-i18n="disc_start">
       开始测试 →
     </button>
-    <button class="rb" onclick="backToHome()" style="margin-top:10px;font-size:13px;padding:9px 24px">← 返回体质测试</button>
+    <button class="rb" onclick="backToHome()" style="margin-top:10px;font-size:13px;padding:9px 24px" data-i18n="disc_back">← 返回体质测试</button>
   </div>
 
   <!-- DISC测试区 -->
@@ -1263,7 +1373,7 @@ handleHash();
     <div class="disc-test thdr">
       <div class="pbar">
         <div class="plabel">
-          <span class="mtag" style="background:#8B6914">DISC性格测试</span>
+          <span class="mtag" style="background:#8B6914" data-i18n="disc_mtag">DISC性格测试</span>
           <span id="disc-pt">1 / 30</span>
         </div>
         <div class="pbar-track"><div id="disc-pf" style="height:5px;background:#8B6914;border-radius:3px;transition:width .4s;width:0%"></div></div>
@@ -1275,24 +1385,24 @@ handleHash();
       <div class="opts" id="disc-qo"></div>
     </div>
     <div class="nav">
-      <button class="np" id="disc-bp" onclick="discPrev()" disabled>← 上一题</button>
+      <button class="np" id="disc-bp" onclick="discPrev()" disabled data-i18n="disc_prev">← 上一题</button>
       <button class="nn" id="disc-bn" onclick="discNext()">下一题 →</button>
     </div>
     <div class="devsig" style="margin-top:auto;margin-bottom:0;max-width:480px">
-      <span style="font-size:12px;color:#8B6914;font-weight:600">🐯 DISC性格测试</span> · 基于行为风格理论 · 2026.7.25
+      <span style="font-size:12px;color:#8B6914;font-weight:600"> data-i18n="disc_credit">🐯 DISC性格测试</span> · 基于行为风格理论 · 2026.7.25
     </div>
   </div>
 
   <!-- DISC报告 -->
   <div class="pageDISC disc-report" id="disc-page-report" style="display:none">
     <div class="disc-rhd">
-      <h1>🐯 DISC性格报告</h1>
-      <p>基于DISC行为风格测试 · 2026.7.25</p>
+      <h1> data-i18n="disc_rpt_title">🐯 DISC性格报告</h1>
+      <p data-i18n="disc_rpt_sub">基于DISC行为风格测试 · 2026.7.25</p>
     </div>
     <div class="disc-result-card" id="disc-result-card"></div>
     <div class="disc-char-cards" id="disc-char-cards"></div>
     <div class="disc-bar-wrap">
-      <div class="disc-bar-title">🔬 DISC四象限分布图</div>
+      <div class="disc-bar-title"> data-i18n="disc_bar_title">🔬 DISC四象限分布图</div>
       <div id="disc-bar-chart"></div>
       <div class="disc-bar-legend">
         <div class="disc-legend-item"><div class="disc-legend-dot" style="background:#E67E22"></div>支配(D)</div>
@@ -1302,10 +1412,10 @@ handleHash();
       </div>
     </div>
     <div class="disc-advice" id="disc-advice"></div>
-    <button class="rb" onclick="discRestart()" style="margin:0 auto 20px">🔄 重新测试</button>
-    <button class="rb btn-history" onclick="showHistoryPage()" style="margin:0 auto 8px;font-size:13px;padding:9px 24px;background:linear-gradient(135deg,#6B5B95,#8B7FB5);box-shadow:0 4px 12px rgba(107,91,149,0.2);color:#fff">📋 查看历史记录</button>
-    <button class="rb" onclick="backToHome()" style="margin:0 auto 30px;font-size:13px;padding:9px 24px">← 返回体质测试</button>
-    <div class="dbox" style="max-width:500px;margin:0 auto">
+    <button class="rb" onclick="discRestart()" style="margin:0 auto 20px"> data-i18n="disc_retake">🔄 重新测试</button>
+    <button class="rb btn-history" onclick="showHistoryPage()" style="margin:0 auto 8px;font-size:13px;padding:9px 24px;background:linear-gradient(135deg,#6B5B95,#8B7FB5);box-shadow:0 4px 12px rgba(107,91,149,0.2);color:#fff"> data-i18n="disc_view_hist">📋 查看历史记录</button>
+    <button class="rb" onclick="backToHome()" style="margin:0 auto 30px;font-size:13px;padding:9px 24px" data-i18n="disc_back">← 返回体质测试</button>
+    <div class="dbox" style="max-width:500px;margin:0 auto" data-i18n="disc_disclaimer">
       ⚠ DISC是行为风格参考工具，不对应能力高低或人品优劣。每种类型都有独特价值，有效沟通需要理解并尊重彼此的风格差异。
     </div>
   </div>
@@ -1447,7 +1557,7 @@ function discRenderQ(){
   document.getElementById('disc-bp').disabled = idx === 0;
   const isLast = idx === total - 1;
   const bn = document.getElementById('disc-bn');
-  bn.textContent = isLast ? '查看结果 →' : '下一题 →';
+  bn.textContent = isLast ? (LANG==='en'?'View Result ->':'查看结果 →') : (LANG==='en'?'Next ->':'下一题 →');
   bn.disabled = discAns[idx] === undefined;
 }
 
@@ -1648,7 +1758,7 @@ function renderHistoryPage() {
 
   const container = document.getElementById('hist-all-list');
   if (all.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--tl);font-size:14px">暂无测试记录</div>';
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--tl);font-size:14px">'+i18nPick('hist_empty')+'</div>';
     return;
   }
 
@@ -1760,9 +1870,9 @@ function closeHistModal() {
   <!-- 历史记录页 -->
   <div id="p-history" class="page">
     <div class="hist-page-hd">
-      <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p0').classList.add('active');" style="float:right;background:none;border:none;cursor:pointer;font-size:20px;color:var(--tl);padding:4px 8px">✕</button>
-      <h2>📋 测试历史记录</h2>
-      <p>保留最近 20 条记录</p>
+      <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p0').classList.add('active');" style="float:right;background:none;border:none;cursor:pointer;font-size:20px;color:var(--tl);padding:4px 8px;margin-right:56px">✕</button>
+      <h2> data-i18n="hist_title">📋 测试历史记录</h2>
+      <p data-i18n="hist_keep">保留最近 20 条记录</p>
     </div>
     <div id="hist-all-list"></div>
   </div>
