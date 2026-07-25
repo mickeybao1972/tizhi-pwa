@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>四诊体质自测系统</title>
+<title>四诊体质·DISC性格自测系统</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 :root {
@@ -33,6 +33,39 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
 .btn { display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,var(--p),var(--pl)); color:#fff; border:none; padding:13px 32px; border-radius:40px; font-size:15px; font-weight:600; cursor:pointer; transition:all .3s; box-shadow:0 4px 16px rgba(74,124,89,0.3); }
 .btn:hover { transform:translateY(-2px); }
 .btn-accent { background:linear-gradient(135deg,var(--a),var(--al)); box-shadow:0 4px 16px rgba(196,154,108,0.3); }
+.btn-disc { background:linear-gradient(135deg,#8B6914,#C49A6C); box-shadow:0 4px 16px rgba(139,105,20,0.25); }
+.btn-history { background:linear-gradient(135deg,#6B5B95,#8B7FB5); box-shadow:0 4px 16px rgba(107,91,149,0.25); color:#fff; }
+
+/* === 历史记录页 === */
+#p-history { padding:20px 16px 40px; }
+#p-history .hist-page-hd { text-align:center; margin-bottom:20px; }
+#p-history .hist-page-hd h2 { font-size:20px; color:var(--pd); margin-bottom:4px; }
+#p-history .hist-page-hd p { font-size:12px; color:var(--tl); }
+.hist-section-title { font-size:12px; color:var(--tl); padding:0 0 8px 4px; margin-top:16px; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.hist-section-title span { font-size:14px; }
+#hist-all-list { width:100%; max-width:600px; margin:0 auto; display:flex; flex-direction:column; gap:10px; }
+.hist-card { background:var(--card); border-radius:var(--r); padding:14px; box-shadow:0 2px 8px rgba(0,0,0,0.05); position:relative; transition:transform .15s,box-shadow .15s; }
+.hist-card:active { transform:scale(.98); }
+.hist-card-left { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.hist-card-icon { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.hist-card-meta { flex:1; }
+.hist-card-type { font-size:14px; font-weight:700; }
+.hist-card-date { font-size:11px; color:var(--tl); margin-top:2px; }
+.hist-card-right { padding-left:52px; }
+.hist-disc-bars { display:flex; flex-direction:column; gap:5px; }
+.hist-db-row { display:flex; align-items:center; gap:6px; }
+.hist-db-label { width:16px; font-size:12px; font-weight:700; text-align:center; }
+.hist-db-bar { flex:1; height:6px; background:#eee; border-radius:3px; overflow:hidden; }
+.hist-db-bar div { height:100%; border-radius:3px; }
+.hist-db-val { font-size:11px; color:var(--tl); min-width:20px; text-align:right; }
+.hist-tcm-tags { display:flex; flex-wrap:wrap; gap:4px; }
+.hist-del-btn { position:absolute; top:10px; right:10px; background:none; border:none; color:#ccc; font-size:14px; cursor:pointer; padding:2px 6px; line-height:1; }
+.hist-del-btn:hover { color:#e74c3c; }
+
+/* 历史详情弹窗 */
+#hist-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+#hist-modal-body { background:var(--card); border-radius:var(--r); padding:24px 20px; max-width:400px; width:100%; max-height:80vh; overflow-y:auto; }
+#hist-modal-close { display:block; margin:14px auto 0; background:var(--p); color:#fff; border:none; border-radius:8px; padding:8px 24px; font-size:13px; cursor:pointer; }
 
 /* Test header */
 .thdr { background:var(--card); width:100%; padding:14px 16px; position:sticky; top:0; z-index:10; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
@@ -132,7 +165,12 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
 .uf-row { display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
 .uf-row .ufg { flex:1; min-width:120px; }
 .ufg label { display:block; font-size:11px; color:var(--tl); margin-bottom:4px; }
-.ufg input, .ufg select { width:100%; padding:8px 10px; border:1px solid var(--brd); border-radius:8px; font-size:13px; background:#fff; }
+.ufg input, .ufg select { width:100%; padding:8px 10px; border:1px solid var(--brd); border-radius:8px; font-size:13px; background:#fff; color:var(--tx); }
+.ufg input::placeholder { color:#aaa; opacity:1; }
+.ufg input::-webkit-input-placeholder { color:#aaa; opacity:1; }
+.ufg input:-moz-placeholder { color:#aaa; opacity:1; }
+.ufg input::-moz-placeholder { color:#aaa; opacity:1; }
+.ufg input:-ms-input-placeholder { color:#aaa; opacity:1; }
 .ufg input:focus, .ufg select:focus { outline:none; border-color:var(--p); box-shadow:0 0 0 2px rgba(74,124,89,0.1); }
 
 /* 历史记录列表（报告页内嵌） */
@@ -208,7 +246,22 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
     </div>
   </div>
 
-  <button class="btn" onclick="start()" style="max-width:480px;justify-content:center;width:auto;margin:0 auto">开始测评 →</button>
+  <button class="btn" onclick="start()" style="max-width:480px;justify-content:center;width:auto;margin:0 auto 10px">开始测评 →</button>
+
+  <!-- DISC入口 -->
+  <div style="width:auto;max-width:480px;margin:10px auto 0">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <div style="flex:1;height:1px;background:var(--brd)"></div>
+      <span style="font-size:11px;color:var(--tl);letter-spacing:1px">其它工具</span>
+      <div style="flex:1;height:1px;background:var(--brd)"></div>
+    </div>
+    <button class="btn btn-disc" onclick="startDISC()" style="max-width:480px;justify-content:center;width:100%;font-size:14px;padding:11px 24px">
+      🐯 DISC性格测试 · 5种动物类型
+    </button>
+    <button class="btn btn-history" onclick="showHistoryPage()" style="max-width:480px;justify-content:center;width:100%;font-size:14px;padding:10px 24px;margin-top:8px;background:linear-gradient(135deg,#6B5B95,#8B7FB5);box-shadow:0 4px 16px rgba(107,91,149,0.2);color:#fff">
+      📋 测试历史记录
+    </button>
+  </div>
  </div>
 
   <div id="report-section" style="display:none;width:100%;max-width:760px">
@@ -939,6 +992,39 @@ function saveRecord(judgeResult, scores) {
   return record;
 }
 
+// DISC 记录
+const DISC_DB_KEY = 'disc_records';
+function saveDiscRecord(judge, scores, chameleonScore) {
+  const mainType = DISC_TYPES[judge.typeIdx];
+  const record = {
+    id: Date.now(),
+    date: new Date().toLocaleString('zh-CN'),
+    kind: 'disc',
+    discType: mainType.short,
+    discEmoji: mainType.name.split(' ')[0],
+    discColor: mainType.color,
+    discSubLabel: judge.subLabel,
+    discDesc: mainType.desc,
+    discScores: { D: scores[0], I: scores[1], S: scores[2], C: scores[3] },
+    chameleonScore: chameleonScore,
+    discRange: judge.range
+  };
+  let records = JSON.parse(localStorage.getItem(DISC_DB_KEY) || '[]');
+  records.unshift(record);
+  if (records.length > 50) records = records.slice(0, 50);
+  localStorage.setItem(DISC_DB_KEY, JSON.stringify(records));
+  return record;
+}
+function getDiscRecords() {
+  return JSON.parse(localStorage.getItem(DISC_DB_KEY) || '[]');
+}
+function deleteDiscRecord(id) {
+  let records = getDiscRecords();
+  records = records.filter(r => r.id !== id);
+  localStorage.setItem(DISC_DB_KEY, JSON.stringify(records));
+  renderHistoryPage();
+}
+
 // 获取当前用户的记录（仅返回匹配 userId 的记录）
 function getRecords() {
   const allRecords = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
@@ -1024,7 +1110,665 @@ function renderReportHistory() {
 
 restoreLastUser();
 renderReportHistory();
+
+// Hash 路由：支持直接访问子页面
+window.addEventListener('hashchange', handleHash);
+function handleHash() {
+  const h = location.hash;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  if (h === '#p-history') {
+    document.getElementById('p-history').classList.add('active');
+    // Demo模式注入数据
+    if (location.search.includes('seed=1')) {
+      const DB_KEY = 'tcm_records';
+      const records = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+      const now = new Date().toISOString();
+      if (!records.find(r => r.id && r.id.startsWith('demo_'))) {
+        records.push({ id:'demo_d1', kind:'disc', discType:'老虎型 (D)', discSubLabel:'老虎型 (D)', discEmoji:'🐯', discColor:'#E8A020', discScores:{D:28,I:14,S:18,C:10}, chameleonScore:12, judge:'D', timestamp:now, description:'主导型人格，善于掌控全局，决策果断，勇于承担领导责任。' });
+        records.push({ id:'demo_d2', kind:'disc', discType:'孔雀型 (I)', discSubLabel:'孔雀型 (I)', discEmoji:'🦚', discColor:'#27AE60', discScores:{D:10,I:26,S:16,C:8}, chameleonScore:10, judge:'I', timestamp:new Date(now.getTime()-86400000).toISOString(), description:'社交达人，热情洋溢，善于表达，乐于激励和鼓舞他人。' });
+        records.push({ id:'demo_t1', kind:'tcm', type:'气虚质', emoji:'😮‍💨', timestamp:new Date(now.getTime()-172800000).toISOString(), description:'元气不足，易疲劳。' });
+        localStorage.setItem(DB_KEY, JSON.stringify(records));
+      }
+    }
+    renderHistoryPage();
+  }
+  else if (h === '#pDISC') { document.getElementById('pDISC').classList.add('active'); }
+  else { document.getElementById('p-cover').classList.add('active'); }
+}
+handleHash();
 </script>
 
+<!-- ═══════════════════════════════════════════════════════════
+     DISC性格测试页面
+═══════════════════════════════════════════════════════════ -->
+<style>
+/* DISC测试页 */
+#pDISC .pageDISC { display:none; min-height:100vh; }
+#pDISC.page.active { display:flex; flex-direction:column; }
+#pDISC.page.active .pageDISC { display:flex; flex-direction:column; min-height:100vh; }
+.disc-cover { align-items:center; justify-content:center; padding:24px 16px; flex:1; }
+.disc-cover .badge { background:linear-gradient(135deg,#8B6914,#C49A6C); }
+.disc-types { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; max-width:480px; width:100%; margin:0 auto 20px; }
+.disc-types .dtype { flex:0 1 calc((100% - 20px) / 3); }
+.disc-blank { visibility:hidden; pointer-events:none; flex:0 1 calc((100% - 20px) / 3); }
+.dtype { background:var(--card); border-radius:var(--r); padding:16px 12px; text-align:center; box-shadow:var(--shd); cursor:pointer; transition:all .2s; }
+.dtype:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.15); }
+.dtype .di { font-size:32px; line-height:1; margin-bottom:4px; }
+.dtype .dn { font-size:13px; font-weight:700; color:var(--pd); margin-bottom:4px; }
+.dtype .dd { font-size:11px; color:var(--tl); line-height:1.5; }
+.disc-note { max-width:480px; width:100%; font-size:11px; color:var(--tl); text-align:center; line-height:1.7; margin-bottom:20px; }
+.disc-test { flex:1; padding:24px 16px; }
+.disc-test .thdr { background:var(--card); width:100%; padding:14px 16px; position:sticky; top:0; z-index:10; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+.disc-report { padding:24px 16px; }
+.disc-rhd { text-align:center; margin-bottom:20px; }
+.disc-rhd h1 { font-size:clamp(22px,5vw,32px); color:var(--pd); margin-bottom:4px; }
+.disc-rhd p { font-size:12px; color:var(--tl); }
+.disc-result-card { background:var(--card); border-radius:var(--r); padding:20px 18px; max-width:500px; margin:0 auto 14px; box-shadow:var(--shd); text-align:center; }
+.disc-scores, .disc-bar-wrap, .disc-char-cards, .disc-advice { max-width:600px; }
+.disc-main-icon { font-size:48px; line-height:1; margin-bottom:8px; }
+.disc-main-label { font-size:clamp(28px,7vw,38px); font-weight:800; color:#8B6914; margin-bottom:2px; }
+.disc-sub-label { font-size:14px; color:var(--a); font-weight:600; margin-bottom:10px; }
+.disc-main-desc { font-size:13px; color:var(--tl); line-height:1.7; }
+.disc-scores { background:var(--card); border-radius:var(--r); padding:18px; max-width:500px; margin:0 auto 14px; box-shadow:var(--shd); }
+.disc-scores-title { font-size:13px; font-weight:700; color:#8B6914; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+.disc-score-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.disc-score-row:last-child { margin-bottom:0; }
+.disc-slabel { font-size:13px; font-weight:600; color:var(--pd); width:60px; flex-shrink:0; white-space:nowrap; }
+.disc-sbar { flex:1; height:8px; background:#eee; border-radius:4px; overflow:hidden; }
+.disc-sbf { height:100%; border-radius:4px; transition:width .6s; }
+.disc-sval { font-size:12px; color:var(--tl); min-width:28px; text-align:right; }
+.disc-char-cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(80px, 1fr)); gap:10px; max-width:600px; margin:0 auto 14px; }
+.disc-char { background:var(--card); border-radius:var(--r); padding:10px 6px 12px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.05); position:relative; overflow:hidden; }
+.disc-char .dc-bar { position:absolute; top:0; left:0; right:0; height:6px; background:#eee; }
+.disc-char .dc-barf { height:100%; border-radius:0 0 4px 4px; transition:width .6s; }
+.disc-char .dci { font-size:26px; margin:6px 0 2px; }
+.disc-char .dcn { font-size:12px; font-weight:700; color:var(--pd); margin-bottom:2px; white-space:nowrap; }
+.disc-char .dcv { font-size:11px; color:var(--tl); }
+.disc-bar-wrap { max-width:500px; margin:0 auto 14px; }
+.disc-bar-title { font-size:12px; font-weight:600; color:#8B6914; margin-bottom:10px; }
+.disc-bar-row { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+.disc-bar-label { font-size:12px; color:var(--pd); font-weight:600; width:50px; flex-shrink:0; }
+.disc-bar-track { flex:1; height:6px; background:#eee; border-radius:3px; overflow:hidden; display:flex; }
+.disc-bar-seg { height:100%; }
+.disc-bar-legend { max-width:500px; margin:8px auto 0; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+.disc-quad { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; max-width:600px; margin:0 auto 8px; }
+.disc-quad-card { border-radius:10px; padding:10px 6px 12px; text-align:center; border:1px solid; position:relative; overflow:hidden; }
+.disc-quad-bar { position:absolute; top:0; left:0; height:5px; border-radius:0 0 4px 4px; transition:width .6s; }
+.disc-quad-emoji { font-size:24px; margin:4px 0 2px; }
+.disc-quad-label { font-size:11px; font-weight:700; }
+.disc-quad-val { font-size:13px; color:var(--pd); font-weight:700; margin-top:2px; }
+.disc-legend-item { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--tl); }
+.disc-legend-dot { width:10px; height:10px; border-radius:50%; }
+.disc-advice { background:var(--card); border-radius:var(--r); padding:18px; max-width:500px; margin:0 auto 14px; box-shadow:var(--shd); }
+.disc-advice-title { font-size:13px; font-weight:700; color:#8B6914; margin-bottom:10px; }
+.disc-advice-item { display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; }
+.disc-advice-item:last-child { margin-bottom:0; }
+.disc-advice-icon { font-size:18px; flex-shrink:0; }
+.disc-advice-text { font-size:12px; color:var(--tl); line-height:1.6; }
+.disc-advice-text strong { color:var(--pd); }
+</style>
+
+<div id="pDISC" class="page">
+  <!-- DISC封面 -->
+  <div class="pageDISC disc-cover" id="disc-page-cover">
+    <div class="badge">DISC行为风格测试</div>
+    <div class="ctitle" style="margin-bottom:10px">性格<span>自测系统</span></div>
+    <div class="csub" style="margin-bottom:24px">用5种动物读懂你的行为风格</div>
+    <div class="disc-types">
+      <div class="dtype">
+        <div class="di">🐯</div>
+        <div class="dn">老虎</div>
+        <div class="dd">支配型<br>果断、目标导向</div>
+      </div>
+      <div class="dtype">
+        <div class="di">🦚</div>
+        <div class="dn">孔雀</div>
+        <div class="dd">表达型<br>热情、善于交际</div>
+      </div>
+      <div class="dtype">
+        <div class="di">🐨</div>
+        <div class="dn">考拉</div>
+        <div class="dd">稳健型<br>温和、善于配合</div>
+      </div>
+      <div class="dtype">
+        <div class="di">🦉</div>
+        <div class="dn">猫头鹰</div>
+        <div class="dd">严谨型<br>精确、注重细节</div>
+      </div>
+      <div class="dtype">
+        <div class="di">🦎</div>
+        <div class="dn">变色龙</div>
+        <div class="dd">综合型<br>适应力强、多面融合</div>
+      </div>
+      <div class="dtype disc-blank" aria-hidden="true">
+        <div class="di">&nbsp;</div>
+        <div class="dn">&nbsp;</div>
+        <div class="dd">&nbsp;</div>
+      </div>
+    </div>
+    <div class="disc-note">
+      本测试基于DISC行为风格理论，共30题，约3分钟完成<br>
+      适合职场沟通、团队建设、人际了解参考使用
+    </div>
+    <button class="btn btn-disc" onclick="discStartTest()" style="max-width:300px;justify-content:center;width:100%">
+      开始测试 →
+    </button>
+    <button class="rb" onclick="backToHome()" style="margin-top:10px;font-size:13px;padding:9px 24px">← 返回体质测试</button>
+  </div>
+
+  <!-- DISC测试区 -->
+  <div class="pageDISC disc-test" id="disc-page-test" style="display:none">
+    <div class="disc-test thdr">
+      <div class="pbar">
+        <div class="plabel">
+          <span class="mtag" style="background:#8B6914">DISC性格测试</span>
+          <span id="disc-pt">1 / 30</span>
+        </div>
+        <div class="pbar-track"><div id="disc-pf" style="height:5px;background:#8B6914;border-radius:3px;transition:width .4s;width:0%"></div></div>
+      </div>
+    </div>
+    <div class="qa">
+      <div class="qnum" id="disc-qn"></div>
+      <div class="qtext" id="disc-qt"></div>
+      <div class="opts" id="disc-qo"></div>
+    </div>
+    <div class="nav">
+      <button class="np" id="disc-bp" onclick="discPrev()" disabled>← 上一题</button>
+      <button class="nn" id="disc-bn" onclick="discNext()">下一题 →</button>
+    </div>
+    <div class="devsig" style="margin-top:auto;margin-bottom:0;max-width:480px">
+      <span style="font-size:12px;color:#8B6914;font-weight:600">🐯 DISC性格测试</span> · 基于行为风格理论 · 2026.7.25
+    </div>
+  </div>
+
+  <!-- DISC报告 -->
+  <div class="pageDISC disc-report" id="disc-page-report" style="display:none">
+    <div class="disc-rhd">
+      <h1>🐯 DISC性格报告</h1>
+      <p>基于DISC行为风格测试 · 2026.7.25</p>
+    </div>
+    <div class="disc-result-card" id="disc-result-card"></div>
+    <div class="disc-char-cards" id="disc-char-cards"></div>
+    <div class="disc-bar-wrap">
+      <div class="disc-bar-title">🔬 DISC四象限分布图</div>
+      <div id="disc-bar-chart"></div>
+      <div class="disc-bar-legend">
+        <div class="disc-legend-item"><div class="disc-legend-dot" style="background:#E67E22"></div>支配(D)</div>
+        <div class="disc-legend-item"><div class="disc-legend-dot" style="background:#27AE60"></div>影响(I)</div>
+        <div class="disc-legend-item"><div class="disc-legend-dot" style="background:#2980B9"></div>稳健(S)</div>
+        <div class="disc-legend-item"><div class="disc-legend-dot" style="background:#8E44AD"></div>严谨(C)</div>
+      </div>
+    </div>
+    <div class="disc-advice" id="disc-advice"></div>
+    <button class="rb" onclick="discRestart()" style="margin:0 auto 20px">🔄 重新测试</button>
+    <button class="rb btn-history" onclick="showHistoryPage()" style="margin:0 auto 8px;font-size:13px;padding:9px 24px;background:linear-gradient(135deg,#6B5B95,#8B7FB5);box-shadow:0 4px 12px rgba(107,91,149,0.2);color:#fff">📋 查看历史记录</button>
+    <button class="rb" onclick="backToHome()" style="margin:0 auto 30px;font-size:13px;padding:9px 24px">← 返回体质测试</button>
+    <div class="dbox" style="max-width:500px;margin:0 auto">
+      ⚠ DISC是行为风格参考工具，不对应能力高低或人品优劣。每种类型都有独特价值，有效沟通需要理解并尊重彼此的风格差异。
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DISC测试数据
+// ═══════════════════════════════════════════════════════════
+const DISC_Q = [
+  {q:'1.你做事是一个值得信赖的人吗？', d:[5,10,14,18,24,30]},
+  {q:'2.你个性温和吗？', d:[2,8,15,17,25,28]},
+  {q:'3.你有活力吗？', d:[3,6,13,20,22,29]},
+  {q:'4.你善解人意吗？', d:[4,9,12,19,23,27]},
+  {q:'5.你独立吗？', d:[5,10,14,18,24,30]},
+  {q:'6.你受人爱戴吗？', d:[3,6,13,20,22,29]},
+  {q:'7.做事认真且正直吗？', d:[1,7,11,16,21,26]},
+  {q:'8.你富有同情心吗？', d:[2,8,15,17,25,28]},
+  {q:'9.你有说服力吗？', d:[4,9,12,19,23,27]},
+  {q:'10.你大胆吗？', d:[5,10,14,18,24,30]},
+  {q:'11.你精确吗？', d:[1,7,11,16,21,26]},
+  {q:'12.你适应能力强吗？', d:[4,9,12,19,23,27]},
+  {q:'13.你组织能力好吗？', d:[3,6,13,20,22,29]},
+  {q:'14.你是否积极主动？', d:[5,10,14,18,24,30]},
+  {q:'15.你害羞吗？', d:[2,8,15,17,25,28]},
+  {q:'16.你强势吗？', d:[1,7,11,16,21,26]},
+  {q:'17.你镇定吗？', d:[2,8,15,17,25,28]},
+  {q:'18.你勇于学习吗？', d:[5,10,14,18,24,30]},
+  {q:'19.你反应快吗？', d:[4,9,12,19,23,27]},
+  {q:'20.你外向吗？', d:[3,6,13,20,22,29]},
+  {q:'21.你注意细节吗？', d:[1,7,11,16,21,26]},
+  {q:'22.你爱说话吗？', d:[3,6,13,20,22,29]},
+  {q:'23.你的协调能力好吗？', d:[4,9,12,19,23,27]},
+  {q:'24.你勤劳吗？', d:[5,10,14,18,24,30]},
+  {q:'25.你慷慨吗？', d:[2,8,15,17,25,28]},
+  {q:'26.你小心翼翼吗？', d:[1,7,11,16,21,26]},
+  {q:'27.你令人愉快吗？', d:[4,9,12,19,23,27]},
+  {q:'28.你传统吗？', d:[2,8,15,17,25,28]},
+  {q:'29.你亲切吗？', d:[3,6,13,20,22,29]},
+  {q:'30.你工作足够有效率吗？', d:[5,10,14,18,24,30]},
+];
+
+// 维度映射：题目索引(0-29) → 哪个动物维度
+// DISC_MAP: 每道题(索引) → 对应的维度
+// 老虎(D/老虎)=索引4,9,13,17,23,29
+// 孔雀(I/孔雀)=索引2,5,12,19,21,28
+// 考拉(S/考拉)=索引1,7,14,16,24,27
+// 猫头鹰(C/猫头鹰)=索引0,6,10,15,20,25
+// 变色龙根据四维均匀程度自动计算，不单独计分
+const DISC_MAP = {
+  0:0, 1:2, 2:1, 3:null, 4:0,
+  5:1, 6:3, 7:2, 8:null, 9:0,
+  10:3, 11:null, 12:1, 13:0, 14:2,
+  15:3, 16:2, 17:0, 18:null, 19:1,
+  20:3, 21:1, 22:null, 23:0, 24:2,
+  25:3, 26:null, 27:2, 28:1, 29:0,
+};
+
+const DISC_TYPES = [
+  {idx:0, name:'🐯 老虎', short:'老虎', color:'#E67E22', bg:'#FEF3E2',
+    desc:'支配型（Dominance）。你是一个有决断力、目标感强的人，喜欢掌控局面，敢于冒险，行动迅速。你有强烈的竞争意识，渴望成功，在团队中往往扮演领导者的角色。',
+    traits:['有自信、有权威','决断力高','竞争性强','喜欢冒险','积极主动'],
+    advice:'你的优势是决策果断、执行力强。建议注意倾听他人意见，给团队成员表达的机会，避免过于强硬而造成沟通障碍。在与稳健型（考拉）相处时，多一些耐心；在与严谨型（猫头鹰）合作时，提供足够的细节和数据支撑。'},
+  {idx:1, name:'🦚 孔雀', short:'孔雀', color:'#27AE60', bg:'#E8F8F0',
+    desc:'表达型（Influence）。你热情外向，善于表达，人际沟通能力很强，容易感染周围的人。你是天生的社交高手，喜欢成为焦点，在团队中往往是活跃气氛的那个人。',
+    traits:['热情洋溢','善于表达','人际高手','乐观开朗','有感染力'],
+    advice:'你的优势是人际影响力强、善于激励团队。建议发挥创意和表达能力的同时，学会专注完成任务，避免过度追求认可而忽视细节。在与严谨型（猫头鹰）合作时，注意提供数据和事实支撑；在与支配型（老虎）沟通时，直接切入重点。'},
+  {idx:2, name:'🐨 考拉', short:'考拉', color:'#2980B9', bg:'#EBF5FB',
+    desc:'稳健型（Steadiness）。你性格温和，善于配合，极具耐心，喜欢稳定的节奏。你是团队中的稳定力量，重视和谐，善于倾听，在人际交往中给人安全感。',
+    traits:['温和耐心','善于配合','重视和谐','倾听者','稳定可靠'],
+    advice:'你的优势是建立信任、促进团队协作。建议在保持温和特质的同时，适度表达自己的想法和需求，勇于在必要时发声。在与支配型（老虎）相处时，理解对方对速度和结果的追求；在与表达型（孔雀）合作时，享受活跃氛围的同时保持专注。'},
+  {idx:3, name:'🦉 猫头鹰', short:'猫头鹰', color:'#8E44AD', bg:'#F5EEF8',
+    desc:'严谨型（Conscientiousness）。你注重细节，追求精确，做事严谨，思维缜密。你喜欢在行动前充分分析和规划，重视规则和质量，在团队中是可靠的分析者。',
+    traits:['注重细节','追求精确','思维缜密','严谨负责','善于分析'],
+    advice:'你的优势是质量意识强、分析深入。建议在保持高标准的同时，给自己和他人一些弹性空间，接受不完美的存在。在与表达型（孔雀）相处时，理解对方对快速迭代的偏好；在与支配型（老虎）合作时，适时提供决策所需的关键细节。'},
+  {idx:4, name:'🦎 变色龙', short:'变色龙', color:'#16A085', bg:'#E8F6F3',
+    desc:'综合型（Versatile）。你兼具多种特质，适应能力强，能够根据环境和对象灵活调整自己的行为方式。你是天然的协调者，能够在不同风格的人之间搭建桥梁。',
+    traits:['适应力强','灵活多变','善于协调','面面俱到','包容性强'],
+    advice:'你的优势是弹性高、适应力强，能够融入各种团队。建议在发挥多面性的同时，找到自己相对更倾向的主导风格，避免为了取悦所有人而失去自我核心。找到最让你感到自然和舒适的角色，是变色龙修炼的关键。'},
+];
+
+const DISC_OPTS = [
+  {v:1,l:'不同意'},{v:2,l:'有一点同意'},{v:3,l:'差不多'},
+  {v:4,l:'比较同意'},{v:5,l:'非常同意'}
+];
+
+// ═══════════════════════════════════════════════════════════
+// DISC状态
+// ═══════════════════════════════════════════════════════════
+let discIdx = 0;
+let discAns = {}; // idx → value (1-5)
+
+function startDISC(){
+    discIdx = 0; discAns = {};
+    document.getElementById('disc-page-cover').style.display = 'flex';
+    document.getElementById('disc-page-test').style.display = 'none';
+    document.getElementById('disc-page-report').style.display = 'none';
+    document.getElementById('pDISC').classList.add('active');
+  document.getElementById('p0').classList.remove('active');
+  document.getElementById('p1').classList.remove('active');
+  discRenderQ();
+}
+
+function backToHome(){
+  document.getElementById('pDISC').classList.remove('active');
+  document.getElementById('p0').classList.add('active');
+  document.getElementById('disc-page-cover').style.display = 'none';
+  document.getElementById('disc-page-test').style.display = 'none';
+  document.getElementById('disc-page-report').style.display = 'none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function discStartTest(){
+  discIdx = 0; discAns = {};
+  document.getElementById('disc-page-cover').style.display = 'none';
+  document.getElementById('disc-page-test').style.display = 'none';
+  document.getElementById('disc-page-report').style.display = 'none';
+  discRenderQ();
+}
+
+function discRenderQ(){
+  const total = DISC_Q.length;
+  const idx = discIdx;
+  const q = DISC_Q[idx];
+  document.getElementById('disc-pt').textContent = (idx+1)+' / '+total;
+  document.getElementById('disc-pf').style.width = ((idx+1)/total*100)+'%';
+  document.getElementById('disc-qn').innerHTML = '<b>DISC</b> 第 '+(idx+1)+' 题 · '+total+'题中';
+  document.getElementById('disc-qt').textContent = q.q;
+  const el = document.getElementById('disc-qo');
+  el.innerHTML = '';
+  DISC_OPTS.forEach(o => {
+    const sel = discAns[idx] === o.v;
+    const d = document.createElement('div');
+    d.className = 'opt' + (sel ? ' selected' : '');
+    d.onclick = () => { discAns[idx] = o.v; discRenderQ(); };
+    d.innerHTML = '<div class="oc"></div><div class="olbl">'+o.l+'</div>';
+    el.appendChild(d);
+  });
+  document.getElementById('disc-bp').disabled = idx === 0;
+  const isLast = idx === total - 1;
+  const bn = document.getElementById('disc-bn');
+  bn.textContent = isLast ? '查看结果 →' : '下一题 →';
+  bn.disabled = discAns[idx] === undefined;
+}
+
+function discPrev(){ if(discIdx > 0){ discIdx--; discRenderQ(); } }
+function discNext(){
+  if(discIdx < DISC_Q.length - 1){ discIdx++; discRenderQ(); }
+  else { discShowReport(); }
+}
+
+// ═══════════════════════════════════════════════════════════
+// DISC计分算法
+// 老虎(D)=题5,10,14,18,24,30 → 索引4,9,13,17,23,29
+// 孔雀(I)=题3,6,13,20,22,29 → 索引2,5,12,19,21,28
+// 考拉(S)=题2,8,15,17,25,28 → 索引1,7,14,16,24,27
+// 猫头鹰(C)=题1,7,11,16,21,26 → 索引0,6,10,15,20,25
+// 变色龙=各项均匀程度（自动计算）
+// 每维度6题，每题1-5分，满分30分
+// ═══════════════════════════════════════════════════════════
+function discCalcScores(){
+  // raw[0]=老虎D, raw[1]=孔雀I, raw[2]=考拉S, raw[3]=猫头鹰C
+  const raw = [0, 0, 0, 0];
+  DISC_Q.forEach((_, qi) => {
+    const v = discAns[qi];
+    if(v === undefined) return;
+    const dim = DISC_MAP[qi]; // 0=老虎,1=孔雀,2=考拉,3=猫头鹰, null=无效题
+    if(dim !== null && dim < 4) raw[dim] += v;
+  });
+  // 原始分即0-30分（每维度6题×5分=30）
+  const scores = raw.map(r => Math.round(r));
+  // 变色龙：四项分数越接近，得分越高（差异越小→越像变色龙）
+  const maxScore = Math.max(...scores);
+  const minScore = Math.min(...scores);
+  const range = maxScore - minScore;
+  // range=0→30分(最均匀)，range=24→0分(最悬殊)
+  const chameleonScore = Math.max(0, Math.round(30 - range * 1.2));
+  return { scores, chameleonScore };
+}
+
+// DISC判定逻辑
+function discJudge(scores, chameleonScore){
+  const sc = scores;
+  const max = Math.max(...sc);
+  const second = [...sc].sort((a,b)=>b-a)[1];
+  const range = Math.max(...sc) - Math.min(...sc);
+
+  let typeIdx = 4; // 默认变色龙
+  let label = '🦎 变色龙';
+  let subLabel = '综合型 · 面面俱到';
+
+  // 变色龙判定：四项分数差异小（任意两项差≤4）
+  if(range <= 4){
+    typeIdx = 4;
+    label = '🦎 变色龙';
+    subLabel = '综合型 · 面面俱到';
+  } else if(max - second > 4){
+    // 单项明显突出
+    typeIdx = sc.indexOf(max);
+    const type = DISC_TYPES[typeIdx];
+    label = type.name;
+    subLabel = type.short + '型';
+  } else {
+    // 两项或多维度综合：以最高项为主类型
+    const topTwoIdx = sc.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]).slice(0,2).map(x=>x[1]);
+    const names = topTwoIdx.map(i=>DISC_TYPES[i].short).join('+');
+    label = '🦎 变色龙';
+    subLabel = names + '综合型';
+    typeIdx = topTwoIdx[0]; // 以第一高分为主类型展示
+  }
+
+  return { typeIdx, label, subLabel, max, second, range };
+}
+
+function discShowReport(){
+  document.getElementById('disc-page-test').style.display = 'none';
+  document.getElementById('disc-page-report').style.display = 'flex';
+    discRenderReport();
+}
+
+// Demo 模式（仅供截图调试使用，URL 加 ?demo=1 直接渲染报告）
+if (location.search.includes('demo=1')) {
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('pDISC').classList.add('active');
+    document.getElementById('disc-page-cover').style.display = 'none';
+    document.getElementById('disc-page-test').style.display = 'none';
+    document.getElementById('disc-page-report').style.display = 'flex';
+    // 伪造 30 题答案：老虎型偏高分
+    for (let i = 0; i < 30; i++) {
+      const map = DISC_MAP[i] || 0;
+      discAns[i] = (map === 0 ? 5 : map === 1 ? 2 : map === 2 ? 3 : map === 3 ? 2 : 3);
+    }
+    discShowReport();
+  });
+}
+
+function discRenderReport(){
+  const {scores, chameleonScore} = discCalcScores();
+  const judge = discJudge(scores, chameleonScore);
+  const mainType = DISC_TYPES[judge.typeIdx];
+
+  // 结果卡片
+  document.getElementById('disc-result-card').innerHTML = `
+    <div class="disc-main-icon">${mainType.name.split(' ')[0]}</div>
+    <div class="disc-main-label">${mainType.name.split(' ')[1]}</div>
+    <div class="disc-sub-label">${judge.subLabel}</div>
+    <div class="disc-main-desc">${mainType.desc}</div>
+  `;
+
+  // 得分条
+  const scoreColors = ['#E67E22','#27AE60','#2980B9','#8E44AD'];
+  const scoreLabels = ['🐯 老虎(D)','🦚 孔雀(I)','🐨 考拉(S)','🦉 猫头鹰(C)'];
+  const scoreMax = 30;
+  ((document.getElementById('disc-scores-rows'))||{innerHTML:''}).innerHTML = scores.map((s,i) => `
+    <div class="disc-score-row">
+      <div class="disc-slabel" style="color:${scoreColors[i]}">${scoreLabels[i].split('(')[0]}</div>
+      <div class="disc-sbar"><div class="disc-sbf" style="width:${(s/scoreMax)*100}%;background:${scoreColors[i]}"></div></div>
+      <div class="disc-sval">${s}分</div>
+    </div>
+  `).join('') + `
+    <div class="disc-score-row" style="margin-top:8px;padding-top:8px;border-top:1px dashed #eee">
+      <div class="disc-slabel" style="color:#16A085">🦎 变色龙</div>
+      <div class="disc-sbar"><div class="disc-sbf" style="width:${(chameleonScore/scoreMax)*100}%;background:#16A085"></div></div>
+      <div class="disc-sval">${chameleonScore}分</div>
+    </div>
+  `;
+
+  // 四象限分布图 + 各类型得分（一体化）
+  const [d,i,s,c] = scores;
+  const dimData = [
+    {label:'支配(D)', emoji:'🐯', color:'#E67E22', val:d, idx:0},
+    {label:'影响(I)', emoji:'🦚', color:'#27AE60', val:i, idx:1},
+    {label:'稳健(S)', emoji:'🐨', color:'#2980B9', val:s, idx:2},
+    {label:'严谨(C)', emoji:'🦉', color:'#8E44AD', val:c, idx:3}
+  ];
+  document.getElementById('disc-bar-chart').innerHTML = `
+    <div class="disc-quad">
+      ${dimData.map(d => `
+        <div class="disc-quad-card" style="background:${d.color}10;border-color:${d.color}40">
+          <div class="disc-quad-bar" style="width:${(d.val/scoreMax)*100}%;background:${d.color}"></div>
+          <div class="disc-quad-emoji">${d.emoji}</div>
+          <div class="disc-quad-label" style="color:${d.color}">${d.label}</div>
+          <div class="disc-quad-val">${d.val} 分</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  // 特质卡
+  document.getElementById('disc-char-cards').innerHTML = mainType.traits.map(t => `
+    <div class="disc-char">
+      <div class="dci">✨</div>
+      <div class="dcn">${t}</div>
+    </div>
+  `).join('');
+
+  // 沟通建议
+  document.getElementById('disc-advice').innerHTML = `
+    <div class="disc-advice-title">💬 与不同类型沟通建议</div>
+    ${DISC_TYPES.filter(t=>t.idx!==judge.typeIdx).slice(0,3).map(t => `
+      <div class="disc-advice-item">
+        <div class="disc-advice-icon">${t.name.split(' ')[0]}</div>
+        <div class="disc-advice-text">
+          <strong>${t.short}型</strong>：${t.advice.split('。')[1]||t.advice.split('。')[0]+'。'}
+        </div>
+      </div>
+    `).join('')}
+  `;
+
+  // 保存 DISC 记录
+  saveDiscRecord(judge, scores, chameleonScore);
+}
+
+function discRestart(){
+  discIdx = 0; discAns = {};
+  document.getElementById('disc-page-report').style.display = 'none';
+  document.getElementById('disc-page-test').style.display = 'none';
+  discRenderQ();
+}
+
+// === 历史记录全屏页 ===
+function showHistoryPage() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const hp = document.getElementById('p-history');
+  hp.classList.add('active');
+  hp.classList.remove('showing-report');
+  renderHistoryPage();
+}
+
+function renderHistoryPage() {
+  const tcm = getRecords().slice(0, 20);
+  const disc = getDiscRecords().slice(0, 20);
+
+  // 合并按时间排序
+  const all = [
+    ...tcm.map(r => ({...r, _sort: new Date(r.date)})),
+    ...disc.map(r => ({...r, _sort: new Date(r.date)}))
+  ].sort((a,b) => b._sort - a._sort);
+
+  const container = document.getElementById('hist-all-list');
+  if (all.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--tl);font-size:14px">暂无测试记录</div>';
+    return;
+  }
+
+  container.innerHTML = all.map(r => {
+    if (r.kind === 'disc') {
+      const scores = r.discScores;
+      return `
+        <div class="hist-card hist-disc-card" onclick="showDiscRecordDetail(${r.id})">
+          <div class="hist-card-left">
+            <div class="hist-card-icon" style="background:${r.discColor}20;color:${r.discColor}">${r.discEmoji}</div>
+            <div class="hist-card-meta">
+              <div class="hist-card-type" style="color:${r.discColor}">${r.discSubLabel}</div>
+              <div class="hist-card-date">${r.date.split(' ')[0]}</div>
+            </div>
+          </div>
+          <div class="hist-card-right">
+            <div class="hist-disc-bars">
+              ${['D','I','S','C'].map(k => `
+                <div class="hist-db-row">
+                  <span class="hist-db-label">${k}</span>
+                  <div class="hist-db-bar"><div style="width:${(scores[k]/30)*100}%;background:${k==='D'?'#E67E22':k==='I'?'#27AE60':k==='S'?'#2980B9':'#8E44AD'}"></div></div>
+                  <span class="hist-db-val">${scores[k]}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          <button class="hist-del-btn" onclick="event.stopPropagation();deleteDiscRecord(${r.id})" title="删除">✕</button>
+        </div>`;
+    } else {
+      const badge = r.resultType === '平和质' ? '#6B9E7A' : '#C49A6C';
+      return `
+        <div class="hist-card hist-tcm-card" onclick="showTCMRecordDetail(${r.id})">
+          <div class="hist-card-left">
+            <div class="hist-card-icon" style="background:#6B9E7A20;color:#4A7C59">🌿</div>
+            <div class="hist-card-meta">
+              <div class="hist-card-type" style="color:#4A7C59">${r.result}</div>
+              <div class="hist-card-date">${r.date.split(' ')[0]}</div>
+            </div>
+          </div>
+          <div class="hist-card-right">
+            <div class="hist-tcm-tags">${Object.entries(r.scores||{}).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v]) => `<span style="background:#6B9E7A15;color:#4A7C59;font-size:11px;padding:2px 7px;border-radius:10px">${k} ${v}</span>`).join('')}</div>
+          </div>
+          <button class="hist-del-btn" onclick="event.stopPropagation();deleteRecord(${r.id})" title="删除">✕</button>
+        </div>`;
+    }
+  }).join('');
+}
+
+function showDiscRecordDetail(id) {
+  const r = getDiscRecords().find(x => x.id === id);
+  if (!r) return;
+  const modal = document.getElementById('hist-modal');
+  const body = document.getElementById('hist-modal-body');
+  const discColors = {D:'#E67E22',I:'#27AE60',S:'#2980B9',C:'#8E44AD'};
+  body.innerHTML = `
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:40px">${r.discEmoji}</div>
+      <div style="font-size:22px;font-weight:700;color:${r.discColor};margin:6px 0 2px">${r.discSubLabel}</div>
+      <div style="font-size:12px;color:var(--tl)">${r.date}</div>
+    </div>
+    <div style="font-size:13px;color:var(--tl);line-height:1.8;margin-bottom:14px">${r.discDesc}</div>
+    <div style="background:#f8f4ee;border-radius:12px;padding:14px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:#8B6914;margin-bottom:10px">DISC 四项得分</div>
+      ${Object.entries(r.discScores).map(([k,v]) => `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="width:18px;font-weight:700;font-size:13px;color:${discColors[k]}">${k}</span>
+          <div style="flex:1;height:8px;background:#eee;border-radius:4px;overflow:hidden"><div style="width:${(v/30)*100}%;height:100%;background:${discColors[k]};border-radius:4px"></div></div>
+          <span style="font-size:12px;color:var(--tl);min-width:28px;text-align:right">${v}分</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  modal.style.display = 'flex';
+}
+
+function showTCMRecordDetail(id) {
+  const r = getRecords().find(x => x.id === id);
+  if (!r) return;
+  const modal = document.getElementById('hist-modal');
+  const body = document.getElementById('hist-modal-body');
+  const sorted = Object.entries(r.scores||{}).sort((a,b)=>b[1]-a[1]);
+  const colors = {'平和质':'#6B9E7A','气虚质':'#E67E22','阳虚质':'#2980B9','阴虚质':'#8E44AD','痰湿质':'#16A085','湿热质':'#D35400','血瘀质':'#C0392B','气郁质':'#8E44AD','特禀质':'#7F8C8D'};
+  body.innerHTML = `
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:40px">🌿</div>
+      <div style="font-size:22px;font-weight:700;color:#4A7C59;margin:6px 0 2px">${r.result}</div>
+      <div style="font-size:12px;color:var(--tl)">${r.date}</div>
+    </div>
+    ${r.description ? `<div style="font-size:13px;color:var(--tl);line-height:1.8;margin-bottom:14px">${r.description}</div>` : ''}
+    <div style="background:#f8f4ee;border-radius:12px;padding:14px;margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:#8B6914;margin-bottom:10px">九大体质得分</div>
+      ${sorted.map(([k,v]) => `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="width:54px;font-size:12px;color:${colors[k]||'#555'}">${k}</span>
+          <div style="flex:1;height:8px;background:#eee;border-radius:4px;overflow:hidden"><div style="width:${Math.min(100,v)}%;height:100%;background:${colors[k]||'#aaa'};border-radius:4px"></div></div>
+          <span style="font-size:12px;color:var(--tl);min-width:30px;text-align:right">${v}分</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  modal.style.display = 'flex';
+}
+
+function closeHistModal() {
+  document.getElementById('hist-modal').style.display = 'none';
+}
+</script>
+
+  <!-- 历史记录页 -->
+  <div id="p-history" class="page">
+    <div class="hist-page-hd">
+      <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p-cover').classList.add('active');" style="float:right;background:none;border:none;cursor:pointer;font-size:20px;color:var(--tl);padding:4px 8px">✕</button>
+      <h2>📋 测试历史记录</h2>
+      <p>保留最近 20 条记录</p>
+    </div>
+    <div id="hist-all-list"></div>
+  </div>
+
+  <!-- 历史详情弹窗 -->
+  <div id="hist-modal" onclick="if(event.target===this)closeHistModal()">
+    <div id="hist-modal-body"></div>
+    <button id="hist-modal-close" onclick="closeHistModal()">关闭</button>
+  </div>
 </body>
 </html>
