@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>八字前世原型 · 排盘与灵性自测（娱乐）</title>
 <style>
   :root{ --bg:#0f1115; --card:#1a1d24; --ink:#e8e3d6; --sub:#9aa0ab; --gold:#d8b25a; --line:#2c303a;
@@ -84,6 +87,7 @@
     </div>
     <div id="err" class="err"></div>
     <div class="note">提示：时辰按 23:00–00:59 为子时；未做真太阳时校正，山区/边境略有偏差。年柱以立春为界。</div>
+    <div id="diag" class="note"></div>
   </div>
 
   <div id="result">
@@ -144,13 +148,23 @@ function run(){
     bazi=lunar.getBaZi().join(',');  // 库返回数组，拼成 "己巳,丙子,丙寅,甲午"
     na=[e.getYearNaYin(),e.getMonthNaYin(),e.getDayNaYin(),e.getTimeNaYin()];
   }catch(ex){ err.textContent='排盘出错：'+ex.message; return; }
-  const r=BaziEngine.analyzeBazi(bazi, g.value);
+  let r;
+  try{ r=BaziEngine.analyzeBazi(bazi, g.value); }catch(ex){ err.textContent='分析出错：'+ex.message; return; }
   r.naYin=na;
   render(r);
   document.getElementById('result').style.display='block';
   window.scrollTo({top:document.getElementById('result').offsetTop-10,behavior:'smooth'});
 }
 
+window.addEventListener('error', function(ev){
+  const e=document.getElementById('err'); if(e) e.textContent='页面脚本出错：'+(ev.message||(ev.error&&ev.error.message)||'未知错误');
+});
+(function(){
+  const d=document.getElementById('diag'); if(!d) return;
+  const ok=(typeof Lunar!=='undefined')&&(typeof BaziEngine!=='undefined');
+  d.textContent=ok?'✓ 日历库与判定引擎已加载':'✗ 库未加载（Lunar:'+typeof Lunar+'，BaziEngine:'+typeof BaziEngine+'）';
+  d.style.color=ok?'#5fae6b':'#e0664f';
+})();
 function render(r){
   // 四柱表
   const body=document.getElementById('bzBody'); body.innerHTML='';
