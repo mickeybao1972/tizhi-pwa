@@ -129,6 +129,7 @@
 
   // ---- 主函数 ----
   function analyzeBazi(bazi, gender) {
+    if (Array.isArray(bazi)) bazi = bazi.join(','); // 兼容库返回数组的情况
     const pillars = bazi.split(',').map(s => [s[0], s[1]]);
     const [Y, M, D, T] = pillars;
     const dayGan = D[0], dayZhi = D[1];

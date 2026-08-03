@@ -141,7 +141,7 @@ function run(){
     const dt=new Date(yv, mv-1, dv, hv, miv, 0);
     lunar=Lunar.fromDate(dt);
     e=lunar.getEightChar();
-    bazi=lunar.getBaZi();           // "己巳,丙子,丙寅,甲午"
+    bazi=lunar.getBaZi().join(',');  // 库返回数组，拼成 "己巳,丙子,丙寅,甲午"
     na=[e.getYearNaYin(),e.getMonthNaYin(),e.getDayNaYin(),e.getTimeNaYin()];
   }catch(ex){ err.textContent='排盘出错：'+ex.message; return; }
   const r=BaziEngine.analyzeBazi(bazi, g.value);
