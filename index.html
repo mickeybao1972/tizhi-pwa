@@ -1926,6 +1926,13 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ 
           <div style="font-size:12px;color:#8B4513;margin-bottom:8px;font-weight:600">流年（近年）</div>
           <div id="bz-liunian" style="display:flex;gap:4px;overflow-x:auto;padding-bottom:4px"></div>
         </div>
+        <div id="bz-liuyue" style="margin-top:10px;font-size:11px;color:#8B4513"></div>
+      </div>
+      
+      <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">💰 流年·流月·流日 财运</h3>
+        <div id="bz-caiyun"></div>
+        <p style="font-size:10px;color:#888;text-align:center;margin-top:8px">财运指数依据日主与流年/流月/流日干支的五行生克（食伤生财、比劫夺财等）推算，纯娱乐参考</p>
       </div>
       
       <div id="bz-main" style="background:#fff;border-radius:10px;padding:16px;text-align:center;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"></div>
@@ -1980,6 +1987,7 @@ function runBazi(){
   r.naYin=na;r.yun={qiYun:qiYunText,daYun:daYun};
   renderBaziPan(e,r,yv);
   renderBaziResult(r);
+  renderCaiYun(r);
   document.getElementById('bz-result').style.display='block';
 }
 
@@ -2022,6 +2030,9 @@ function renderBaziPan(e,r,birthYear){
     div.innerHTML='<div>'+yy+'</div><div>'+gz+'</div>';
     lnList.appendChild(div);
   }
+  const nowL=Lunar.fromDate(new Date());
+  const liuYue=nowL.getEightChar().getMonthInGanZhi();
+  document.getElementById('bz-liuyue').innerHTML='本月流月：<b>'+liuYue+'</b> · 阴历 '+nowL.getYearInGanZhi()+'年 '+nowL.getMonthInChinese();
 }
 
 function renderBaziResult(r){
@@ -2042,6 +2053,87 @@ function renderBaziResult(r){
     const isMain=x.key===r.main.key;
     div.innerHTML='<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span>'+x.key+'</span><b style="color:#666;font-weight:500">'+x.pct+'%</b></div><div style="background:#eee;border-radius:4px;height:7px;overflow:hidden"><div style="height:100%;background:'+(isMain?'linear-gradient(90deg,#e8a87c,#8B4513)':'#8B4513')+';border-radius:4px;width:'+x.pct+'%"></div></div>';
     pl.appendChild(div);
+  });
+}
+
+function caiYunScore(riGan,gz){
+  const g=gz[0],z=gz[1];
+  const riWX=BZ_WX[riGan];
+  const ke={木:'土',土:'水',水:'火',火:'金',金:'木'};
+  const sheng={木:'火',火:'土',土:'金',金:'水',水:'木'};
+  const beiSheng={火:'木',土:'火',金:'土',水:'金',木:'水'};
+  const beiKe={土:'木',水:'土',火:'水',金:'火',木:'金'};
+  const caiWX=ke[riWX];      // 财星（我克者）
+  const shiWX=sheng[riWX];   // 食伤（我生者，生财之源）
+  const biWX=riWX;           // 比劫（同我，夺财）
+  const yinWX=beiSheng[riWX];// 印星（生我者）
+  const guanWX=beiKe[riWX];  // 官杀（克我者）
+  const yang=['甲','丙','戊','庚','壬'];
+  const gWX=BZ_WX[g];
+  let score=50,rel='',tip='';
+  if(gWX===caiWX){
+    const zheng=yang.includes(riGan)===yang.includes(g);
+    score=85;rel=zheng?'正财':'偏财';
+    tip=zheng?'正财透干，稳进之财，宜踏实经营、工资分红，忌投机。':'偏财露头，外财机遇，投资偏门易有意外之得，忌贪多冒进。';
+  }else if(gWX===shiWX){
+    score=75;rel='食伤';
+    tip='食伤生财，才华变现之期，凭技艺、创意、表达得财，宜主动出击。';
+  }else if(gWX===biWX){
+    score=35;rel='比劫';
+    tip='比劫夺财，钱财易分于人，防破耗、借贷、合伙分利，宜守不宜攻。';
+  }else if(gWX===yinWX){
+    score=55;rel='印星';
+    tip='印星护身，财运平稳，得长辈贵人荫庇，宜学习积累，不宜冒进。';
+  }else if(gWX===guanWX){
+    score=45;rel='官杀';
+    tip='官杀压顶，财被事夺，多因责任压力耗财，宜稳妥理财、量入为出。';
+  }else{
+    score=50;rel='中平';tip='干支平运，财气不显不伏，平常心经营即可。';
+  }
+  const zWX=BZ_WX[z];
+  if(zWX===caiWX){score+=4;tip+=' 地支亦藏财，暗财可期。';}
+  if(zWX===biWX){score-=4;tip+=' 地支比劫，暗耗须防。';}
+  if(zWX===shiWX){score+=2;}
+  score=Math.max(12,Math.min(98,score));
+  const level=score>=75?'旺':score>=60?'平旺':score>=45?'平':score>=30?'弱':'低迷';
+  return {score,rel,level,tip};
+}
+
+function renderCaiYun(r){
+  const riGan=r.pillars[2][0];
+  const now=new Date();
+  const nowL=Lunar.fromDate(now);
+  const nowYin=nowL.getYearInGanZhi();
+  const yGZ=nowL.getYearInGanZhi();
+  const mGZ=nowL.getEightChar().getMonthInGanZhi();
+  const dGZ=nowL.getEightChar().getDayInGanZhi();
+  const ySolar=now.getFullYear()+'年';
+  const mSolar=now.getFullYear()+'年'+(now.getMonth()+1)+'月';
+  const dSolar=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日';
+  const yLunar=nowYin+'年';
+  const mLunar=nowYin+'年 '+nowL.getMonthInChinese();
+  const dLunar=nowYin+'年 '+nowL.getMonthInChinese()+' '+nowL.getDayInChinese();
+  const cards=[
+    {label:'本年',gz:yGZ,solar:ySolar,lunar:yLunar},
+    {label:'本月',gz:mGZ,solar:mSolar,lunar:mLunar},
+    {label:'本日',gz:dGZ,solar:dSolar,lunar:dLunar}
+  ];
+  const box=document.getElementById('bz-caiyun');box.innerHTML='';
+  cards.forEach(c=>{
+    const cy=caiYunScore(riGan,c.gz);
+    const color=cy.score>=75?'#2e7d32':cy.score>=60?'#8B4513':cy.score>=45?'#888':cy.score>=30?'#c62828':'#b71c1c';
+    const div=document.createElement('div');
+    div.style.cssText='background:#fafafa;border-radius:8px;padding:10px;margin-bottom:8px';
+    div.innerHTML=
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">'+
+        '<span style="font-size:13px;font-weight:700;color:#8B4513">'+c.label+'财运</span>'+
+        '<span style="font-size:12px;color:'+color+';font-weight:700">'+cy.score+'分 · '+cy.level+'</span>'+
+      '</div>'+
+      '<div style="font-size:11px;color:#666;margin-bottom:4px">阳历 '+c.solar+' · 阴历 '+c.lunar+'</div>'+
+      '<div style="font-size:11px;color:#666;margin-bottom:6px">流'+c.label+'：'+c.gz+'（'+cy.rel+'）</div>'+
+      '<div style="background:#eee;border-radius:4px;height:8px;overflow:hidden;margin-bottom:6px"><div style="height:100%;background:'+color+';border-radius:4px;width:'+cy.score+'%"></div></div>'+
+      '<div style="font-size:11px;color:#555;line-height:1.5">'+cy.tip+'</div>';
+    box.appendChild(div);
   });
 }
 </script>
