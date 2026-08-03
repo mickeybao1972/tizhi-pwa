@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>八字前世原型 · 排盘与灵性自测（娱乐）</title>
+<style>
+  :root{ --bg:#0f1115; --card:#1a1d24; --ink:#e8e3d6; --sub:#9aa0ab; --gold:#d8b25a; --line:#2c303a;
+         --木:#5fae6b; --火:#e0664f; --土:#c9a063; --金:#cfd3da; --水:#5b9bd5; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+       line-height:1.7;padding:18px 14px 60px;}
+  .wrap{max-width:680px;margin:0 auto;}
+  h1{text-align:center;font-size:23px;letter-spacing:2px;color:var(--gold);margin:6px 0 2px;font-weight:600}
+  .tag{text-align:center;color:var(--sub);font-size:12px;margin-bottom:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px;margin-bottom:16px}
+  .card h2{font-size:15px;color:var(--gold);margin:0 0 12px;letter-spacing:1px;border-left:3px solid var(--gold);padding-left:9px}
+  .form-row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+  .form-row .fld{display:flex;flex-direction:column;font-size:12px;color:var(--sub)}
+  .fld input,.fld select{background:#0f1115;border:1px solid var(--line);color:var(--ink);border-radius:8px;
+       padding:7px 8px;font-size:15px;width:78px;margin-top:3px}
+  .fld.grow input{width:100%}
+  .btn{display:block;width:100%;margin-top:14px;background:linear-gradient(135deg,#d8b25a,#b88a2e);color:#1a1206;
+       border:none;border-radius:10px;padding:13px;font-size:16px;font-weight:700;letter-spacing:3px;cursor:pointer}
+  .btn:active{transform:translateY(1px)}
+  .ghost{background:none;border:1px solid var(--line);color:var(--sub);border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;margin-top:10px}
+  /* 排盘 */
+  table.bz{width:100%;border-collapse:collapse;font-size:14px}
+  table.bz th,table.bz td{border:1px solid var(--line);padding:8px 4px;text-align:center}
+  table.bz th{color:var(--sub);font-weight:500;font-size:12px;background:#14171d}
+  .gan{font-size:22px;font-weight:700;color:var(--gold)}
+  .zhi{font-size:20px;font-weight:700}
+  .small{font-size:11px;color:var(--sub)}
+  .wxbar{display:flex;gap:6px;margin-top:6px}
+  .wxbar .seg{flex:1;text-align:center;font-size:12px;padding:5px 0;border-radius:6px;background:#14171d}
+  .gods{display:flex;flex-wrap:wrap;gap:7px}
+  .gods span{background:#14171d;border:1px solid var(--line);border-radius:20px;padding:4px 11px;font-size:13px;color:var(--ink)}
+  /* 主型 */
+  .main-card{text-align:center;padding:20px 14px}
+  .main-card .tt{font-size:13px;color:var(--sub)}
+  .main-card .nm{font-size:30px;color:var(--gold);font-weight:700;letter-spacing:3px;margin:6px 0}
+  .main-card .pc{font-size:13px;color:var(--sub)}
+  .lightshadow{display:flex;gap:10px;margin-top:12px}
+  .lightshadow div{flex:1;background:#14171d;border-radius:10px;padding:10px;font-size:13px}
+  .ls-t{color:var(--gold);font-size:12px;margin-bottom:4px}
+  .story{font-size:14px;color:var(--ink);margin-top:12px;font-style:normal}
+  .lesson{font-size:13px;color:var(--sub);margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+  .vice{font-size:13px;color:var(--sub);text-align:center;margin-top:4px}
+  .vice b{color:var(--ink)}
+  /* 占比条 */
+  .proto{margin-bottom:9px}
+  .proto .lab{display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px}
+  .proto .lab b{color:var(--sub);font-weight:500}
+  .track{background:#14171d;border-radius:6px;height:9px;overflow:hidden}
+  .fill{height:100%;background:linear-gradient(90deg,#d8b25a,#b88a2e);border-radius:6px}
+  .fill.top{background:linear-gradient(90deg,#e8c97a,#d8b25a)}
+  .note{font-size:11px;color:#6b7280;text-align:center;margin-top:8px;line-height:1.6}
+  #result{display:none}
+  .err{color:var(--火);font-size:13px;text-align:center;margin-top:10px}
+  .seg.木{color:var(--木)} .seg.火{color:var(--火)} .seg.土{color:var(--土)} .seg.金{color:var(--金)} .seg.水{color:var(--水)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>八字前世原型</h1>
+  <div class="tag">公历排盘 · 十神五行神煞 · 17 种前世灵性原型（纯娱乐，非正统命理）</div>
+
+  <div class="card">
+    <h2>填写出生信息</h2>
+    <div class="form-row">
+      <div class="fld">年<input id="y" type="number" value="1990" min="1900" max="2100"></div>
+      <div class="fld">月<input id="m" type="number" value="1" min="1" max="12"></div>
+      <div class="fld">日<input id="d" type="number" value="1" min="1" max="31"></div>
+      <div class="fld">时(0-23)<input id="h" type="number" value="12" min="0" max="23"></div>
+      <div class="fld">分<input id="mi" type="number" value="0" min="0" max="59"></div>
+      <div class="fld">性别
+        <select id="g"><option value="男">男</option><option value="女">女</option></select>
+      </div>
+    </div>
+    <button class="btn" onclick="run()">排 盘 看 前 世</button>
+    <div style="text-align:center">
+      <button class="ghost" onclick="fillSample()">填示例</button>
+      <button class="ghost" onclick="randomChart()">随机一个</button>
+    </div>
+    <div id="err" class="err"></div>
+    <div class="note">提示：时辰按 23:00–00:59 为子时；未做真太阳时校正，山区/边境略有偏差。年柱以立春为界。</div>
+  </div>
+
+  <div id="result">
+    <!-- 排盘 -->
+    <div class="card">
+      <h2>四柱排盘</h2>
+      <table class="bz">
+        <tr><th>四柱</th><th>天干</th><th>十神</th><th>地支</th><th>本气</th><th>十神</th><th>纳音</th></tr>
+        <tbody id="bzBody"></tbody>
+      </table>
+      <div style="margin-top:12px;font-size:12px;color:var(--sub)">五行个数（天干+地支本气）：</div>
+      <div class="wxbar" id="wxBar"></div>
+    </div>
+
+    <!-- 神煞 -->
+    <div class="card">
+      <h2>神煞 · 空亡</h2>
+      <div class="gods" id="godsBox"></div>
+      <div class="note" id="kongBox"></div>
+    </div>
+
+    <!-- 主型 -->
+    <div class="card main-card" id="mainCard"></div>
+    <div class="card" id="viceCard"></div>
+
+    <!-- 全部占比 -->
+    <div class="card">
+      <h2>17 种前世原型 · 成分占比</h2>
+      <div id="protoList"></div>
+      <div class="note">百分比为各原型相对强度的归一化占比，总和 100%。多数人为 2–3 种混合，主型只是最强的一道印记。</div>
+    </div>
+  </div>
+</div>
+
+<script src="lunar.js"></script>
+<script src="bazi-engine.js"></script>
+<script>
+const ZHNames = ['年柱','月柱','日柱','时柱'];
+const WXCOLOR = {木:'木',火:'火',土:'土',金:'金',水:'水'};
+
+function fillSample(){ y.value=1990;m.value=1;d.value=1;h.value=12;mi.value=0;g.value='男'; }
+function randomChart(){
+  const ry=1900+Math.floor(Math.random()*100), rm=1+Math.floor(Math.random()*12),
+        rd=1+Math.floor(Math.random()*28), rh=Math.floor(Math.random()*24), rmi=Math.floor(Math.random()*60);
+  y.value=ry;m.value=rm;d.value=rd;h.value=rh;mi.value=rmi;g.value=Math.random()<0.5?'男':'女';
+}
+
+function run(){
+  const err=document.getElementById('err'); err.textContent='';
+  const yv=+y.value,mv=+m.value,dv=+d.value,hv=+h.value,miv=+mi.value;
+  if(!(yv&&mv&&dv&&hv>=0)){ err.textContent='请把年月日时填完整'; return; }
+  if(typeof Lunar==='undefined'){ err.textContent='日历库 lunar.js 未加载（请确认 lunar.js 与本文件在同一文件夹）'; return; }
+  let lunar, e, bazi, na;
+  try{
+    const dt=new Date(yv, mv-1, dv, hv, miv, 0);
+    lunar=Lunar.fromDate(dt);
+    e=lunar.getEightChar();
+    bazi=lunar.getBaZi();           // "己巳,丙子,丙寅,甲午"
+    na=[e.getYearNaYin(),e.getMonthNaYin(),e.getDayNaYin(),e.getTimeNaYin()];
+  }catch(ex){ err.textContent='排盘出错：'+ex.message; return; }
+  const r=BaziEngine.analyzeBazi(bazi, g.value);
+  r.naYin=na;
+  render(r);
+  document.getElementById('result').style.display='block';
+  window.scrollTo({top:document.getElementById('result').offsetTop-10,behavior:'smooth'});
+}
+
+function render(r){
+  // 四柱表
+  const body=document.getElementById('bzBody'); body.innerHTML='';
+  ZHNames.forEach((zn,i)=>{
+    const p=r.pillars[i], pi=r.pillarsInfo[i];
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="small">${zn}</td>`+
+      `<td><span class="gan">${p[0]}</span><div class="small">${pi.ganWX}</div></td>`+
+      `<td class="small">${pi.ganGod}</td>`+
+      `<td><span class="zhi">${p[1]}</span><div class="small">${pi.zhiWX}</div></td>`+
+      `<td class="small">${pi.zhiBen}</td>`+
+      `<td class="small">${pi.zhiGod}</td>`+
+      `<td class="small">${r.naYin?.[i]||''}</td>`;
+    body.appendChild(tr);
+  });
+  // 五行条
+  const wx=r.wuxingCount; const max=Math.max(...Object.values(wx),1);
+  const bar=document.getElementById('wxBar'); bar.innerHTML='';
+  ['木','火','土','金','水'].forEach(k=>{
+    const d=document.createElement('div'); d.className='seg '+k;
+    d.innerHTML=`${k}<br>${wx[k]}`;
+    bar.appendChild(d);
+  });
+  // 神煞
+  const gb=document.getElementById('godsBox'); gb.innerHTML='';
+  if(r.gods.length===0) gb.innerHTML='<span class="small">无明显神煞</span>';
+  r.gods.forEach(gd=>{ const s=document.createElement('span'); s.textContent=gd; gb.appendChild(s); });
+  document.getElementById('kongBox').textContent='日柱空亡：'+r.kongwang.join('、')+'（若四柱地支落入，则标“空亡”神煞）';
+  // 主型
+  const mc=document.getElementById('mainCard');
+  mc.innerHTML=`<div class="tt">你的主型前世原型</div>`+
+    `<div class="nm">${r.main.name}</div>`+
+    `<div class="pc">强度 ${r.main.pct}%　·　核心命理：${r.main.core}</div>`+
+    `<div class="lightshadow">`+
+      `<div><div class="ls-t">光明面</div>${r.main.light}</div>`+
+      `<div><div class="ls-t">阴影面</div>${r.main.shadow}</div>`+
+    `</div>`+
+    `<div class="story">${r.main.story}</div>`+
+    `<div class="lesson">今生课题：${r.main.lesson}</div>`;
+  // 副型
+  document.getElementById('viceCard').innerHTML=
+    `<div class="vice">次强印记 · <b>${r.vice.name}</b>（${r.vice.pct}%）— ${r.vice.light} / ${r.vice.shadow}<br>`+
+    `<span class="small">${r.vice.story}</span></div>`;
+  // 全部占比
+  const pl=document.getElementById('protoList'); pl.innerHTML='';
+  r.ranked.forEach(x=>{
+    const div=document.createElement('div'); div.className='proto';
+    const top = x.key===r.main.key ? ' top':'';
+    div.innerHTML=`<div class="lab"><span>${x.key}</span><b>${x.pct}%</b></div>`+
+      `<div class="track"><div class="fill${top}" style="width:${x.pct}%"></div></div>`;
+    pl.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
