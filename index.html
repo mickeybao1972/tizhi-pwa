@@ -370,6 +370,9 @@ function toggleLang(){
     <button class="btn btn-history" onclick="showHistoryPage()" style="max-width:480px;justify-content:center;width:100%;font-size:14px;padding:10px 24px;margin-top:8px;background:linear-gradient(135deg,#6B5B95,#8B7FB5);box-shadow:0 4px 16px rgba(107,91,149,0.2);color:#fff" data-i18n="btn_history">
       📋 测试历史记录
     </button>
+    <button class="btn" onclick="startBazi()" style="max-width:480px;justify-content:center;width:100%;font-size:14px;padding:11px 24px;margin-top:8px;background:linear-gradient(135deg,#8B4513,#CD853F);box-shadow:0 4px 16px rgba(139,69,19,0.25);color:#fff">
+      🔮 八字看三生 · 前世今生原型
+    </button>
   </div>
  </div>
 
@@ -1884,6 +1887,163 @@ function closeHistModal() {
   </div>
 <script>
 if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(e){console.log('SW',e);}); }); }
+</script>
+
+<!-- 八字三生页面 -->
+<div id="p-bazi" class="page" style="background:#f5f5f0;padding:16px 12px">
+  <div style="max-width:720px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:16px">
+      <h1 style="font-size:22px;color:#8B4513;margin:4px 0">🔮 八字看三生</h1>
+      <p style="font-size:12px;color:#666">公历排盘 · 大运流年 · 17种前世灵性原型（纯娱乐）</p>
+    </div>
+    <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p0').classList.add('active');" style="position:fixed;top:12px;right:12px;background:#8B4513;color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;z-index:100">✕ 返回</button>
+    
+    <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+      <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">出生信息</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end">
+        <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>年</label><input id="bz-y" type="number" value="1990" min="1900" max="2100" style="width:64px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
+        <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>月</label><input id="bz-m" type="number" value="1" min="1" max="12" style="width:56px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
+        <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>日</label><input id="bz-d" type="number" value="1" min="1" max="31" style="width:56px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
+        <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>时</label><input id="bz-h" type="number" value="12" min="0" max="23" style="width:56px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
+        <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>分</label><input id="bz-mi" type="number" value="0" min="0" max="59" style="width:56px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
+        <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>性别</label><select id="bz-g" style="width:56px;padding:6px;border:1px solid #ddd;border-radius:6px"><option value="男">男</option><option value="女">女</option></select></div>
+      </div>
+      <button onclick="runBazi()" style="display:block;width:100%;margin-top:12px;background:#8B4513;color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:600;cursor:pointer">排 盘 看 三 生</button>
+      <div id="bz-err" style="color:#c62828;font-size:12px;text-align:center;margin-top:8px"></div>
+      <p style="font-size:10px;color:#888;text-align:center;margin-top:6px">时辰按 23:00–00:59 为子时；年柱以立春为界；未做真太阳时校正</p>
+    </div>
+    
+    <div id="bz-result" style="display:none">
+      <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">基本命盘</h3>
+        <div id="bz-pan" style="overflow-x:auto"></div>
+        <div id="bz-qiyun" style="font-size:11px;color:#666;text-align:center;margin:10px 0;padding:8px;background:#fafafa;border-radius:6px"></div>
+        <div style="margin-top:12px">
+          <div style="font-size:12px;color:#8B4513;margin-bottom:8px;font-weight:600">大运（十年一柱）</div>
+          <div id="bz-dayun" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px"></div>
+        </div>
+        <div style="margin-top:10px">
+          <div style="font-size:12px;color:#8B4513;margin-bottom:8px;font-weight:600">流年（近年）</div>
+          <div id="bz-liunian" style="display:flex;gap:4px;overflow-x:auto;padding-bottom:4px"></div>
+        </div>
+      </div>
+      
+      <div id="bz-main" style="background:#fff;border-radius:10px;padding:16px;text-align:center;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"></div>
+      <div id="bz-vice" style="background:#fff;border-radius:10px;padding:12px;text-align:center;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"></div>
+      <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">17 种前世原型 · 成分占比</h3>
+        <div id="bz-protolist"></div>
+        <p style="font-size:10px;color:#888;text-align:center;margin-top:6px">百分比为相对强度归一化，总和 100%。多数人为 2–3 种混合。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="lunar.js"></script>
+<script src="bazi-engine.js"></script>
+<script>
+function startBazi(){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('p-bazi').classList.add('active');
+}
+const BZ_GAN=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const BZ_ZHI=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const BZ_WX={甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水',子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
+const BZ_CANG={子:['癸'],丑:['己','癸','辛'],寅:['甲','丙','戊'],卯:['乙'],辰:['戊','乙','癸'],巳:['丙','庚','戊'],午:['丁','己'],未:['己','丁','乙'],申:['庚','壬','戊'],酉:['辛'],戌:['戊','辛','丁'],亥:['壬','甲']};
+const BZ_SHENG=['长生','沐浴','冠带','临官','帝旺','衰','病','死','墓','绝','胎','养'];
+const BZ_KONG={甲子:'戌亥',甲戌:'申酉',甲申:'午未',甲午:'辰巳',甲辰:'寅卯',甲寅:'子丑'};
+function bzYearGZ(y){return BZ_GAN[(y-4)%10<0?(y-4)%10+10:(y-4)%10]+BZ_ZHI[(y-4)%12<0?(y-4)%12+12:(y-4)%12];}
+function bzGetKong(riZhu){const g=riZhu[0];const xunShou=BZ_GAN.indexOf(g)%2===0?g+'子':'乙丑';return BZ_KONG[xunShou]||'--';}
+function bzSheng12(gan,zhi){const yang=['甲','丙','戊','庚','壬'].includes(gan);const start={'亥':0,'子':1,'丑':2,'寅':3,'卯':4,'辰':5,'巳':6,'午':7,'未':8,'申':9,'酉':10,'戌':11};const idx=start[zhi];if(idx==null)return'--';const pos=yang?idx:(11-idx+12)%12;return BZ_SHENG[pos];}
+function bzShiShen(riGan,gan){const riIdx=BZ_GAN.indexOf(riGan),gIdx=BZ_GAN.indexOf(gan);if(gIdx===riIdx)return'比肩';if((gIdx-riIdx+10)%10===1)return'劫财';const riWX=BZ_WX[riGan],gWX=BZ_WX[gan];const yang=['甲','丙','戊','庚','壬'];const riYang=yang.includes(riGan),gYang=yang.includes(gan);const sheng={木:'火',火:'土',土:'金',金:'水',水:'木'};const ke={木:'土',土:'水',水:'火',火:'金',金:'木'};if(sheng[riWX]===gWX)return(riYang===gYang)?'食神':'伤官';if(ke[riWX]===gWX)return(riYang===gYang)?'偏财':'正财';const beiSheng={火:'木',土:'火',金:'土',水:'金',木:'水'};const beiKe={土:'木',水:'土',火:'水',金:'火',木:'金'};if(beiSheng[riWX]===gWX)return(riYang===gYang)?'偏印':'正印';if(beiKe[riWX]===gWX)return(riYang===gYang)?'七杀':'正官';return'';}
+function bzNayin(gz){const t={'甲子':'海中金','乙丑':'海中金','丙寅':'炉中火','丁卯':'炉中火','戊辰':'大林木','己巳':'大林木','庚午':'路旁土','辛未':'路旁土','壬申':'剑锋金','癸酉':'剑锋金','甲戌':'山头火','乙亥':'山头火','丙子':'涧下水','丁丑':'涧下水','戊寅':'城头土','己卯':'城头土','庚辰':'白蜡金','辛巳':'白蜡金','壬午':'杨柳木','癸未':'杨柳木','甲申':'泉中水','乙酉':'泉中水','丙戌':'屋上土','丁亥':'屋上土','戊子':'霹雳火','己丑':'霹雳火','庚寅':'松柏木','辛卯':'松柏木','壬辰':'长流水','癸巳':'长流水','甲午':'沙中金','乙未':'沙中金','丙申':'山下火','丁酉':'山下火','戊戌':'平地木','己亥':'平地木','庚子':'壁上土','辛丑':'壁上土','壬寅':'金箔金','癸卯':'金箔金','甲辰':'佛灯火','乙巳':'佛灯火','丙午':'天河水','丁未':'天河水','戊申':'大驿土','己酉':'大驿土','庚戌':'钗钏金','辛亥':'钗钏金','壬子':'桑柘木','癸丑':'桑柘木','甲寅':'大溪水','乙卯':'大溪水','丙辰':'沙中土','丁巳':'沙中土','戊午':'天上火','己未':'天上火','庚申':'石榴木','辛酉':'石榴木','壬戌':'大海水','癸亥':'大海水'};return t[gz]||'';}
+
+function runBazi(){
+  const err=document.getElementById('bz-err');err.textContent='';
+  const yv=+document.getElementById('bz-y').value,mv=+document.getElementById('bz-m').value,dv=+document.getElementById('bz-d').value,hv=+document.getElementById('bz-h').value,miv=+document.getElementById('bz-mi').value;
+  if(!(yv&&mv&&dv&&hv>=0)){err.textContent='请把年月日时填完整';return}
+  if(typeof Lunar==='undefined'){err.textContent='日历库未加载';return}
+  let lunar,e,bazi,na,yun,daYun,qiYunText;
+  try{
+    const dt=new Date(yv,mv-1,dv,hv,miv,0);
+    lunar=Lunar.fromDate(dt);
+    e=lunar.getEightChar();
+    bazi=lunar.getBaZi().join(',');
+    na=[e.getYearNaYin(),e.getMonthNaYin(),e.getDayNaYin(),e.getTimeNaYin()];
+    const genderCode=document.getElementById('bz-g').value==='男'?1:0;
+    yun=e.getYun(genderCode);
+    daYun=yun.getDaYun().map(d=>({startAge:d.getStartAge(),startYear:d.getStartYear(),ganZhi:d.getGanZhi()}));
+    qiYunText='起运：出生后'+yun.getStartYear()+'年'+yun.getStartMonth()+'个月 · 交运：'+(yun.getStartYear()+yv)+'年';
+  }catch(ex){err.textContent='排盘出错：'+ex.message;return}
+  let r;
+  try{r=BaziEngine.analyzeBazi(bazi,document.getElementById('bz-g').value)}catch(ex){err.textContent='分析出错：'+ex.message;return}
+  r.naYin=na;r.yun={qiYun:qiYunText,daYun:daYun};
+  renderBaziPan(e,r,yv);
+  renderBaziResult(r);
+  document.getElementById('bz-result').style.display='block';
+}
+
+function renderBaziPan(e,r,birthYear){
+  const bz=r.pillars,riGan=bz[2][0],nowYear=new Date().getFullYear(),nowAge=nowYear-birthYear;
+  let curDyIdx=0;r.yun.daYun.forEach((d,i)=>{if(d.startAge<=nowAge)curDyIdx=i});
+  const curDy=r.yun.daYun[curDyIdx],liuYear=bzYearGZ(nowYear);
+  const wxColor={木:'#2e7d32',火:'#c62828',土:'#8d6e63',金:'#546e7a',水:'#1565c0'};
+  let html='<table style="width:100%;border-collapse:collapse;font-size:11px;background:#fff">';
+  html+='<tr style="background:#f9f9f6"><th style="border:1px solid #e0e0d8;padding:5px;width:40px">时间</th><th style="border:1px solid #e0e0d8;padding:5px">年柱</th><th style="border:1px solid #e0e0d8;padding:5px">月柱</th><th style="border:1px solid #e0e0d8;padding:5px">日柱</th><th style="border:1px solid #e0e0d8;padding:5px">时柱</th><th style="border:1px solid #e0e0d8;padding:5px;background:#fff8f0">大运</th><th style="border:1px solid #e0e0d8;padding:5px;background:#f0f8ff">流年</th></tr>';
+  const zhuXing=['主星',r.pillarsInfo[0].ganGod,r.pillarsInfo[1].ganGod,'元'+riGan,r.pillarsInfo[3].ganGod,curDy?bzShiShen(riGan,curDy.ganZhi[0]):'',bzShiShen(riGan,liuYear[0])];
+  html+='<tr>'+zhuXing.map((x,i)=>'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center;font-size:10px;color:#666"'+(i>4?' style="background:'+(i===5?'#fff8f0':'#f0f8ff')+'"':'')+'>'+x+'</td>').join('')+'</tr>';
+  const ganRow=['天干',...bz.map(p=>'<span style="font-size:18px;font-weight:700;color:'+wxColor[BZ_WX[p[0]]]+'">'+p[0]+'</span>'),curDy?'<span style="font-size:18px;font-weight:700;color:'+wxColor[BZ_WX[curDy.ganZhi[0]]]+'">'+curDy.ganZhi[0]+'</span>':'','<span style="font-size:18px;font-weight:700;color:'+wxColor[BZ_WX[liuYear[0]]]+'">'+liuYear[0]+'</span>'];
+  html+='<tr>'+ganRow.map((x,i)=>'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center"'+(i>4?' style="background:'+(i===5?'#fff8f0':'#f0f8ff')+'"':'')+'>'+x+'</td>').join('')+'</tr>';
+  const zhiRow=['地支',...bz.map(p=>'<span style="font-size:16px;font-weight:700;color:'+wxColor[BZ_WX[p[1]]]+'">'+p[1]+'</span>'),curDy?'<span style="font-size:16px;font-weight:700;color:'+wxColor[BZ_WX[curDy.ganZhi[1]]]+'">'+curDy.ganZhi[1]+'</span>':'','<span style="font-size:16px;font-weight:700;color:'+wxColor[BZ_WX[liuYear[1]]]+'">'+liuYear[1]+'</span>'];
+  html+='<tr>'+zhiRow.map((x,i)=>'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center"'+(i>4?' style="background:'+(i===5?'#fff8f0':'#f0f8ff')+'"':'')+'>'+x+'</td>').join('')+'</tr>';
+  const cangRow=['藏干',...bz.map(p=>{const c=BZ_CANG[p[1]]||[];return c.map(cg=>'<div style="font-size:9px;line-height:1.4"><span style="color:#999">'+cg+'</span>'+bzShiShen(riGan,cg)+'</div>').join('')}),curDy?(BZ_CANG[curDy.ganZhi[1]]||[]).map(cg=>'<div style="font-size:9px;line-height:1.4"><span style="color:#999">'+cg+'</span>'+bzShiShen(riGan,cg)+'</div>').join(''):'',(BZ_CANG[liuYear[1]]||[]).map(cg=>'<div style="font-size:9px;line-height:1.4"><span style="color:#999">'+cg+'</span>'+bzShiShen(riGan,cg)+'</div>').join('')];
+  html+='<tr>'+cangRow.map((x,i)=>'<td style="border:1px solid #e0e0d8;padding:5px;text-align:left"'+(i>4?' style="background:'+(i===5?'#fff8f0':'#f0f8ff')+'"':'')+'>'+x+'</td>').join('')+'</tr>';
+  const shengRow=['星运',...bz.map(p=>bzSheng12(riGan,p[1])),curDy?bzSheng12(riGan,curDy.ganZhi[1]):'',bzSheng12(riGan,liuYear[1])];
+  html+='<tr>'+shengRow.map((x,i)=>'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center;font-size:10px;color:#666"'+(i>4?' style="background:'+(i===5?'#fff8f0':'#f0f8ff')+'"':'')+'>'+x+'</td>').join('')+'</tr>';
+  const naRow=['纳音',...r.naYin.map(n=>'<span style="font-size:9px;color:#888">'+n+'</span>'),curDy?'<span style="font-size:9px;color:#888">'+bzNayin(curDy.ganZhi)+'</span>':'','<span style="font-size:9px;color:#888">'+bzNayin(liuYear)+'</span>'];
+  html+='<tr>'+naRow.map((x,i)=>'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center"'+(i>4?' style="background:'+(i===5?'#fff8f0':'#f0f8ff')+'"':'')+'>'+x+'</td>').join('')+'</tr>';
+  html+='</table>';
+  document.getElementById('bz-pan').innerHTML=html;
+  document.getElementById('bz-qiyun').textContent=r.yun.qiYun;
+  const dyList=document.getElementById('bz-dayun');dyList.innerHTML='';
+  r.yun.daYun.forEach((d,i)=>{
+    const isCur=i===curDyIdx;
+    const c=BZ_CANG[d.ganZhi[1]]||[];
+    const div=document.createElement('div');
+    div.style.cssText='flex:0 0 58px;text-align:center;background:'+(isCur?'#8B4513':'#fafafa')+';color:'+(isCur?'#fff':'#333')+';border:1px solid #e0e0d8;border-radius:6px;padding:6px 3px';
+    div.innerHTML='<span style="font-size:10px;display:block;margin-bottom:2px">'+d.startAge+'岁</span><span style="font-size:13px;font-weight:700;display:block">'+d.ganZhi+'</span><span style="font-size:9px;display:block;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+c.join(' ')+'</span>';
+    dyList.appendChild(div);
+  });
+  const lnList=document.getElementById('bz-liunian');lnList.innerHTML='';
+  for(let i=-2;i<=4;i++){
+    const yy=nowYear+i,gz=bzYearGZ(yy),isCur=i===0;
+    const div=document.createElement('div');
+    div.style.cssText='flex:0 0 44px;text-align:center;background:'+(isCur?'#1565c0':'#f5f5f5')+';color:'+(isCur?'#fff':'#333')+';border-radius:4px;padding:4px 2px;font-size:11px';
+    div.innerHTML='<div>'+yy+'</div><div>'+gz+'</div>';
+    lnList.appendChild(div);
+  }
+}
+
+function renderBaziResult(r){
+  const mc=document.getElementById('bz-main');
+  mc.innerHTML='<div style="font-size:12px;color:#666">你的主型前世原型</div>'+
+    '<div style="font-size:26px;color:#8B4513;font-weight:700;margin:4px 0">'+r.main.name+'</div>'+
+    '<div style="font-size:12px;color:#666">强度 '+r.main.pct+'% · 核心命理：'+r.main.core+'</div>'+
+    '<div style="display:flex;gap:8px;margin-top:10px">'+
+      '<div style="flex:1;background:#fafafa;border-radius:8px;padding:10px;font-size:12px"><div style="color:#8B4513;font-size:11px;margin-bottom:3px;font-weight:600">光明面</div>'+r.main.light+'</div>'+
+      '<div style="flex:1;background:#fafafa;border-radius:8px;padding:10px;font-size:12px"><div style="color:#8B4513;font-size:11px;margin-bottom:3px;font-weight:600">阴影面</div>'+r.main.shadow+'</div>'+
+    '</div>'+
+    '<div style="font-size:13px;margin-top:10px;text-align:left">'+r.main.story+'</div>'+
+    '<div style="font-size:12px;color:#666;margin-top:8px;border-top:1px dashed #e0e0d8;padding-top:8px;text-align:left">今生课题：'+r.main.lesson+'</div>';
+  document.getElementById('bz-vice').innerHTML='<div style="font-size:12px;color:#666">次强印记 · <b>'+r.vice.name+'</b>（'+r.vice.pct+'%）— '+r.vice.light+' / '+r.vice.shadow+'<br><span style="font-size:11px">'+r.vice.story+'</span></div>';
+  const pl=document.getElementById('bz-protolist');pl.innerHTML='';
+  r.ranked.forEach(x=>{
+    const div=document.createElement('div');div.style.cssText='margin-bottom:7px';
+    const isMain=x.key===r.main.key;
+    div.innerHTML='<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span>'+x.key+'</span><b style="color:#666;font-weight:500">'+x.pct+'%</b></div><div style="background:#eee;border-radius:4px;height:7px;overflow:hidden"><div style="height:100%;background:'+(isMain?'linear-gradient(90deg,#e8a87c,#8B4513)':'#8B4513')+';border-radius:4px;width:'+x.pct+'%"></div></div>';
+    pl.appendChild(div);
+  });
+}
 </script>
 </body>
 </html>
