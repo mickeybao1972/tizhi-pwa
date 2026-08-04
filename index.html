@@ -1960,6 +1960,26 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ 
 <script src="lunar.js"></script>
 <script src="bazi-engine.js"></script>
 <script>
+// 兜底：万一 lunar.js 的 UMD 在浏览器里走 module 分支没挂全局，手动挂一次
+(function(){
+  try {
+    var mod = (typeof module!=='undefined' && module.exports) || null;
+    var lunarObj = null;
+    if (mod && mod.Lunar) lunarObj = mod;
+    else if (typeof window.Lunar === 'undefined' && typeof Lunar !== 'undefined') {
+      // Lunar 已在全局
+    }
+    if (mod && !window.Lunar) {
+      var keys = ['SolarUtil','LunarUtil','Solar','Lunar','Foto','Tao','NineStar','EightChar','SolarWeek','SolarMonth','SolarSeason','SolarHalfYear','SolarYear','LunarMonth','LunarYear','LunarTime','HolidayUtil','I18n','ShouXingUtil','FotoUtil','TaoUtil','NineStarUtil'];
+      keys.forEach(function(k){ if (mod[k]) window[k] = mod[k]; });
+    }
+    if (!window.BaziEngine && typeof BaziEngine !== 'undefined') {
+      window.BaziEngine = BaziEngine;
+    }
+  } catch(e) { console.error('lunar shim err', e); }
+})();
+</script>
+<script>
 function startBazi(){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('p-bazi').classList.add('active');
