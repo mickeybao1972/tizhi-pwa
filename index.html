@@ -2009,7 +2009,7 @@ function runBazi(){
     lunar=Lunar.fromDate(dt);
     e=lunar.getEightChar();
     bazi=lunar.getBaZi().join(',');
-    na=[e.getYearNaYin(),e.getMonthNaYin(),e.getDayNaYin(),e.getTimeNaYin()];
+    na=[lunar.getYearNaYin(),lunar.getMonthNaYin(),lunar.getDayNaYin(),lunar.getTimeNaYin()];
     err.textContent='[2/4] 排大运...';
     const genderCode=document.getElementById('bz-g').value==='男'?1:0;
     yun=e.getYun(genderCode);
@@ -2069,7 +2069,7 @@ function renderBaziPan(e,r,birthYear){
     lnList.appendChild(div);
   }
   const nowL=Lunar.fromDate(new Date());
-  const liuYue=nowL.getEightChar().getMonthInGanZhi();
+  const liuYue=nowL.getMonthInGanZhi();
   document.getElementById('bz-liuyue').innerHTML='本月流月：<b>'+liuYue+'</b> · 阴历 '+nowL.getYearInGanZhi()+'年 '+nowL.getMonthInChinese();
 }
 
@@ -2143,8 +2143,8 @@ function renderCaiYun(r){
   const nowL=Lunar.fromDate(now);
   const nowYin=nowL.getYearInGanZhi();
   const yGZ=nowL.getYearInGanZhi();
-  const mGZ=nowL.getEightChar().getMonthInGanZhi();
-  const dGZ=nowL.getEightChar().getDayInGanZhi();
+  const mGZ=nowL.getMonthInGanZhi();
+  const dGZ=nowL.getDayInGanZhi();
   const ySolar=now.getFullYear()+'年';
   const mSolar=now.getFullYear()+'年'+(now.getMonth()+1)+'月';
   const dSolar=now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日';
@@ -2242,8 +2242,8 @@ function renderCaiTotal(r, birthYear) {
   var now = new Date();
   var nowL = Lunar.fromDate(now);
   var liuNian = nowL.getYearInGanZhi();
-  var liuYue = nowL.getEightChar().getMonthInGanZhi();
-  var liuRi = nowL.getEightChar().getDayInGanZhi();
+  var liuYue = nowL.getMonthInGanZhi();
+  var liuRi = nowL.getDayInGanZhi();
   var nowYear = now.getFullYear(), nowAge = nowYear - birthYear;
   var curDyIdx = 0;
   r.yun.daYun.forEach(function(d, i){ if (d.startAge <= nowAge) curDyIdx = i; });
