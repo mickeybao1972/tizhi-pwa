@@ -1990,7 +1990,7 @@ function runBazi(){
     na=[e.getYearNaYin(),e.getMonthNaYin(),e.getDayNaYin(),e.getTimeNaYin()];
     const genderCode=document.getElementById('bz-g').value==='男'?1:0;
     yun=e.getYun(genderCode);
-    daYun=yun.getDaYun().map(d=>({startAge:d.getStartAge(),startYear:d.getStartYear(),ganZhi:d.getGanZhi()}));
+    daYun=yun.getDaYun().map(function(d){return {startAge:d.startAge,startYear:d.startYear,ganZhi:d.getGanZhi()};});
     qiYunText='起运：出生后'+yun.getStartYear()+'年'+yun.getStartMonth()+'个月 · 交运：'+(yun.getStartYear()+yv)+'年';
   }catch(ex){err.textContent='排盘出错：'+ex.message;return}
   let r;
@@ -1999,9 +1999,8 @@ function runBazi(){
   renderBaziPan(e,r,yv);
   renderBaziResult(r);
   renderCaiYun(r);
-  renderCaiTotal(r, yv);
   document.getElementById('bz-result').style.display='block';
-  renderCaiTotal(r,yv);
+  renderCaiTotal(r, yv);
 }
 
 function renderBaziPan(e,r,birthYear){
