@@ -2000,27 +2000,33 @@ function runBazi(){
   const err=document.getElementById('bz-err');err.textContent='';
   const yv=+document.getElementById('bz-y').value,mv=+document.getElementById('bz-m').value,dv=+document.getElementById('bz-d').value,hv=+document.getElementById('bz-h').value,miv=+document.getElementById('bz-mi').value;
   if(!(yv&&mv&&dv&&hv>=0)){err.textContent='请把年月日时填完整';return}
-  if(typeof Lunar==='undefined'){err.textContent='日历库未加载';return}
+  if(typeof Lunar==='undefined'){err.textContent='日历库未加载（Lunar=undefined）';return}
+  if(typeof BaziEngine==='undefined'){err.textContent='八字引擎未加载（BaziEngine=undefined）';return}
   let lunar,e,bazi,na,yun,daYun,qiYunText;
   try{
+    err.textContent='[1/4] 排四柱...';
     const dt=new Date(yv,mv-1,dv,hv,miv,0);
     lunar=Lunar.fromDate(dt);
     e=lunar.getEightChar();
     bazi=lunar.getBaZi().join(',');
     na=[e.getYearNaYin(),e.getMonthNaYin(),e.getDayNaYin(),e.getTimeNaYin()];
+    err.textContent='[2/4] 排大运...';
     const genderCode=document.getElementById('bz-g').value==='男'?1:0;
     yun=e.getYun(genderCode);
     daYun=yun.getDaYun().map(function(d){return {startAge:d.startAge,startYear:d.startYear,ganZhi:d.getGanZhi()};});
     qiYunText='起运：出生后'+yun.getStartYear()+'年'+yun.getStartMonth()+'个月 · 交运：'+(yun.getStartYear()+yv)+'年';
-  }catch(ex){err.textContent='排盘出错：'+ex.message;return}
+    err.textContent='[3/4] 分析原型...';
+  }catch(ex){err.textContent='排盘出错：'+ex.message+'（行'+(ex.lineNumber||'?')+'）';return}
   let r;
   try{r=BaziEngine.analyzeBazi(bazi,document.getElementById('bz-g').value)}catch(ex){err.textContent='分析出错：'+ex.message;return}
   r.naYin=na;r.yun={qiYun:qiYunText,daYun:daYun};
-  renderBaziPan(e,r,yv);
-  renderBaziResult(r);
-  renderCaiYun(r);
+  err.textContent='[4/4] 渲染结果...';
+  try{renderBaziPan(e,r,yv)}catch(ex){err.textContent='盘渲染错：'+ex.message;return}
+  try{renderBaziResult(r)}catch(ex){err.textContent='结果渲染错：'+ex.message;return}
+  try{renderCaiYun(r)}catch(ex){err.textContent='财运算错：'+ex.message;return}
   document.getElementById('bz-result').style.display='block';
-  renderCaiTotal(r, yv);
+  try{renderCaiTotal(r, yv)}catch(ex){err.textContent='综合财运错：'+ex.message;return}
+  err.textContent='完成✓';
 }
 
 function renderBaziPan(e,r,birthYear){
