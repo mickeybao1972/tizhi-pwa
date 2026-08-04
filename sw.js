@@ -1,5 +1,5 @@
 // Service Worker for 四诊体质自测系统 PWA
-const CACHE_NAME = 'sizheng-pwa-v4';
+const CACHE_NAME = 'sizheng-pwa-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -40,10 +40,14 @@ self.addEventListener('fetch', (event) => {
     return; // 不干预，使用浏览器默认网络
   }
 
-  // Navigation: network-first with offline fallback
+  // Navigation: network-first, update cache with fresh version
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request).catch(() => caches.match('./index.html'))
+      fetch(request).then(response => {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put('./index.html', clone));
+        return response;
+      }).catch(() => caches.match('./index.html'))
     );
     return;
   }
