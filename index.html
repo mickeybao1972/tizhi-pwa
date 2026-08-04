@@ -2083,8 +2083,8 @@ function renderBaziPan(e,r,birthYear){
     div.innerHTML='<div>'+yy+'</div><div>'+gz+'</div>';
     lnList.appendChild(div);
   }
-  const nowL=Lunar.fromDate(new Date());
-  const liuYue=nowL.getMonthInGanZhi();
+  const nowL2=Lunar.fromDate(new Date());
+  const liuYue=nowL2.getMonthInGanZhi();
   document.getElementById('bz-liuyue').innerHTML='本月流月：<b>'+liuYue+'</b> · 阴历 '+nowL.getYearInGanZhi()+'年 '+nowL.getMonthInChinese();
 }
 
