@@ -1,5 +1,5 @@
 // Service Worker for 四诊体质自测系统 PWA
-const CACHE_NAME = 'sizheng-pwa-v1';
+const CACHE_NAME = 'sizheng-pwa-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -34,6 +34,11 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET and cross-origin requests
   if (request.method !== 'GET') return;
   if (url.origin !== location.origin) return;
+
+  // lunar.js / bazi-engine.js：始终走网络（避免 SW 缓存了损坏版本）
+  if (url.pathname.endsWith('lunar.js') || url.pathname.endsWith('bazi-engine.js')) {
+    return; // 不干预，使用浏览器默认网络
+  }
 
   // Navigation: network-first with offline fallback
   if (request.mode === 'navigate') {
