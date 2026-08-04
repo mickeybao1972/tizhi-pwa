@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -1935,6 +1935,17 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ 
         <p style="font-size:10px;color:#888;text-align:center;margin-top:8px">财运指数依据日主与流年/流月/流日干支的五行生克（食伤生财、比劫夺财等）推算，纯娱乐参考</p>
       </div>
       
+      <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">💎 综合财运指数</h3>
+        <div id="bz-total"></div>
+        <div id="bz-totalbars"></div>
+        <div style="font-size:12px;color:#8B4513;margin:12px 0 6px;font-weight:600">大运财富走势（一生）</div>
+        <canvas id="bz-chart-dy" style="width:100%;height:160px;display:block"></canvas>
+        <div style="font-size:12px;color:#8B4513;margin:12px 0 6px;font-weight:600">流年财富走势（近12年）</div>
+        <canvas id="bz-chart-ln" style="width:100%;height:160px;display:block"></canvas>
+        <p style="font-size:10px;color:#888;text-align:center;margin-top:8px">总分 =（本命财+大运财+流年财+月财+日财）÷5；曲线为各周期财运分数走势，纯娱乐参考</p>
+      </div>
+      
       <div id="bz-main" style="background:#fff;border-radius:10px;padding:16px;text-align:center;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"></div>
       <div id="bz-vice" style="background:#fff;border-radius:10px;padding:12px;text-align:center;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"></div>
       <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
@@ -1988,7 +1999,9 @@ function runBazi(){
   renderBaziPan(e,r,yv);
   renderBaziResult(r);
   renderCaiYun(r);
+  renderCaiTotal(r, yv);
   document.getElementById('bz-result').style.display='block';
+  renderCaiTotal(r,yv);
 }
 
 function renderBaziPan(e,r,birthYear){
@@ -2135,6 +2148,119 @@ function renderCaiYun(r){
       '<div style="font-size:11px;color:#555;line-height:1.5">'+cy.tip+'</div>';
     box.appendChild(div);
   });
+}
+
+function natalWealthScore(riGan, bz) {
+  var riWX = BZ_WX[riGan];
+  var ke = {木:'土',土:'水',水:'火',火:'金',金:'木'};
+  var sheng = {木:'火',火:'土',土:'金',金:'水',水:'木'};
+  var beiSheng = {火:'木',土:'火',金:'土',水:'金',木:'水'};
+  var beiKe = {土:'木',水:'土',火:'水',金:'火',木:'金'};
+  var caiWX = ke[riWX], shiWX = sheng[riWX], biWX = riWX, yinWX = beiSheng[riWX], guanWX = beiKe[riWX];
+  var items = [];
+  [0,1,3].forEach(function(i){ items.push(bz[i][0]); var c = BZ_CANG[bz[i][1]]||[]; if(c[0]) items.push(c[0]); });
+  var rc = BZ_CANG[bz[2][1]]||[]; if(rc[0]) items.push(rc[0]);
+  var sum = 0;
+  items.forEach(function(el){
+    var elWX = BZ_WX[el];
+    if (elWX === caiWX) sum += 85;
+    else if (elWX === shiWX) sum += 75;
+    else if (elWX === biWX) sum += 35;
+    else if (elWX === yinWX) sum += 55;
+    else if (elWX === guanWX) sum += 45;
+    else sum += 50;
+  });
+  return Math.round(sum / items.length);
+}
+
+function drawBars(canvasId, labels, values, curIdx) {
+  var cv = document.getElementById(canvasId);
+  if (!cv) return;
+  var dpr = window.devicePixelRatio || 1;
+  var cssW = cv.clientWidth || 320, cssH = 130;
+  cv.width = cssW * dpr; cv.height = cssH * dpr;
+  var ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, cssW, cssH);
+  var padL = 30, padR = 6, padT = 10, padB = 26;
+  var w = cssW - padL - padR, h = cssH - padT - padB;
+  var n = values.length;
+  var barW = Math.max(6, Math.min(28, (w / n) - 4));
+  var gap = (w - barW * n) / (n + 1);
+  for (var g = 0; g <= 4; g++) {
+    var y = padT + h * (g / 4);
+    ctx.beginPath(); ctx.strokeStyle = '#eee'; ctx.lineWidth = 1;
+    ctx.moveTo(padL, y); ctx.lineTo(padL + w, y); ctx.stroke();
+    ctx.fillStyle = '#bbb'; ctx.font = '9px sans-serif';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText(String(100 - g * 25), padL - 3, y);
+  }
+  for (var i = 0; i < n; i++) {
+    var v = values[i];
+    var barH = Math.round(h * v / 100);
+    var x = padL + gap + i * (barW + gap);
+    var y = padT + h - barH;
+    var isCur = (i === curIdx);
+    var col = isCur ? '#c62828' : (v >= 70 ? '#8B4513' : (v >= 50 ? '#c49a6c' : '#bbb'));
+    ctx.fillStyle = col;
+    ctx.fillRect(x, y, barW, barH);
+    ctx.fillStyle = '#666'; ctx.font = '10px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillText(v, x + barW / 2, y - 14);
+    ctx.fillStyle = '#999'; ctx.font = '9px sans-serif';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(labels[i], x + barW / 2, padT + h + 4);
+  }
+}
+
+function renderCaiTotal(r, birthYear) {
+  var riGan = r.pillars[2][0];
+  var now = new Date();
+  var nowL = Lunar.fromDate(now);
+  var liuNian = nowL.getYearInGanZhi();
+  var liuYue = nowL.getEightChar().getMonthInGanZhi();
+  var liuRi = nowL.getEightChar().getDayInGanZhi();
+  var nowYear = now.getFullYear(), nowAge = nowYear - birthYear;
+  var curDyIdx = 0;
+  r.yun.daYun.forEach(function(d, i){ if (d.startAge <= nowAge) curDyIdx = i; });
+  var curDy = r.yun.daYun[curDyIdx];
+  var ben = natalWealthScore(riGan, r.pillars);
+  var dy  = caiYunScore(riGan, curDy.ganZhi).score;
+  var yn  = caiYunScore(riGan, liuNian).score;
+  var yue = caiYunScore(riGan, liuYue).score;
+  var ri  = caiYunScore(riGan, liuRi).score;
+  var total = Math.round((ben + dy + yn + yue + ri) / 5);
+  var comps = [['本命财', ben], ['大运财', dy], ['流年财', yn], ['月财', yue], ['日财', ri]];
+  document.getElementById('bz-total').innerHTML =
+    '<div style="text-align:center;margin-bottom:10px">' +
+      '<span style="font-size:36px;font-weight:800;color:#8B4513">' + total + '</span>' +
+      '<span style="font-size:13px;color:#666"> 分 · 综合财运指数</span>' +
+    '</div>';
+  var barsEl = document.getElementById('bz-totalbars');
+  barsEl.innerHTML = '';
+  comps.forEach(function(c) {
+    var div = document.createElement('div');
+    div.style.cssText = 'margin-bottom:6px';
+    div.innerHTML =
+      '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px">' +
+        '<span style="color:#666">' + c[0] + '</span>' +
+        '<b style="color:#8B4513">' + c[1] + '</b>' +
+      '</div>' +
+      '<div style="background:#eee;border-radius:4px;height:6px;overflow:hidden">' +
+        '<div style="height:100%;background:' + (c[1] >= 70 ? '#8B4513' : (c[1] >= 50 ? '#c49a6c' : '#bbb')) + ';border-radius:4px;width:' + c[1] + '%"></div>' +
+      '</div>';
+    barsEl.appendChild(div);
+  });
+  var dyScores = r.yun.daYun.map(function(d){ return caiYunScore(riGan, d.ganZhi).score; });
+  var dyLabels = r.yun.daYun.map(function(d){ return d.startAge + '岁'; });
+  drawBars('bz-chart-dy', dyLabels, dyScores, curDyIdx);
+  var lnScores = [], lnLabels = [];
+  for (var i = -5; i <= 6; i++) {
+    var yy = nowYear + i;
+    var gz = bzYearGZ(yy);
+    var sc = Math.round((ben + dy + caiYunScore(riGan, gz).score) / 3);
+    lnScores.push(sc); lnLabels.push(String(yy).slice(2));
+  }
+  drawBars('bz-chart-ln', lnLabels, lnScores, 5);
 }
 </script>
 </body>
