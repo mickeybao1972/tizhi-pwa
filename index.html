@@ -2120,7 +2120,7 @@ function bzImportFromFile(ev) {
   }
 }
 // =============================================
-function saveBaziRecordAuto(){var r=window.BZ_LAST_RESULT;var e=window.BZ_LAST_EIGHTCHAR;if(!r||!e)return;var name=document.getElementById('bz-name').value.trim()||'未命名';var loc=document.getElementById('bz-loc').value.trim();var cal=document.getElementById('bz-cal').value;var y=+document.getElementById('bz-y').value,m=+document.getElementById('bz-m').value,d=+document.getElementById('bz-d').value,h=+document.getElementById('bz-h').value,mi=+document.getElementById('bz-mi').value;var rec={id:Date.now(),name:name,cal:cal,y:y,m:m,d:d,h:h,mi:mi,loc:loc,g:document.getElementById('bz-g').value,birthYear:window.BZ_BIRTH_YEAR,dayun:window.BZ_LAST_DAYUN,result:r,eightchar:e.getBaZi().join(',')};var list=JSON.parse(localStorage.getItem('bazi_records')||'[]');// 同姓名+同生辰则覆盖原存档
+function saveBaziRecordAuto(){var r=window.BZ_LAST_RESULT;var e=window.BZ_LAST_EIGHTCHAR;if(!r||!e)return;var name=document.getElementById('bz-name').value.trim()||'未命名';var loc=document.getElementById('bz-loc').value.trim();var cal=document.getElementById('bz-cal').value;var y=+document.getElementById('bz-y').value,m=+document.getElementById('bz-m').value,d=+document.getElementById('bz-d').value,h=+document.getElementById('bz-h').value,mi=+document.getElementById('bz-mi').value;var rec={id:Date.now(),name:name,cal:cal,y:y,m:m,d:d,h:h,mi:mi,loc:loc,g:document.getElementById('bz-g').value,birthYear:window.BZ_BIRTH_YEAR,dayun:window.BZ_LAST_DAYUN,result:r,eightchar:(window.BZ_LAST_BAZI||'')};var list=JSON.parse(localStorage.getItem('bazi_records')||'[]');// 同姓名+同生辰则覆盖原存档
 list=list.filter(function(x){return !(x.name===rec.name&&x.y===rec.y&&x.m===rec.m&&x.d===rec.d&&x.h===rec.h&&x.mi===rec.mi&&x.cal===rec.cal);});list.unshift(rec);if(list.length>10)list=list.slice(0,10);
   try{
     var _strip=function(o){try{return JSON.parse(JSON.stringify(o))}catch(ex){return{stripErr:ex.message,keys:Object.keys(o||{}).slice(0,5)}}};
@@ -2164,7 +2164,7 @@ function runBazi(isReload, rec){
   let r;
   try{r=BaziEngine.analyzeBazi(bazi,(isReload&&rec)?rec.g:document.getElementById('bz-g').value)}catch(ex){err.textContent='分析出错：'+ex.message;return}
   r.naYin=na;r.yun={qiYun:qiYunText,daYun:daYun};
-  window.BZ_LAST_RESULT=r;window.BZ_LAST_EIGHTCHAR=e;window.BZ_BIRTH_YEAR=birthYear;window.BZ_LAST_DAYUN=daYun;
+  window.BZ_LAST_RESULT=r;window.BZ_LAST_EIGHTCHAR=e;window.BZ_BIRTH_YEAR=birthYear;window.BZ_LAST_DAYUN=daYun;window.BZ_LAST_BAZI=bazi;
   // 自动存档（同姓名+同生辰则覆盖）—— 提前到渲染之前，避免渲染异常导致漏存
   try{
     var _beforeCount=(JSON.parse(localStorage.getItem('bazi_records')||'[]')).length;
