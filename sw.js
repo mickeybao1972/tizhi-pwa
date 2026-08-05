@@ -1,5 +1,5 @@
 ﻿// Service Worker for 四诊体质顾问 PWA
-const CACHE_NAME = 'sizheng-pwa-v14';
+const CACHE_NAME = 'sizheng-pwa-v15';
 const ASSETS = [
   './',
   './index.html',
@@ -7,13 +7,17 @@ const ASSETS = [
   './icon.svg'
 ];
 
-// Install: cache core assets
+// Install: fetch assets with cache: 'no-store' to bypass HTTP cache,
+// then write to our SW cache. This guarantees fresh code on every SW update.
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      console.log('[SW v7] Caching app assets');
-      return cache.addAll(ASSETS);
-    }).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.all(ASSETS.map(u =>
+        fetch(u, { cache: 'no-store' }).then(r => {
+          if (r && r.status === 200) return cache.put(u, r.clone());
+        }).catch(() => {})
+      ))
+    ).then(() => self.skipWaiting())
   );
 });
 
