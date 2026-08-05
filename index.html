@@ -1938,7 +1938,7 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ 
     <div style="background:#fff;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
       <h3 style="font-size:13px;color:#8B4513;margin:0 0 8px;border-left:3px solid #8B4513;padding-left:8px">📂 历史存档</h3>
       <div id="bz-history-list" style="font-size:12px;color:#666"></div>
-    </div>
+    </div><div style="display:flex;gap:6px;margin-top:8px"><button onclick="bzSaveNow()" style="flex:1;background:#8B4513;color:#fff;border:none;border-radius:6px;padding:6px;font-size:12px;cursor:pointer">💾 存档</button><button onclick="bzExportAll()" style="flex:1;background:#1565c0;color:#fff;border:none;border-radius:6px;padding:6px;font-size:12px;cursor:pointer">📤 导出</button><label style="flex:1;background:#2e7d32;color:#fff;border-radius:6px;padding:6px;font-size:12px;cursor:pointer;text-align:center;display:inline-block">📥 导入<input type="file" accept=".json,application/json" onchange="bzImportFromFile(event)" style="display:none"></label></div><div id="bz-storage-msg" style="margin-top:6px;font-size:11px;color:#888"></div>
     
     <div id="bz-result" style="display:none">
       <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
@@ -2025,6 +2025,101 @@ const BZ_CITIES={'北京':116.4,'上海':121.5,'天津':117.2,'重庆':106.5,'�
 function bzTrueSolarOffset(city){if(!city)return 0;var lon=BZ_CITIES[city];if(!lon)return 0;return Math.round((lon-120)*4);}// 返回分钟（正值=当地比北京慢，需加；负值=比北京快）
 function toggleCal(){var cal=document.getElementById('bz-cal').value;var hint=document.getElementById('bz-lunar-hint');if(hint)hint.style.display=cal==='lunar'?'block':'none';var y=document.getElementById('bz-y'),m=document.getElementById('bz-m'),d=document.getElementById('bz-d');y.placeholder=cal==='lunar'?'阴历年(如1990)':'阳历年';m.placeholder=cal==='lunar'?'阴历月':'阳历月';d.placeholder=cal==='lunar'?'阴历日':'阳历日';}
 function getBaziDateTime(){var cal=document.getElementById('bz-cal').value;var name=document.getElementById('bz-name').value.trim();var h=+document.getElementById('bz-h').value,miv=+document.getElementById('bz-mi').value;if(!(h>=0)){return{err:'请填写时'};}if(cal==='lunar'){var ly=+document.getElementById('bz-y').value,lm=+document.getElementById('bz-m').value,ld=+document.getElementById('bz-d').value;if(!(ly&&lm&&ld)){return{err:'请把阴历年月日填完整'};}var isLeap=lm!==Math.floor(lm);var monthInt=Math.floor(lm);var leapFlag=isLeap?1:0;try{var solar;if(isLeap){var lm2=Lunar.fromYmd(ly,monthInt-1,ld);solar=lm2.getSolar();}else{var lm3=Lunar.fromYmd(ly,monthInt,ld);solar=lm3.getSolar();}return{dt:new Date(solar.getYear(),solar.getMonth()-1,solar.getDay(),h,miv),name:name};}catch(e){return{err:'阴历日期转换失败：'+e.message};}}else{var yv=+document.getElementById('bz-y').value,mv=+document.getElementById('bz-m').value,dv=+document.getElementById('bz-d').value;if(!(yv&&mv&&dv)){return{err:'请把阳历年月日填完整'};}return{dt:new Date(yv,mv-1,dv,h,miv,0),name:name};}}
+// ========== JSON 导出/导入 + 手动存档 ==========
+function bzStorageMsg(text, color) {
+  var el = document.getElementById("bz-storage-msg");
+  if (el) { el.textContent = text; el.style.color = color || "#666"; }
+}
+function bzSaveNow() {
+  // 手动存档 + 双重校验
+  try {
+    if (typeof window.BZ_LAST_RESULT === "undefined" || typeof window.BZ_LAST_EIGHTCHAR === "undefined") {
+      bzStorageMsg("请先点“排盘”看一次结果", "#c62828"); return;
+    }
+    var key = "bazi_records";
+    var before = JSON.parse(localStorage.getItem(key) || "[]");
+    var after = saveBaziRecordAuto();
+    var read = JSON.parse(localStorage.getItem(key) || "[]");
+    if (read.length !== after) {
+      bzStorageMsg("⚠ 写入后回读条数不一致 " + after + "!=" + read.length, "#c62828");
+      return;
+    }
+    bzStorageMsg("✓ 已存档 " + after + " 条(原" + before.length + "→现" + after + ")", "#2e7d32");
+    renderBaziHistory();
+  } catch (ex) {
+    bzStorageMsg("✗ 存档失败: " + ex.message, "#c62828");
+    console.error("bzSaveNow:", ex);
+  }
+}
+function bzExportAll() {
+  try {
+    var list = JSON.parse(localStorage.getItem("bazi_records") || "[]");
+    if (list.length === 0) {
+      bzStorageMsg("⚠ 当前无存档可导出", "#c62828"); return;
+    }
+    var payload = {
+      ver: 1,
+      app: "tizhi-pwa",
+      exportAt: new Date().toISOString(),
+      count: list.length,
+      records: list
+    };
+    var json = JSON.stringify(payload, null, 2);
+    var blob = new Blob([json], { type: "application/json;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    var ts = new Date();
+    var stamp = ts.getFullYear() + ("0" + (ts.getMonth() + 1)).slice(-2) + ("0" + ts.getDate()).slice(-2);
+    a.href = url; a.download = "bazi-records-" + stamp + ".json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    bzStorageMsg("✓ 已导出 " + list.length + " 条到下载", "#2e7d32");
+  } catch (ex) {
+    bzStorageMsg("✗ 导出失败: " + ex.message, "#c62828");
+  }
+}
+function bzImportFromFile(ev) {
+  try {
+    var file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function() {
+      try {
+        var data = JSON.parse(reader.result);
+        if (!data || !Array.isArray(data.records)) {
+          bzStorageMsg("✗ 文件格式不对: 缺少 records 数组", "#c62828"); return;
+        }
+        var mode = window.confirm("要以哪种方式导入?\n\n点确定 = 覆盖现有存档\n点取消 = 合并到现有存档末尾");
+        var key = "bazi_records";
+        var cur = JSON.parse(localStorage.getItem(key) || "[]");
+        var incoming = data.records;
+        var merged;
+        if (mode) {
+          merged = incoming;
+        } else {
+          var seen = {};
+          cur.concat(incoming).forEach(function(r) { seen[r.id] = r; });
+          merged = Object.keys(seen).map(function(k) { return seen[k]; });
+          if (merged.length > 10) merged = merged.slice(0, 10);
+        }
+        localStorage.setItem(key, JSON.stringify(merged));
+        var read = JSON.parse(localStorage.getItem(key) || "[]");
+        if (read.length !== merged.length) {
+          bzStorageMsg("✗ 导入后回读不一致", "#c62828"); return;
+        }
+        bzStorageMsg("✓ 导入成功: 现有 " + read.length + " 条", "#2e7d32");
+        renderBaziHistory();
+      } catch (ex) {
+        bzStorageMsg("✗ 解析失败: " + ex.message, "#c62828");
+      }
+    };
+    reader.readAsText(file, "utf-8");
+    ev.target.value = "";
+  } catch (ex) {
+    bzStorageMsg("✗ 读取文件失败: " + ex.message, "#c62828");
+  }
+}
+// =============================================
 function saveBaziRecordAuto(){var r=window.BZ_LAST_RESULT;var e=window.BZ_LAST_EIGHTCHAR;if(!r||!e)return;var name=document.getElementById('bz-name').value.trim()||'未命名';var loc=document.getElementById('bz-loc').value.trim();var cal=document.getElementById('bz-cal').value;var y=+document.getElementById('bz-y').value,m=+document.getElementById('bz-m').value,d=+document.getElementById('bz-d').value,h=+document.getElementById('bz-h').value,mi=+document.getElementById('bz-mi').value;var rec={id:Date.now(),name:name,cal:cal,y:y,m:m,d:d,h:h,mi:mi,loc:loc,g:document.getElementById('bz-g').value,birthYear:window.BZ_BIRTH_YEAR,dayun:window.BZ_LAST_DAYUN,result:r,eightchar:e.getBaZi().join(',')};var list=JSON.parse(localStorage.getItem('bazi_records')||'[]');// 同姓名+同生辰则覆盖原存档
 list=list.filter(function(x){return !(x.name===rec.name&&x.y===rec.y&&x.m===rec.m&&x.d===rec.d&&x.h===rec.h&&x.mi===rec.mi&&x.cal===rec.cal);});list.unshift(rec);if(list.length>10)list=list.slice(0,10);
   try{
