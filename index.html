@@ -2031,12 +2031,12 @@ const BZ_SHENSHA={tianYi:function(g){var m={'甲':'丑未','戊':'丑未','庚':
 function calcShenSha(p){var n=p[0],y=p[1],r=p[2],s=p[3],ng=n[0],nz=n[1],yg=y[0],yz=y[1],rg=r[0],rz=r[1],sg=s[0],sz=s[1];var R=[];var ty=BZ_SHENSHA.tianYi(rg);if(ty)R.push({name:'天乙贵人',type:'吉',pos:ty,desc:'逢凶化吉'});var tj=BZ_SHENSHA.taiJi(rg);if(tj)R.push({name:'太极贵人',type:'吉',pos:tj,desc:'聪明好学'});var wc=BZ_SHENSHA.wenChang(rg);if(wc)R.push({name:'文昌贵人',type:'吉',pos:wc,desc:'才华学业'});var td=BZ_SHENSHA.tianDe(yz);if(td)R.push({name:'天德贵人',type:'吉',pos:td,desc:'福德深厚'});var yd=BZ_SHENSHA.yueDe(yz);if(yd)R.push({name:'月德贵人',type:'吉',pos:yd,desc:'心地善良'});var jx=BZ_SHENSHA.jiangXing(nz,yz,rz,sz);if(jx)R.push({name:'将星',type:'吉',pos:jx.replace('将星在',''),desc:'领导才能'});var hg=BZ_SHENSHA.huaGai(nz,yz,rz,sz);if(hg)R.push({name:'华盖',type:'中',pos:hg.replace('华盖在',''),desc:'艺术宗教'});var th=BZ_SHENSHA.taoHua(nz,yz,rz,sz);if(th)R.push({name:'桃花',type:'中',pos:th.replace('桃花在',''),desc:'人缘感情'});var ym=BZ_SHENSHA.yiMa(nz,yz,rz,sz);if(ym)R.push({name:'驿马',type:'中',pos:ym.replace('驿马在',''),desc:'变动远行'});var yr=BZ_SHENSHA.yangRen(rg);if(yr)R.push({name:'羊刃',type:'凶',pos:yr,desc:'刚强冲动'});var kw=BZ_SHENSHA.kongWang(r);if(kw)R.push({name:'空亡',type:'凶',pos:kw,desc:'力量减弱'});return R}
 function calcShenShaSingle(gz){
   var g=gz[0],z=gz[1],R=[];
-  var ty=BZ_SHENSHA.tianYi(g);if(ty)R.push({name:天乙,type:吉,pos:ty});
-  var tj=BZ_SHENSHA.taiJi(g);if(tj)R.push({name:太极,type:吉,pos:tj});
-  var wc=BZ_SHENSHA.wenChang(g);if(wc)R.push({name:文昌,type:吉,pos:wc});
-  var td=BZ_SHENSHA.tianDe(z);if(td)R.push({name:天德,type:吉,pos:td});
-  var yd=BZ_SHENSHA.yueDe(z);if(yd)R.push({name:月德,type:吉,pos:yd});
-  var yr=BZ_SHENSHA.yangRen(g);if(yr)R.push({name:羊刃,type:凶,pos:yr});
+  var ty=BZ_SHENSHA.tianYi(g);if(ty)R.push({name:'天乙',type:'吉',pos:ty});
+  var tj=BZ_SHENSHA.taiJi(g);if(tj)R.push({name:'太极',type:'吉',pos:tj});
+  var wc=BZ_SHENSHA.wenChang(g);if(wc)R.push({name:'文昌',type:'吉',pos:wc});
+  var td=BZ_SHENSHA.tianDe(z);if(td)R.push({name:'天德',type:'吉',pos:td});
+  var yd=BZ_SHENSHA.yueDe(z);if(yd)R.push({name:'月德',type:'吉',pos:yd});
+  var yr=BZ_SHENSHA.yangRen(g);if(yr)R.push({name:'羊刃',type:'凶',pos:yr});
   return R;
 }
 function _ssColor(t){return t===吉?'#2e7d32':t===凶?'#c62828':'#8d6e63'}
