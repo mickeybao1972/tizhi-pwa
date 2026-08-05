@@ -2034,6 +2034,19 @@ function _ssColor(t){return t==='吉'?'#2e7d32':t==='凶'?'#c62828':'#8d6e63'}fu
 
 function calcShenSha(p){var n=p[0],y=p[1],r=p[2],s=p[3],ng=n[0],nz=n[1],yg=y[0],yz=y[1],rg=r[0],rz=r[1],sg=s[0],sz=s[1];var R=[];var ty=BZ_SHENSHA.tianYi(rg);if(ty)R.push({name:'天乙贵人',type:'吉',pos:ty,desc:'逢凶化吉'});var tj=BZ_SHENSHA.taiJi(rg);if(tj)R.push({name:'太极贵人',type:'吉',pos:tj,desc:'聪明好学'});var wc=BZ_SHENSHA.wenChang(rg);if(wc)R.push({name:'文昌贵人',type:'吉',pos:wc,desc:'才华学业'});var td=BZ_SHENSHA.tianDe(yz);if(td)R.push({name:'天德贵人',type:'吉',pos:td,desc:'福德深厚'});var yd=BZ_SHENSHA.yueDe(yz);if(yd)R.push({name:'月德贵人',type:'吉',pos:yd,desc:'心地善良'});var jx=BZ_SHENSHA.jiangXing(nz,yz,rz,sz);if(jx)R.push({name:'将星',type:'吉',pos:jx.replace('将星在',''),desc:'领导才能'});var hg=BZ_SHENSHA.huaGai(nz,yz,rz,sz);if(hg)R.push({name:'华盖',type:'中',pos:hg.replace('华盖在',''),desc:'艺术宗教'});var th=BZ_SHENSHA.taoHua(nz,yz,rz,sz);if(th)R.push({name:'桃花',type:'中',pos:th.replace('桃花在',''),desc:'人缘感情'});var ym=BZ_SHENSHA.yiMa(nz,yz,rz,sz);if(ym)R.push({name:'驿马',type:'中',pos:ym.replace('驿马在',''),desc:'变动远行'});var yr=BZ_SHENSHA.yangRen(rg);if(yr)R.push({name:'羊刃',type:'凶',pos:yr,desc:'刚强冲动'});var kw=BZ_SHENSHA.kongWang(r);if(kw)R.push({name:'空亡',type:'凶',pos:kw,desc:'力量减弱'});return R}
 
+
+function calcShenShaSingle(ganZhi){
+  // 单柱神煞计算（ganZhi = ['干','支']）
+  var g=ganZhi[0],z=ganZhi[1],R=[];
+  var ty=BZ_SHENSHA.tianYi(g);if(ty)R.push({name:'天乙',type:'吉'});
+  var tj=BZ_SHENSHA.taiJi(g);if(tj)R.push({name:'太极',type:'吉'});
+  var wc=BZ_SHENSHA.wenChang(g);if(wc)R.push({name:'文昌',type:'吉'});
+  var td=BZ_SHENSHA.tianDe(z);if(td)R.push({name:'天德',type:'吉'});
+  var yd=BZ_SHENSHA.yueDe(z);if(yd)R.push({name:'月德',type:'吉'});
+  var yr=BZ_SHENSHA.yangRen(g);if(yr)R.push({name:'羊刃',type:'凶'});
+  var kw=BZ_SHENSHA.kongWang(ganZhi.join(''));if(kw)R.push({name:'空亡',type:'凶'});
+  return R;
+}
 function renderBaziPan(e,r,birthYear){
   const bz=r.pillars,riGan=bz[2][0],nowYear=new Date().getFullYear(),nowAge=nowYear-birthYear;
   let curDyIdx=0;r.yun.daYun.forEach((d,i)=>{if(d.startAge<=nowAge)curDyIdx=i});
@@ -2072,7 +2085,7 @@ function renderBaziPan(e,r,birthYear){
   const naRow=['纳音'].concat(r.naYin.map(function(n){return'<span style="font-size:9px;color:#888">'+n+'</span>'}),[curDy?'<span style="font-size:9px;color:#888">'+bzNayin(curDy.ganZhi)+'</span>':'',bzNayin(liuYear),bzNayin(liuYueGZ),bzNayin(liuRiGZ)]);
   html+='<tr>'+naRow.map(function(x,i){return'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center;background:'+colBg[i]+'">'+x+'</td>'}).join('')+'</tr>';
   // 神煞行
-  var shenRow=['神煞'].concat(bz.map(function(p){return _ssTags(calcShenSha(p))}),[
+  var shenRow=['神煞'].concat(bz.map(function(p){return _ssTags(calcShenShaSingle(p))}),[
     curDy?_ssTags(calcShenSha(curDy.ganZhi.split(''))):'',
     _ssTags(calcShenSha(liuYear.split(''))),
     _ssTags(calcShenSha(liuYueGZ.split(''))),
@@ -2330,9 +2343,9 @@ var html='<table style="width:100%;border-collapse:collapse;font-family:SimSun,s
 [ganRow,zhiRow].forEach(function(row){html+='<tr>'+row.map(function(x,i){return'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center;vertical-align:top;background:'+colBg[i]+'">'+x+'</td>'}).join('')+'</tr>'});
 if(curDy){var d=r.yun.daYun[curDyIdx];html+='<tr><td style="border:1px solid #e0e0d8;padding:5px;text-align:center;background:#e8f0f8" colspan=5><b>'+d.startAge+'\u5c81\u8fd0</b></td><td style="border:1px solid #e0e0d8;padding:5px;text-align:center;background:#e8f0f8" colspan=4><b>'+d.ganZhi+'</b></td></tr>'}
 var lyGZ=liuYearGZ||'';if(lyGZ){html+='<tr><td style="border:1px solid #e0e0d8;padding:5px;text-align:center;background:#e8f8e8" colspan=5><b>\u6d41\u5e74</b></td><td style="border:1px solid #e0e0d8;padding:5px;text-align:center;background:#e8f8e8" colspan=4><b>'+lyGZ+'</b></td></tr>'}
-var shenRow=['\u795e\u715e'].concat(bz.map(function(p){return _ssTags(calcShenSha(p))}),[curDy?_ssTags(calcShenSha(curDy.ganZhi.split(''))):'',_ssTags(calcShenSha(liuYearGZ.split(''))),_ssTags(calcShenSha(liuYueGZ.split(''))),_ssTags(calcShenSha(liuRiGZ.split('')))]);html+='<tr>'+shenRow.map(function(x,i){return'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center;vertical-align:top;background:'+colBg[i]+'">'+x+'</td>'}).join('')+'</tr>';
+var shenRow=['\u795e\u715e'].concat(bz.map(function(p){return _ssTags(calcShenShaSingle(p))}),[curDy?_ssTags(calcShenSha(curDy.ganZhi.split(''))):'',_ssTags(calcShenSha(liuYearGZ.split(''))),_ssTags(calcShenSha(liuYueGZ.split(''))),_ssTags(calcShenSha(liuRiGZ.split('')))]);html+='<tr>'+shenRow.map(function(x,i){return'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center;vertical-align:top;background:'+colBg[i]+'">'+x+'</td>'}).join('')+'</tr>';
 document.getElementById('bz-pan').innerHTML=html;
 var tds=document.querySelectorAll('#bz-pan td');
 if(curDyIdx>=0&&tds[5+curDyIdx*9]){tds[5+curDyIdx*9].style.boxShadow='0 0 8px #1976d2';tds[5+curDyIdx*9].style.fontWeight='bold'}
 if(liuYearGZ){for(var i=0;i<tds.length;i++){var tx=tds[i].textContent||'';if(tx===lyGZ||tx.includes(lyGZ)){tds[i].style.boxShadow='0 0 8px #388e3c';tds[i].style.fontWeight='bold';break}}}
-}),[curDy?(function(){var ss=calcShenSha(curDy.ganZhi.split(''));return ss.length?ss.map(function(s){var c=(s.type==='吉')?'#2e7d32':(s.type==='凶')?'#c62828':'#8d6e63';return'<span style="background:'+c+'22;border:1px solid '+c+';color:'+c+';font-size:9px;padding:2px 4px;border-radius:3px;margin:1px">'+s.name+'</span>'}).join(' '):'<span style="font-size:9px;color:#ccc">—</span>'})():'',(function(){var ss=calcShenSha(liuYearGZ.split(''));return ss.length?ss.map(function(s){var c=(s.type==='吉')?'#2e7d32':(s.type==='凶')?'#c62828':'#8d6e63';return'<span style="background:'+c+'22;border:1px solid '+c+';color:'+c+';font-size:9px;padding:2px 4px;border-radius:3px;margin:1px">'+s.name+'</span>'}).join(' '):'<span style="font-size:9px;color:#ccc">—</span>'})(),(function(){var ss=calcShenSha(liuYueGZ.split(''));return ss.length?ss.map(function(s){var c=(s.type==='吉')?'#2e7d32':(s.type==='凶')?'var shenRow=['神煞'].concat(bz.map(function(p){return _ssTags(calcShenSha(p))}),[curDy?_ssTags(calcShenSha(curDy.ganZhi.split(''))):'',_ssTags(calcShenSha(liuYearGZ.split(''))),_ssTags(calcShenSha(liuYueGZ.split(''))),_ssTags(calcShenSha(liuRiGZ.split('')))]);html+='<tr>'+shenRow.map(function(x,i){return'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center;vertical-align:top;background:'+colBg[i]+'">'+x+'</td>'}).join('')+'</tr>';
+}),[curDy?(function(){var ss=calcShenSha(curDy.ganZhi.split(''));return ss.length?ss.map(function(s){var c=(s.type==='吉')?'#2e7d32':(s.type==='凶')?'#c62828':'#8d6e63';return'<span style="background:'+c+'22;border:1px solid '+c+';color:'+c+';font-size:9px;padding:2px 4px;border-radius:3px;margin:1px">'+s.name+'</span>'}).join(' '):'<span style="font-size:9px;color:#ccc">—</span>'})():'',(function(){var ss=calcShenSha(liuYearGZ.split(''));return ss.length?ss.map(function(s){var c=(s.type==='吉')?'#2e7d32':(s.type==='凶')?'#c62828':'#8d6e63';return'<span style="background:'+c+'22;border:1px solid '+c+';color:'+c+';font-size:9px;padding:2px 4px;border-radius:3px;margin:1px">'+s.name+'</span>'}).join(' '):'<span style="font-size:9px;color:#ccc">—</span>'})(),(function(){var ss=calcShenSha(liuYueGZ.split(''));return ss.length?ss.map(function(s){var c=(s.type==='吉')?'#2e7d32':(s.type==='凶')?'var shenRow=['神煞'].concat(bz.map(function(p){return _ssTags(calcShenShaSingle(p))}),[curDy?_ssTags(calcShenSha(curDy.ganZhi.split(''))):'',_ssTags(calcShenSha(liuYearGZ.split(''))),_ssTags(calcShenSha(liuYueGZ.split(''))),_ssTags(calcShenSha(liuRiGZ.split('')))]);html+='<tr>'+shenRow.map(function(x,i){return'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center;vertical-align:top;background:'+colBg[i]+'">'+x+'</td>'}).join('')+'</tr>';
