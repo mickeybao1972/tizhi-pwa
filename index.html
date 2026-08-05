@@ -1986,7 +1986,7 @@ const BZ_SHENG=['长生','沐浴','冠带','临官','帝旺','衰','病','死','
 const BZ_KONG={甲子:'戌亥',甲戌:'申酉',甲申:'午未',甲午:'辰巳',甲辰:'寅卯',甲寅:'子丑'};
 function bzYearGZ(y){return BZ_GAN[(y-4)%10<0?(y-4)%10+10:(y-4)%10]+BZ_ZHI[(y-4)%12<0?(y-4)%12+12:(y-4)%12];}
 function bzGetKong(riZhu){const g=riZhu[0];const xunShou=BZ_GAN.indexOf(g)%2===0?g+'子':'乙丑';return BZ_KONG[xunShou]||'--';}
-function bzSheng12(gan,zhi){const yang=['甲','丙','戊','庚','壬'].includes(gan);const start={'亥':0,'子':1,'丑':2,'寅':3,'卯':4,'辰':5,'巳':6,'午':7,'未':8,'申':9,'酉':10,'戌':11};const idx=start[zhi];if(idx==null)return'--';const pos=yang?idx:(11-idx+12)%12;return BZ_SHENG[pos];}
+function bzSheng12(gan,zhi){var CS={甲:'亥',乙:'午',丙:'寅',丁:'酉',戊:'寅',己:'酉',庚:'巳',辛:'子',壬:'申',癸:'卯'};var cs=CS[gan];if(!cs)return'--';var seq=['亥','子','丑','寅','卯','辰','巳','午','未','申','酉','戌'];var ci=seq.indexOf(cs);var zi=seq.indexOf(zhi);if(ci<0||zi<0)return'--';var yang=['甲','丙','戊','庚','壬'].indexOf(gan)>-1;var pos=yang?(zi-ci+12)%12:(ci-zi+12)%12;return BZ_SHENG[pos];}
 function bzZiZuo(z){const m={'子':'子水','丑':'丑土','寅':'寅木','卯':'卯木','辰':'辰土','巳':'巳火','午':'午火','未':'未土','申':'申金','酉':'酉金','戌':'戌土','亥':'亥水'};return m[z]||'—';}
 function bzKongWangByRi(rg,rz){const m={'子':'戌亥','丑':'戌亥','寅':'申酉','卯':'申酉','辰':'午未','巳':'午未','午':'辰巳','未':'辰巳','申':'寅卯','酉':'寅卯','戌':'子丑','亥':'子丑'};return m[rz]||'—';}
 function bzKongWangByZhu(g,z){const gi=BZ_GAN.indexOf(g),zi=BZ_ZHI.indexOf(z);if(gi<0||zi<0)return'—';const zs=(zi-gi+12)%12;return BZ_ZHI[(zs+10)%12]+BZ_ZHI[(zs+11)%12];}
