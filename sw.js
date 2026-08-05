@@ -1,5 +1,5 @@
 ﻿// Service Worker for 四诊体质顾问 PWA
-const CACHE_NAME = 'sizheng-pwa-v17';
+const CACHE_NAME = 'sizheng-pwa-v18';
 const ASSETS = [
   './',
   './index.html',
