@@ -2066,7 +2066,7 @@ function runBazi(isReload, rec){
   r.naYin=na;r.yun={qiYun:qiYunText,daYun:daYun};
   window.BZ_LAST_RESULT=r;window.BZ_LAST_EIGHTCHAR=e;window.BZ_BIRTH_YEAR=birthYear;window.BZ_LAST_DAYUN=daYun;
   // 自动存档（同姓名+同生辰则覆盖）—— 提前到渲染之前，避免渲染异常导致漏存
-  try{saveBaziRecordAuto();}catch(ex){console.log('auto save err:',ex)}
+  try{saveBaziRecordAuto();err.textContent+='[存档✓]';}catch(ex){err.textContent='存档出错：'+ex.message+'；可在控制台查看详细';console.log('auto save err:',ex)}
   err.textContent='[4/4] 渲染结果...';
   try{renderBaziPan(e,r,birthYear)}catch(ex){err.textContent='盘渲染错：'+ex.message;return}
   try{renderBaziResult(r)}catch(ex){err.textContent='结果渲染错：'+ex.message;return}
@@ -2076,7 +2076,11 @@ function runBazi(isReload, rec){
   try{initTimeSwitch()}catch(ex){console.log('time switch init:',ex)}
   try{recalcCaiYun()}catch(ex){console.log('recalc err:',ex)}
   err.textContent=name?name+'的八字已排好\u2713':'八字已排好\u2713';
-  try{renderBaziHistory();}catch(ex){console.log('history render err:',ex)}
+  try{
+    var __list=JSON.parse(localStorage.getItem('bazi_records')||'[]');
+    renderBaziHistory();
+    err.textContent+=' 共存 '+__list.length+' 条';
+  }catch(ex){err.textContent='存档读取错：'+ex.message;console.log('history render err:',ex)}
 }
 
 // 神煞数据与计算函数（移到 renderBaziPan 外部）
