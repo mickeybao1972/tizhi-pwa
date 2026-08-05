@@ -2026,7 +2026,12 @@ function bzTrueSolarOffset(city){if(!city)return 0;var lon=BZ_CITIES[city];if(!l
 function toggleCal(){var cal=document.getElementById('bz-cal').value;var hint=document.getElementById('bz-lunar-hint');if(hint)hint.style.display=cal==='lunar'?'block':'none';var y=document.getElementById('bz-y'),m=document.getElementById('bz-m'),d=document.getElementById('bz-d');y.placeholder=cal==='lunar'?'阴历年(如1990)':'阳历年';m.placeholder=cal==='lunar'?'阴历月':'阳历月';d.placeholder=cal==='lunar'?'阴历日':'阳历日';}
 function getBaziDateTime(){var cal=document.getElementById('bz-cal').value;var name=document.getElementById('bz-name').value.trim();var h=+document.getElementById('bz-h').value,miv=+document.getElementById('bz-mi').value;if(!(h>=0)){return{err:'请填写时'};}if(cal==='lunar'){var ly=+document.getElementById('bz-y').value,lm=+document.getElementById('bz-m').value,ld=+document.getElementById('bz-d').value;if(!(ly&&lm&&ld)){return{err:'请把阴历年月日填完整'};}var isLeap=lm!==Math.floor(lm);var monthInt=Math.floor(lm);var leapFlag=isLeap?1:0;try{var solar;if(isLeap){var lm2=Lunar.fromYmd(ly,monthInt-1,ld);solar=lm2.getSolar();}else{var lm3=Lunar.fromYmd(ly,monthInt,ld);solar=lm3.getSolar();}return{dt:new Date(solar.getYear(),solar.getMonth()-1,solar.getDay(),h,miv),name:name};}catch(e){return{err:'阴历日期转换失败：'+e.message};}}else{var yv=+document.getElementById('bz-y').value,mv=+document.getElementById('bz-m').value,dv=+document.getElementById('bz-d').value;if(!(yv&&mv&&dv)){return{err:'请把阳历年月日填完整'};}return{dt:new Date(yv,mv-1,dv,h,miv,0),name:name};}}
 function saveBaziRecordAuto(){var r=window.BZ_LAST_RESULT;var e=window.BZ_LAST_EIGHTCHAR;if(!r||!e)return;var name=document.getElementById('bz-name').value.trim()||'未命名';var loc=document.getElementById('bz-loc').value.trim();var cal=document.getElementById('bz-cal').value;var y=+document.getElementById('bz-y').value,m=+document.getElementById('bz-m').value,d=+document.getElementById('bz-d').value,h=+document.getElementById('bz-h').value,mi=+document.getElementById('bz-mi').value;var rec={id:Date.now(),name:name,cal:cal,y:y,m:m,d:d,h:h,mi:mi,loc:loc,g:document.getElementById('bz-g').value,birthYear:window.BZ_BIRTH_YEAR,dayun:window.BZ_LAST_DAYUN,result:r,eightchar:e.getBaZi().join(',')};var list=JSON.parse(localStorage.getItem('bazi_records')||'[]');// 同姓名+同生辰则覆盖原存档
-list=list.filter(function(x){return !(x.name===rec.name&&x.y===rec.y&&x.m===rec.m&&x.d===rec.d&&x.h===rec.h&&x.mi===rec.mi&&x.cal===rec.cal);});list.unshift(rec);if(list.length>10)list=list.slice(0,10);localStorage.setItem('bazi_records',JSON.stringify(list));}
+list=list.filter(function(x){return !(x.name===rec.name&&x.y===rec.y&&x.m===rec.m&&x.d===rec.d&&x.h===rec.h&&x.mi===rec.mi&&x.cal===rec.cal);});list.unshift(rec);if(list.length>10)list=list.slice(0,10);
+  try{
+    var _strip=function(o){try{return JSON.parse(JSON.stringify(o))}catch(ex){return{stripErr:ex.message,keys:Object.keys(o||{}).slice(0,5)}}};
+    rec.result=_strip(r);rec.dayun=_strip(window.BZ_LAST_DAYUN);
+    localStorage.setItem('bazi_records',JSON.stringify(list));return list.length
+  }catch(ex){throw new Error('localStorage.setItem 失败：'+ex.message+';list.length='+list.length+';recKeys='+Object.keys(rec).join(','))}}
 function deleteBaziRecord(id){var list=JSON.parse(localStorage.getItem('bazi_records')||'[]');list=list.filter(function(x){return x.id!==id+''});localStorage.setItem('bazi_records',JSON.stringify(list));renderBaziHistory();}
 function loadBaziRecord(id){var list=JSON.parse(localStorage.getItem('bazi_records')||'[]');var rec=list.find(function(x){return x.id===id+''});if(!rec){alert('未找到该记录');return;}document.getElementById('bz-name').value=rec.name||'';document.getElementById('bz-g').value=rec.g||'男';document.getElementById('bz-loc').value=rec.loc||'';document.getElementById('bz-cal').value=rec.cal||'solar';toggleCal();document.getElementById('bz-y').value=rec.y||1990;document.getElementById('bz-m').value=rec.m||1;document.getElementById('bz-d').value=rec.d||1;document.getElementById('bz-h').value=rec.h||12;document.getElementById('bz-mi').value=rec.mi||0;runBazi(true,rec);}
 function deleteBaziRecord(id){var list=JSON.parse(localStorage.getItem('bazi_records')||'[]');list=list.filter(function(x){return x.id!==id+''});localStorage.setItem('bazi_records',JSON.stringify(list));renderBaziHistory();}
@@ -2066,7 +2071,11 @@ function runBazi(isReload, rec){
   r.naYin=na;r.yun={qiYun:qiYunText,daYun:daYun};
   window.BZ_LAST_RESULT=r;window.BZ_LAST_EIGHTCHAR=e;window.BZ_BIRTH_YEAR=birthYear;window.BZ_LAST_DAYUN=daYun;
   // 自动存档（同姓名+同生辰则覆盖）—— 提前到渲染之前，避免渲染异常导致漏存
-  try{saveBaziRecordAuto();err.textContent+='[存档✓]';}catch(ex){err.textContent='存档出错：'+ex.message+'；可在控制台查看详细';console.log('auto save err:',ex)}
+  try{
+    var _beforeCount=(JSON.parse(localStorage.getItem('bazi_records')||'[]')).length;
+    var _newCount=saveBaziRecordAuto();
+    err.textContent='[存档] '+_beforeCount+'->'+_newCount;
+  }catch(ex){err.textContent='存档出错：'+ex.message;console.log('auto save err:',ex)}
   err.textContent='[4/4] 渲染结果...';
   try{renderBaziPan(e,r,birthYear)}catch(ex){err.textContent='盘渲染错：'+ex.message;return}
   try{renderBaziResult(r)}catch(ex){err.textContent='结果渲染错：'+ex.message;return}
