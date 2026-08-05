@@ -1893,24 +1893,59 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ 
 <div id="p-bazi" class="page" style="background:#f5f5f0;padding:16px 12px">
   <div style="max-width:720px;margin:0 auto">
     <div style="text-align:center;margin-bottom:16px">
-      <h1 style="font-size:22px;color:#8B4513;margin:4px 0">🔮 八字看三生</h1>
-      <p style="font-size:12px;color:#666">公历排盘 · 大运流年 · 17种前世灵性原型（纯娱乐）</p>
+      <h1 style="font-size:22px;color:#8B4513;margin:4px 0">🔮 前世·今生·未来</h1>
+      <p style="font-size:12px;color:#666">公历/阴历排盘 · 真太阳时校正 · 大运流年流月流日 · 存档查阅</p>
     </div>
     <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p0').classList.add('active');" style="position:fixed;top:12px;right:12px;background:#8B4513;color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;z-index:100">✕ 返回</button>
     
     <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
       <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">出生信息</h3>
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end">
+        <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>姓名</label><input id="bz-name" type="text" placeholder="张三" style="width:64px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
         <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>年</label><input id="bz-y" type="number" value="1990" min="1900" max="2100" style="width:64px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
         <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>月</label><input id="bz-m" type="number" value="1" min="1" max="12" style="width:56px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
         <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>日</label><input id="bz-d" type="number" value="1" min="1" max="31" style="width:56px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
         <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>时</label><input id="bz-h" type="number" value="12" min="0" max="23" style="width:56px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
         <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>分</label><input id="bz-mi" type="number" value="0" min="0" max="59" style="width:56px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
         <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>性别</label><select id="bz-g" style="width:56px;padding:6px;border:1px solid #ddd;border-radius:6px"><option value="男">男</option><option value="女">女</option></select></div>
+        <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>历法</label>
+          <select id="bz-cal" onchange="toggleCal()" style="padding:6px;border:1px solid #ddd;border-radius:6px;font-size:11px">
+            <option value="solar">公历</option>
+            <option value="lunar">阴历</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>出生地</label><input id="bz-loc" type="text" placeholder="北京" list="bz-city-list" style="width:80px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
+        <datalist id="bz-city-list">
+          <option value="北京"><option value="上海"><option value="广州"><option value="深圳">
+          <option value="成都"><option value="杭州"><option value="南京"><option value="武汉">
+          <option value="西安"><option value="重庆"><option value="天津"><option value="苏州">
+          <option value="沈阳"><option value="青岛"><option value="长沙"><option value="郑州">
+          <option value="昆明"><option value="哈尔滨"><option value="长春"><option value="大连">
+          <option value="济南"><option value="石家庄"><option value="太原"><option value="福州">
+          <option value="厦门"><option value="西安"><option value="合肥"><option value="南昌">
+          <option value="贵阳"><option value="南宁"><option value="海口"><option value="台北">
+          <option value="香港"><option value="澳门"><option value="保定"><option value="乌鲁木齐">
+          <option value="兰州"><option value="银川"><option value="西宁"><option value="拉萨">
+        </datalist>
       </div>
-      <button onclick="runBazi()" style="display:block;width:100%;margin-top:12px;background:#8B4513;color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:600;cursor:pointer">排 盘 看 三 生</button>
+      <div id="bz-lunar-fields" style="display:none;margin-top:8px">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end">
+          <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>阴历年</label><input id="bz-ly" type="number" placeholder="1990" style="width:64px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
+          <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>阴历月</label><input id="bz-lm" type="number" placeholder="1" style="width:56px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
+          <div style="display:flex;flex-direction:column;font-size:11px;color:#666"><label>阴历日</label><input id="bz-ld" type="number" placeholder="1" style="width:56px;padding:6px;border:1px solid #ddd;border-radius:6px"></div>
+          <div style="font-size:10px;color:#888;padding-bottom:6px">闰月标注：输入阴历月后加0.5（如闰五月填5.5）</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px">
+        <button onclick="runBazi()" style="flex:1;background:#8B4513;color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:600;cursor:pointer">排 盘 看 三 生</button>
+        <button onclick="saveBaziRecord()" id="bz-save-btn" style="background:#2e7d32;color:#fff;border:none;border-radius:8px;padding:12px 16px;font-size:14px;font-weight:600;cursor:pointer;display:none">存档</button>
+      </div>
       <div id="bz-err" style="color:#c62828;font-size:12px;text-align:center;margin-top:8px"></div>
-      <p style="font-size:10px;color:#888;text-align:center;margin-top:6px">时辰按 23:00–00:59 为子时；年柱以立春为界；未做真太阳时校正</p>
+      <p style="font-size:10px;color:#888;text-align:center;margin-top:6px">时辰按 23:00–00:59 为子时；年柱以立春为界；真太阳时自动校正经度偏移</p>
+    </div>
+    <div style="background:#fff;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+      <h3 style="font-size:13px;color:#8B4513;margin:0 0 8px;border-left:3px solid #8B4513;padding-left:8px">📂 历史存档</h3>
+      <div id="bz-history-list" style="font-size:12px;color:#666"></div>
     </div>
     
     <div id="bz-result" style="display:none">
@@ -1977,6 +2012,7 @@ if(typeof window.BZ_TIME_STATE==='undefined'){window.BZ_TIME_STATE={mode:'natal'
 function startBazi(){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('p-bazi').classList.add('active');
+  renderBaziHistory();
 }
 const BZ_GAN=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
 const BZ_ZHI=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
@@ -1992,41 +2028,59 @@ function bzKongWangByRi(rg,rz){const m={'子':'戌亥','丑':'戌亥','寅':'申
 function bzKongWangByZhu(g,z){const gi=BZ_GAN.indexOf(g),zi=BZ_ZHI.indexOf(z);if(gi<0||zi<0)return'—';const zs=(zi-gi+12)%12;return BZ_ZHI[(zs+10)%12]+BZ_ZHI[(zs+11)%12];}
 function bzShiShen(riGan,gan){if(riGan===gan)return'比肩';const riWX=BZ_WX[riGan],gWX=BZ_WX[gan];const yang=['甲','丙','戊','庚','壬'];const riYang=yang.includes(riGan),gYang=yang.includes(gan);const same=(riYang===gYang);if(riWX===gWX)return same?'比肩':'劫财';const sheng={木:'火',火:'土',土:'金',金:'水',水:'木'};const ke={木:'土',土:'水',水:'火',火:'金',金:'木'};if(sheng[riWX]===gWX)return same?'食神':'伤官';if(ke[riWX]===gWX)return same?'偏财':'正财';if(ke[gWX]===riWX)return same?'七杀':'正官';if(sheng[gWX]===riWX)return same?'偏印':'正印';return'';}
 function bzNayin(gz){const t={'甲子':'海中金','乙丑':'海中金','丙寅':'炉中火','丁卯':'炉中火','戊辰':'大林木','己巳':'大林木','庚午':'路旁土','辛未':'路旁土','壬申':'剑锋金','癸酉':'剑锋金','甲戌':'山头火','乙亥':'山头火','丙子':'涧下水','丁丑':'涧下水','戊寅':'城头土','己卯':'城头土','庚辰':'白蜡金','辛巳':'白蜡金','壬午':'杨柳木','癸未':'杨柳木','甲申':'泉中水','乙酉':'泉中水','丙戌':'屋上土','丁亥':'屋上土','戊子':'霹雳火','己丑':'霹雳火','庚寅':'松柏木','辛卯':'松柏木','壬辰':'长流水','癸巳':'长流水','甲午':'沙中金','乙未':'沙中金','丙申':'山下火','丁酉':'山下火','戊戌':'平地木','己亥':'平地木','庚子':'壁上土','辛丑':'壁上土','壬寅':'金箔金','癸卯':'金箔金','甲辰':'佛灯火','乙巳':'佛灯火','丙午':'天河水','丁未':'天河水','戊申':'大驿土','己酉':'大驿土','庚戌':'钗钏金','辛亥':'钗钏金','壬子':'桑柘木','癸丑':'桑柘木','甲寅':'大溪水','乙卯':'大溪水','丙辰':'沙中土','丁巳':'沙中土','戊午':'天上火','己未':'天上火','庚申':'石榴木','辛酉':'石榴木','壬戌':'大海水','癸亥':'大海水'};return t[gz]||'';}
+// 中国主要城市经度（真太阳时校正用），格式: 城市名→经度
+const BZ_CITIES={'北京':116.4,'上海':121.5,'天津':117.2,'重庆':106.5,'哈尔滨':126.6,'长春':125.3,'沈阳':123.4,'石家庄':114.5,'太原':112.5,'呼和浩特':111.7,'济南':117.0,'郑州':113.6,'西安':108.9,'兰州':103.8,'西宁':101.8,'乌鲁木齐':87.6,'银川':106.3,'成都':104.1,'昆明':102.7,'贵阳':106.7,'拉萨':91.1,'南宁':108.3,'广州':113.3,'长沙':113.0,'武汉':114.3,'南昌':115.9,'南京':118.8,'杭州':120.2,'福州':119.3,'厦门':118.1,'海口':110.3,'台北':121.5,'香港':114.1,'澳门':113.5,'保定':115.5,'苏州':120.6,'大连':121.6,'青岛':120.4,'宁波':121.5,'深圳':114.1,'佛山':113.1,'沈阳':123.4};
+function bzTrueSolarOffset(city){if(!city)return 0;var lon=BZ_CITIES[city];if(!lon)return 0;return Math.round((lon-120)*4);}// 返回分钟（正值=当地比北京慢，需加；负值=比北京快）
+function toggleCal(){var cal=document.getElementById('bz-cal').value;document.getElementById('bz-lunar-fields').style.display=cal==='lunar'?'flex':'none';document.getElementById('bz-y').disabled=cal==='lunar';document.getElementById('bz-m').disabled=cal==='lunar';document.getElementById('bz-d').disabled=cal==='lunar';}
+function getBaziDateTime(){var cal=document.getElementById('bz-cal').value;if(cal==='lunar'){var ly=+document.getElementById('bz-ly').value,lm=+document.getElementById('bz-lm').value,ld=+document.getElementById('bz-ld').value;if(!(ly&&lm&&ld)){return{err:'请填写完整的阴历年月日'};}var isLeap=lm>12;var actualMonth=isLeap?lm-12:lm;var lunar=Lunar.fromYmd(ly,actualMonth,ld);if(isLeap)lunar=lunar.getLeapMonth()?lunar.getLeapMonth():lunar;var solar=lunar.getSolar();var h=+document.getElementById('bz-h').value,miv=+document.getElementById('bz-mi').value;return{dt:new Date(solar.getYear(),solar.getMonth()-1,solar.getDay(),h,miv),name:document.getElementById('bz-name').value.trim()};}else{var yv=+document.getElementById('bz-y').value,mv=+document.getElementById('bz-m').value,dv=+document.getElementById('bz-d').value,hv=+document.getElementById('bz-h').value,miv=+document.getElementById('bz-mi').value;if(!(yv&&mv&&dv&&hv>=0)){return{err:'请把年月日时填完整'};}return{dt:new Date(yv,mv-1,dv,hv,miv,0),name:document.getElementById('bz-name').value.trim()};}}
+function saveBaziRecord(){var r=window.BZ_LAST_RESULT;var e=window.BZ_LAST_EIGHTCHAR;var name=document.getElementById('bz-name').value.trim()||'未命名';var loc=document.getElementById('bz-loc').value.trim();var cal=document.getElementById('bz-cal').value;if(!r||!e)return;var id=Date.now();var rec={id:id,name:name,cal:cal,y:+document.getElementById('bz-y').value,m:+document.getElementById('bz-m').value,d:+document.getElementById('bz-d').value,h:+document.getElementById('bz-h').value,mi:+document.getElementById('bz-mi').value,ly:cal==='lunar'?+document.getElementById('bz-ly').value:null,lm:cal==='lunar'?+document.getElementById('bz-lm').value:null,ld:cal==='lunar'?+document.getElementById('bz-ld').value:null,loc:loc,g:document.getElementById('bz-g').value,birthYear:window.BZ_BIRTH_YEAR,dayun:window.BZ_LAST_DAYUN,result:r,eightchar:e.getBaZi().join(',')};var list=JSON.parse(localStorage.getItem('bazi_records')||'[]');list.unshift(rec);if(list.length>20)list=list.slice(0,20);localStorage.setItem('bazi_records',JSON.stringify(list));renderBaziHistory();}
+function loadBaziRecord(id){var list=JSON.parse(localStorage.getItem('bazi_records')||'[]');var rec=list.find(function(x){return x.id===id+''});if(!rec){alert('未找到该记录');return;}document.getElementById('bz-name').value=rec.name||'';document.getElementById('bz-g').value=rec.g||'男';document.getElementById('bz-loc').value=rec.loc||'';if(rec.cal==='lunar'){document.getElementById('bz-cal').value='lunar';toggleCal();document.getElementById('bz-ly').value=rec.ly||'';document.getElementById('bz-lm').value=rec.lm||'';document.getElementById('bz-ld').value=rec.ld||'';}else{document.getElementById('bz-cal').value='solar';toggleCal();document.getElementById('bz-y').value=rec.y||1990;document.getElementById('bz-m').value=rec.m||1;document.getElementById('bz-d').value=rec.d||1;}document.getElementById('bz-h').value=rec.h||12;document.getElementById('bz-mi').value=rec.mi||0;runBazi(true,rec);}
+function deleteBaziRecord(id){var list=JSON.parse(localStorage.getItem('bazi_records')||'[]');list=list.filter(function(x){return x.id!==id+''});localStorage.setItem('bazi_records',JSON.stringify(list));renderBaziHistory();}
+function renderBaziHistory(){var el=document.getElementById('bz-history-list');if(!el)return;var list=JSON.parse(localStorage.getItem('bazi_records')||'[]');if(list.length===0){el.innerHTML='<span style="color:#aaa">暂无存档</span>';return;}var html='';list.forEach(function(r){var dateStr=r.cal==='lunar'?'阴'+r.ly+'年'+(r.lm>12?'闰'+(r.lm-12):r.lm)+'月'+r.ld+'日':'公'+r.y+'年'+r.m+'月'+r.d+'日';html+='<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #f0f0f0;gap:8px">';html+='<span style="flex:1;font-size:12px">'+(r.name||'未命名')+'</span>';html+='<span style="font-size:11px;color:#888">'+dateStr+'</span>';html+='<span style="font-size:11px;color:#888">'+r.g+'</span>';html+='<span style="font-size:11px;color:#8B4513">'+r.eightchar.split(',')[2]+'日主</span>';html+='<button onclick="loadBaziRecord('+r.id+')" style="background:#8B4513;color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer">查看</button>';html+='<button onclick="deleteBaziRecord('+r.id+')" style="background:#ccc;color:#666;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">删</button>';html+='</div>';});el.innerHTML=html;}
 
-function runBazi(){
+function runBazi(isReload, rec){
   const err=document.getElementById('bz-err');err.textContent='';
-  const yv=+document.getElementById('bz-y').value,mv=+document.getElementById('bz-m').value,dv=+document.getElementById('bz-d').value,hv=+document.getElementById('bz-h').value,miv=+document.getElementById('bz-mi').value;
-  if(!(yv&&mv&&dv&&hv>=0)){err.textContent='请把年月日时填完整';return}
   if(typeof Lunar==='undefined'){err.textContent='日历库未加载（Lunar=undefined）';return}
   if(typeof BaziEngine==='undefined'){err.textContent='八字引擎未加载（BaziEngine=undefined）';return}
+  let dt, name, birthYear;
+  if(isReload && rec){
+    var y=rec.y||1990,m=rec.m||1,d=rec.d||1,h=rec.h||12,mi=rec.mi||0;
+    dt=new Date(y,m-1,d,h,mi,0);name=rec.name||'';birthYear=rec.birthYear||y;
+  }else{
+    var r2=getBaziDateTime();if(r2.err){err.textContent=r2.err;return;}
+    dt=r2.dt;name=r2.name;
+    var city=document.getElementById('bz-loc').value.trim();var off=bzTrueSolarOffset(city);if(off!==0){dt=new Date(dt.getTime()+off*60000);}
+    birthYear=dt.getFullYear();
+  }
   let lunar,e,bazi,na,yun,daYun,qiYunText;
   try{
     err.textContent='[1/4] 排四柱...';
-    const dt=new Date(yv,mv-1,dv,hv,miv,0);
     lunar=Lunar.fromDate(dt);
     e=lunar.getEightChar();
     bazi=lunar.getBaZi().join(',');
     na=[lunar.getYearNaYin(),lunar.getMonthNaYin(),lunar.getDayNaYin(),lunar.getTimeNaYin()];
     err.textContent='[2/4] 排大运...';
-    const genderCode=document.getElementById('bz-g').value==='男'?1:0;
+    const genderCode=(isReload&&rec)?(rec.g==='男'?1:0):(document.getElementById('bz-g').value==='男'?1:0);
     yun=e.getYun(genderCode);
     daYun=yun.getDaYun().map(function(d){return {startAge:d.getStartAge(),startYear:d.getStartYear(),ganZhi:d.getGanZhi()};});
-    qiYunText='起运：出生后'+yun.getStartYear()+'年'+yun.getStartMonth()+'个月 · 交运：'+(yun.getStartYear()+yv)+'年';
+    qiYunText='起运：出生后'+yun.getStartYear()+'年'+yun.getStartMonth()+'个月 · 交运：'+(yun.getStartYear()+birthYear)+'年';
     err.textContent='[3/4] 分析原型...';
   }catch(ex){err.textContent='排盘出错：'+ex.message+'（行'+(ex.lineNumber||'?')+'）';return}
   let r;
-  try{r=BaziEngine.analyzeBazi(bazi,document.getElementById('bz-g').value)}catch(ex){err.textContent='分析出错：'+ex.message;return}
+  try{r=BaziEngine.analyzeBazi(bazi,(isReload&&rec)?rec.g:document.getElementById('bz-g').value)}catch(ex){err.textContent='分析出错：'+ex.message;return}
   r.naYin=na;r.yun={qiYun:qiYunText,daYun:daYun};
-  window.BZ_LAST_RESULT=r;window.BZ_LAST_EIGHTCHAR=e;window.BZ_BIRTH_YEAR=yv;
+  window.BZ_LAST_RESULT=r;window.BZ_LAST_EIGHTCHAR=e;window.BZ_BIRTH_YEAR=birthYear;window.BZ_LAST_DAYUN=daYun;
   err.textContent='[4/4] 渲染结果...';
-  try{renderBaziPan(e,r,yv)}catch(ex){err.textContent='盘渲染错：'+ex.message;return}
+  try{renderBaziPan(e,r,birthYear)}catch(ex){err.textContent='盘渲染错：'+ex.message;return}
   try{renderBaziResult(r)}catch(ex){err.textContent='结果渲染错：'+ex.message;return}
   try{renderCaiYun(r)}catch(ex){err.textContent='财运算错：'+ex.message;return}
   document.getElementById('bz-result').style.display='block';
-  try{renderCaiTotal(r, yv)}catch(ex){err.textContent='综合财运错：'+ex.message;return}
+  document.getElementById('bz-save-btn').style.display='inline-block';
+  try{renderCaiTotal(r, birthYear)}catch(ex){err.textContent='综合财运错：'+ex.message;return}
   try{initTimeSwitch()}catch(ex){console.log('time switch init:',ex)}
   try{recalcCaiYun()}catch(ex){console.log('recalc err:',ex)}
-  err.textContent='完成✓';
+  err.textContent=name?name+'的八字已排好\u2713':'八字已排好\u2713';
+  renderBaziHistory();
 }
 
 // 神煞数据与计算函数（移到 renderBaziPan 外部）
