@@ -1975,7 +1975,7 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ 
   </div>
 </div>
 
-<script src="lunar.js"></script>
+<script src="lunar.js" onerror="window.__lunarLoadErr='lunar.js 加载失败，请检查网络或硬刷 (Ctrl+Shift+R)'"></script>
 <script src="bazi-engine.js"></script>
 <script>
 // 兜底：万一 lunar.js 的 UMD 在浏览器里走 module 分支没挂全局，手动挂一次
@@ -2135,7 +2135,7 @@ if(list.length>=10){html+='<div style="text-align:center;padding:6px;font-size:1
 function runBazi(isReload, rec){
   const err=document.getElementById('bz-err');err.textContent='';
   var btn=document.getElementById('bz-liuqin-btn');if(btn)btn.textContent=BZ_LIUQIN_MODE?'六亲':'十神';
-  if(typeof Lunar==='undefined'){err.textContent='日历库未加载（Lunar=undefined）';return}
+  if(typeof Lunar==='undefined'){err.textContent='日历库未加载（Lunar=undefined）'+(window.__lunarLoadErr||' 请硬刷 Ctrl+Shift+R');return}
   if(typeof BaziEngine==='undefined'){err.textContent='八字引擎未加载（BaziEngine=undefined）';return}
   let dt, name, birthYear;
   if(isReload && rec){

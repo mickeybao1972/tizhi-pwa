@@ -1,10 +1,11 @@
 ﻿// Service Worker for 四诊体质顾问 PWA
-const CACHE_NAME = 'sizheng-pwa-v32';
+const CACHE_NAME = 'sizheng-pwa-v33';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon.svg'
+  './icon.svg',
+  './lunar.js'
 ];
 
 // Install: fetch assets with cache: 'no-store' to bypass HTTP cache,
