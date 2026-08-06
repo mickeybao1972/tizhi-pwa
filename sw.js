@@ -1,5 +1,5 @@
-ï»¿// Service Worker for å››è¯Šä½“è´¨é¡¾é—® PWA
-const CACHE_NAME='sizheng-pwa-v38';
+// Service Worker for ËÄÕïÌåÖÊ¹ËÎÊ PWA
+const CACHE_NAME='sizheng-pwa-v39';
 const ASSETS = [
   './',
   './index.html',
