@@ -2626,11 +2626,11 @@ function drawBars(canvasId, labels, values, curIdx) {
   var cv = document.getElementById(canvasId);
   if (!cv) return;
   var dpr = window.devicePixelRatio || 1;
-  var cssW = cv.clientWidth || 320, cssH = 150;
+  var cssW = cv.clientWidth || 320, cssH = 140;
   cv.width = cssW * dpr; cv.height = cssH * dpr;
   var ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
   ctx.clearRect(0, 0, cssW, cssH);
-  var padL = 30, padR = 6, padT = 10, padB = 36;
+  var padL = 30, padR = 6, padT = 10, padB = 46;
   var w = cssW - padL - padR, h = cssH - padT - padB;
   var n = values.length;
   var barW = Math.max(6, Math.min(28, (w / n) - 4));
@@ -2658,8 +2658,8 @@ function drawBars(canvasId, labels, values, curIdx) {
     ctx.fillStyle = '#999'; ctx.font = '9px sans-serif';
     ctx.textBaseline = 'bottom';
     var lines = String(labels[i]).split('\n');
-    ctx.fillText(lines[0], x + barW / 2, padT + h + 4);
-    if (lines[1]) ctx.fillText(lines[1], x + barW / 2, padT + h + 14);
+    ctx.fillText(lines[0], x + barW / 2, padT + h + 14);
+    if (lines[1]) ctx.fillText(lines[1], x + barW / 2, padT + h + 26);
   }
 }
 
