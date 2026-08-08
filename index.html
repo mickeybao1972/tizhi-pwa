@@ -2626,11 +2626,11 @@ function drawBars(canvasId, labels, values, curIdx) {
   var cv = document.getElementById(canvasId);
   if (!cv) return;
   var dpr = window.devicePixelRatio || 1;
-  var cssW = cv.clientWidth || 320, cssH = 140;
+  var cssW = cv.clientWidth || 320, cssH = 160;
   cv.width = cssW * dpr; cv.height = cssH * dpr;
   var ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
   ctx.clearRect(0, 0, cssW, cssH);
-  var padL = 30, padR = 6, padT = 10, padB = 56;
+  var padL = 30, padR = 6, padT = 10, padB = 66;
   var w = cssW - padL - padR, h = cssH - padT - padB;
   var n = values.length;
   var barW = Math.max(6, Math.min(28, (w / n) - 4));
