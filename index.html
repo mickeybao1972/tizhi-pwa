@@ -2626,7 +2626,7 @@ function drawBars(canvasId, labels, values, curIdx) {
   var cv = document.getElementById(canvasId);
   if (!cv) return;
   var dpr = window.devicePixelRatio || 1;
-  var cssW = cv.clientWidth || 320, cssH = 130;
+  var cssW = cv.clientWidth || 320, cssH = 150;
   cv.width = cssW * dpr; cv.height = cssH * dpr;
   var ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
   ctx.clearRect(0, 0, cssW, cssH);
