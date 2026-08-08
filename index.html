@@ -1969,13 +1969,18 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ 
         <div id="bz-qiyun" style="font-size:11px;color:#666;text-align:center;margin:10px 0;padding:8px;background:#fafafa;border-radius:6px"></div>
         <div id="bz-shensha" style="margin-top:12px;background:#fafafa;border-radius:8px;padding:12px"></div>
       </div>
-      
+      <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+        <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">👶 子女推算</h3>
+        <div id="bz-children"></div>
+        <p style="font-size:10px;color:#888;text-align:center;margin-top:8px">子女星以大运、流年寻应期（15–50岁生育窗口），月份流日仅作参考，纯娱乐</p>
+      </div>
+      </div>
       <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
         <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">💰 流年·流月·流日 财运</h3>
         <div id="bz-caiyun"></div>
         <p style="font-size:10px;color:#888;text-align:center;margin-top:8px">财运指数依据日主与流年/流月/流日干支的五行生克（食伤生财、比劫夺财等）推算，纯娱乐参考</p>
       </div>
-      
       <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
         <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">💎 综合财运指数</h3>
         <div id="bz-total"></div>
@@ -1986,6 +1991,13 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ 
         <canvas id="bz-chart-ln" style="width:100%;height:160px;display:block"></canvas>
         <p style="font-size:10px;color:#888;text-align:center;margin-top:8px">总分 =（本命财+大运财+流年财+月财+日财）÷5；曲线为各周期财运分数走势，纯娱乐参考</p>
       </div>
+      
+      <div id="bz-main" style="background:#fff;border-radius:10px;padding:16px;text-align:center;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"></div>
+      
+      
+      
+      
+      
       
       <div id="bz-protolist"></div>
         <p style="font-size:10px;color:#888;text-align:center;margin-top:6px">百分比为相对强度归一化，总和 100%。多数人为 2–3 种混合。</p>
@@ -2017,12 +2029,44 @@ if ('serviceWorker' in navigator) { window.addEventListener('load', function(){ 
 })();
 </script>
 
-      <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-        <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">👶 子女推算</h3>
-        <div id="bz-children"></div>
-        <p style="font-size:10px;color:#888;text-align:center;margin-top:8px">子女星以大运、流年寻应期（15–50岁生育窗口），月份流日仅作参考，纯娱乐</p>
+      
+      
+      
+      
+      <div id="bz-protolist"></div>
+        <p style="font-size:10px;color:#888;text-align:center;margin-top:6px">百分比为相对强度归一化，总和 100%。多数人为 2–3 种混合。</p>
       </div>
-      <div id="bz-main" style="background:#fff;border-radius:10px;padding:16px;text-align:center;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"></div>
+    </div>
+  </div>
+</div>
+
+<script src="lunar.js" onerror="window.__lunarLoadErr='lunar.js 加载失败，请检查网络或硬刷 (Ctrl+Shift+R)'"></script>
+<script src="bazi-engine.js"></script>
+<script>
+// 兜底：万一 lunar.js 的 UMD 在浏览器里走 module 分支没挂全局，手动挂一次
+(function(){
+  try {
+    var mod = (typeof module!=='undefined' && module.exports) || null;
+    var lunarObj = null;
+    if (mod && mod.Lunar) lunarObj = mod;
+    else if (typeof window.Lunar === 'undefined' && typeof Lunar !== 'undefined') {
+      // Lunar 已在全局
+    }
+    if (mod && !window.Lunar) {
+      var keys = ['SolarUtil','LunarUtil','Solar','Lunar','Foto','Tao','NineStar','EightChar','SolarWeek','SolarMonth','SolarSeason','SolarHalfYear','SolarYear','LunarMonth','LunarYear','LunarTime','HolidayUtil','I18n','ShouXingUtil','FotoUtil','TaoUtil','NineStarUtil'];
+      keys.forEach(function(k){ if (mod[k]) window[k] = mod[k]; });
+    }
+    if (!window.BaziEngine && typeof BaziEngine !== 'undefined') {
+      window.BaziEngine = BaziEngine;
+    }
+  } catch(e) { console.error('lunar shim err', e); }
+})();
+</script>
+
+      
+      
+      
+      
       <div id="bz-vice" style="background:#fff;border-radius:10px;padding:12px;text-align:center;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"></div>
       <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
         <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">17 种前世原型 · 成分占比</h3>
