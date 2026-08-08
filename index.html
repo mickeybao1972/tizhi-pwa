@@ -2630,7 +2630,7 @@ function drawBars(canvasId, labels, values, curIdx) {
   cv.width = cssW * dpr; cv.height = cssH * dpr;
   var ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
   ctx.clearRect(0, 0, cssW, cssH);
-  var padL = 30, padR = 6, padT = 10, padB = 46;
+  var padL = 30, padR = 6, padT = 10, padB = 56;
   var w = cssW - padL - padR, h = cssH - padT - padB;
   var n = values.length;
   var barW = Math.max(6, Math.min(28, (w / n) - 4));
@@ -2658,8 +2658,8 @@ function drawBars(canvasId, labels, values, curIdx) {
     ctx.fillStyle = '#999'; ctx.font = '9px sans-serif';
     ctx.textBaseline = 'bottom';
     var lines = String(labels[i]).split('\n');
-    ctx.fillText(lines[0], x + barW / 2, padT + h + 14);
-    if (lines[1]) ctx.fillText(lines[1], x + barW / 2, padT + h + 26);
+    ctx.fillText(lines[0], x + barW / 2, padT + h + 16);
+    if (lines[1]) ctx.fillText(lines[1], x + barW / 2, padT + h + 30);
   }
 }
 
@@ -2702,7 +2702,7 @@ function renderCaiTotal(r, birthYear) {
     barsEl.appendChild(div);
   });
   var dyScores = r.yun.daYun.map(function(d){ return caiYunScore(riGan, d.ganZhi).score; });
-  var dyLabels = r.yun.daYun.map(function(d){ return d.startYear + '年\n' + d.startYear + '年\n' + d.startAge + '岁'; });
+  var dyLabels = r.yun.daYun.map(function(d){ return d.startYear + '年\n' + d.startAge + '岁'; });
   drawBars('bz-chart-dy', dyLabels, dyScores, curDyIdx);
   var lnScores = [], lnLabels = [];
   for (var i = -5; i <= 6; i++) {
