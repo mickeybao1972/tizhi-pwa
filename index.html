@@ -2574,14 +2574,17 @@ function renderJingLuo(){
   // 开穴表：时辰 → 主气经
   const OPEN_MAP={子:'足少阳胆经',丑:'足厥阴肝经',寅:'手太阴肺经',卯:'手阳明大肠经',辰:'足阳明胃经',巳:'足太阴脾经',午:'手少阴心经',未:'手太阳小肠经',申:'足太阳膀胱经',酉:'足少阴肾经',戌:'手厥阴心包经',亥:'手少阳三焦经'};
   const openJing=OPEN_MAP[curShiName];
+  const SHI_ORDER=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
   rows.sort((a,b)=>{
     const ao=a.jing===openJing?1:0;
     const bo=b.jing===openJing?1:0;
     if(bo-ao!==0)return bo-ao;
-    const am=a.wx===ri?1:0;
-    const bm=b.wx===ri?1:0;
-    if(bm-am!==0)return bm-am;
-    return b.score-a.score;
+    // 开穴之外按时辰顺序排（子→丑→寅...）
+    const aShi=a.hour.charAt(0);
+    const bShi=b.hour.charAt(0);
+    const aOrder=SHI_ORDER.indexOf(aShi);
+    const bOrder=SHI_ORDER.indexOf(bShi);
+    return aOrder-bOrder;
   });
   const maxSc=Math.max(...rows.map(r=>r.score))||1;
   let html=`<div style="font-size:11px;color:#666;padding:4px 0 8px 0">本地设备时间：<b>${now.toLocaleString('zh-CN',{hour12:false})}</b> · 当前时辰 <span style="color:#2E7D32;font-weight:700">${curShiName}时${SHI_RANGES[curSHI]}</span> · 主气开穴：<b>${openJing}</b>（子午流注气血最旺）</div>`;
