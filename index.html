@@ -2702,7 +2702,7 @@ function renderCaiTotal(r, birthYear) {
     barsEl.appendChild(div);
   });
   var dyScores = r.yun.daYun.map(function(d){ return caiYunScore(riGan, d.ganZhi).score; });
-  var dyLabels = r.yun.daYun.map(function(d){ return d.startYear + '年\n' + d.startAge + '岁'; });
+  var dyLabels = r.yun.daYun.map(function(d){ return d.startYear + '年\n' + d.startYear + '年\n' + d.startAge + '岁'; });
   drawBars('bz-chart-dy', dyLabels, dyScores, curDyIdx);
   var lnScores = [], lnLabels = [];
   for (var i = -5; i <= 6; i++) {
