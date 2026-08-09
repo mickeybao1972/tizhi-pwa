@@ -2926,7 +2926,7 @@ function renderJingLuo(){
 function renderMianZhen(){
   var c=document.getElementById('bz-mianzhen-content');
   if(!c)return;
-  var w=BZ_PILLARS?BZ_WX_MAP[BZ_PILLARS[2][0]]:'木';
+  var w=BZ_PILLARS?{甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'}[BZ_PILLARS[2][0]]:'木';
   var tizhiColor='#4CAF50';
   var ts='平和质';
   try{
