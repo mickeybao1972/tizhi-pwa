@@ -24,7 +24,12 @@ memory/
 
 _*.js
 _*.ps1
+_*.py
 _*.txt
+_*.png
+_*.html
+_*.svg
+_*.md
 _*.bat
 _push_*.ps1
 .git-credentials
