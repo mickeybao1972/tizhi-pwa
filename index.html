@@ -2920,15 +2920,65 @@ function renderJingLuo(){
 }
 
 // ====== 面诊渲染函数 ======
+var MZ_WM={'木':0,'火':1,'土':2,'金':3,'水':4};
+var MZ_WX_FACE={
+ 木:{color:'#4CAF50',region:'眉间、面颊、目',excess:'面色青暗、目赤干涩、眉间川字纹、颧部黄褐斑',def:'面色青白、视物昏花、爪甲枯槁',exTip:'疏肝解郁（玫瑰花、陈皮、枸杞）；忌怒勿熬夜',defTip:'养肝血（桑葚、当归、桂圆）；早卧养血'},
+ 火:{color:'#F44336',region:'额部、面整体光泽',excess:'面红潮热、口舌生疮、额角红肿心烦',def:'面色苍白无华、心悸气短、神情淡漠',exTip:'清心降火（莲子心、淡竹叶、麦冬）',defTip:'补心血（桂圆、红豆、红枣）；午时小憩'},
+ 土:{color:'#FF9800',region:'口唇四周、前额面颊',excess:'面色萎黄油腻、口唇红肿、痤疮频发',def:'唇淡白、面色萎黄无华、肌肉松弛',exTip:'清胃健脾（薏米、冬瓜、苦瓜）',defTip:'健脾益气（山药、小米、红枣）'},
+ 金:{color:'#9E9E9E',region:'鼻翼、眼睑、毛孔',excess:'面颊潮红、鼻干、毛孔粗大',def:'面色苍白、皮毛枯槁、鼻翼色淡、易过敏',exTip:'清肺润燥（百合、银耳、梨）',defTip:'补肺气（黄芪、太子参、蜂蜜）'},
+ 水:{color:'#1565C2',region:'下颌、颏、耳前',excess:'面黑浮肿、下颌色暗、油光',def:'面色黧黑、下巴松弛、耳前晦暗、眼眶暗',exTip:'利水渗湿（赤小豆、茯苓、玉米须）',defTip:'补肾填精（黑芝麻、核桃、黑豆）；早睡'}
+};
+
+function bzComputeFaceDiag(){
+  if(!BZ_PILLARS)return null;
+  var JW={甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+  var ZW={子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
+  var CANG={子:['癸'],丑:['己','癸','辛'],寅:['甲','丙','戊'],卯:['乙'],辰:['戊','乙','癸'],巳:['丙','庚','戊'],午:['丁','己'],未:['己','丁','乙'],申:['庚','壬','戊'],酉:['辛'],戌:['戊','辛','丁'],亥:['壬','甲']};
+  var WM={'木':0,'火':1,'土':2,'金':3,'水':4};
+  function csJL(g,z){var s=[0,0,0,0,0];s[WM[JW[g]]]+=2;s[WM[ZW[z]]]+=1;(CANG[z]||[]).forEach(function(x){s[WM[JW[x]]]+=0.5;});return s;}
+  function nsJL(p){var s=[0,0,0,0,0];var ws=[1,1.5,2,1];p.forEach(function(p2,i){var c2=csJL(p2[0],p2[1]);c2.forEach(function(v,j){s[j]+=v*ws[i];});});return s.map(Math.round);}
+  var yy=BZ_TIME_STATE&&BZ_TIME_STATE.selectedLiuNianYear?BZ_TIME_STATE.selectedLiuNianYear:new Date().getFullYear();
+  var selLy=BZ_TIME_STATE?BZ_TIME_STATE.selectedLiuYue:null;
+  var selLr=BZ_TIME_STATE?BZ_TIME_STATE.selectedLiuRi:null;
+  var nowL=Lunar.fromDate(new Date());
+  var liuYueGZ=selLy?Lunar.fromYmd(yy,selLy,15).getMonthInGanZhi():nowL.getMonthInGanZhi();
+  var liuRiGZ=nowL.getDayInGanZhi();
+  if(selLr!==null&&selLy){var jq=['立春','惊蛰','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪','小寒'];var l0=Lunar.fromYmd(yy,1,1);var jqt=l0.getJieQiTable();var jqName=jq[selLy-1]||jq[nowL.getMonth()];var jqStart=jqt[jqName];if(jqStart){var startL=Lunar.fromSolar(jqStart);liuRiGZ=startL.next(selLr-1).getDayInGanZhi();}}
+  var natal=nsJL(BZ_PILLARS);
+  var ri=WM[JW[BZ_PILLARS[2][0]]];
+  var dyScore=BZ_DA_YUN&&BZ_DA_YUN.length>0?csJL(BZ_DA_YUN[0].ganZhi[0],BZ_DA_YUN[0].ganZhi[1]):[0,0,0,0,0];
+  var lnScore=BZ_LN_GZ?csJL(BZ_LN_GZ[0],BZ_LN_GZ[1]):[0,0,0,0,0];
+  var lyScore=liuYueGZ?csJL(liuYueGZ[0],liuYueGZ[1]):[0,0,0,0,0];
+  var lrScore=liuRiGZ?csJL(liuRiGZ[0],liuRiGZ[1]):[0,0,0,0,0];
+  var combined=natal.map(function(v,i){return Math.round(v*2+dyScore[i]+lnScore[i]*0.5+lyScore[i]*0.3+lrScore[i]*0.1);});
+  var riS=combined[ri]||1;
+  var rows=JL_MERIDIANS.map(function(m){
+    var wgt=m.yang?0.4:0.6;
+    var sc=Math.round(combined[m.wx]*wgt);
+    var ratio=combined[m.wx]/riS;
+    var st='平';
+    if(m.wx===ri){st='本主';}
+    else if(ratio>=1.5){st='过旺';}
+    else if(ratio>=1.0){st='旺';}
+    else if(ratio<=0.2){st='亏虚';}
+    else if(ratio<=0.4){st='偏弱';}
+    return {jing:m.jing,zang:m.zang,fu:m.fu,wx:m.wx,color:m.color,yang:m.yang,score:sc,ratio:ratio,status:st};
+  });
+  return {combined:combined,riS:riS,ri:ri,rows:rows};
+}
+
 function renderMianZhen(){
   var c=document.getElementById('bz-mianzhen-content');
   if(!c)return;
-  var w=BZ_PILLARS?{甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'}[BZ_PILLARS[2][0]]:'木';
-  var tizhiColor='#4CAF50';
-  var ts='平和质';
+  var diag=bzComputeFaceDiag();
+  if(!diag){c.innerHTML='<div style="font-size:12px;color:#999;padding:12px">请先排盘，再查看面诊参考。</div>';return;}
+  var combined=diag.combined, ri=diag.ri, riS=diag.riS, rows=diag.rows;
+  var WXS=['木','火','土','金','水'];
+  var JW={甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+  var w=BZ_PILLARS?JW[BZ_PILLARS[2][0]]:'木';
+  var tizhiColor='#4CAF50', ts='平和质';
   try{
     var el={木:0,火:0,土:0,金:0,水:0};
-    var JW={甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
     var ZW={子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
     BZ_PILLARS.forEach(function(p){el[JW[p[0]]]=(el[JW[p[0]]]||0)+10;el[ZW[p[1]]]=(el[ZW[p[1]]]||0)+8;});
     var mx=Math.max(el.木,el.火,el.土,el.金,el.水);
@@ -2945,25 +2995,77 @@ function renderMianZhen(){
   }catch(e){}
   var tz=MZ_TIZHI.find(function(t){return ts.indexOf(t.t.replace('质',''))>=0;})||MZ_TIZHI[0];
   tizhiColor=tz.col||'#4CAF50';
-  var html='<div style="font-size:12px;color:#666;margin-bottom:12px">日主 <b style="color:'+tizhiColor+'">'+w+'</b> · 体质倾向 <b style="color:'+tizhiColor+'">'+ts+'</b> · 以下为面诊参考（请结合自身情况）</div>';
-  html+='<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:#E65100;margin-bottom:6px">📃 面部脏腑分区图</div><div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start"><div style="flex:0 0 auto">'+MZ_SVG+'</div><div style="flex:1;min-width:150px">';
-  MZ_ZANGFU.forEach(function(z){html+='<div style="margin-bottom:5px;padding:4px 6px;background:#FAFAFA;border-left:2px solid #E0E0E0;font-size:11px;line-height:1.4"><b style="color:#333">'+z.jing+'</b>：'+z.bu+'<br><span style="color:#666">'+z.jg+'</span></div>';});
-  html+='</div></div></div>';
+
+  function stColor(st){return st==='过旺'?'#C62828':st==='旺'?'#E65100':st==='偏弱'?'#F9A825':st==='亏虚'?'#757575':st==='本主'?'#2E7D32':'#888';}
+  function stBg(st){return st==='过旺'?'#FFEBEE':st==='旺'?'#FFF3E0':st==='偏弱'?'#FFFDE7':st==='亏虚'?'#FAFAFA':st==='本主'?'#E8F5E9':'#F5F5F5';}
+
+  var html='<div style="font-size:12px;color:#666;margin-bottom:12px">日主 <b style="color:'+tizhiColor+'">'+w+'</b> · 体质倾向 <b style="color:'+tizhiColor+'">'+ts+'</b> · 以下面诊为五行·能量·经络联动参考</div>';
+
+  html+='<div style="margin-bottom:16px"><div style="font-size:12px;font-weight:700;color:#E65100;margin-bottom:8px">📃 面部脏腑分区图</div>';
+  html+='<div style="display:flex;justify-content:center;margin-bottom:10px">'+MZ_SVG+'</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px">';
+  MZ_ZANGFU.forEach(function(z){html+='<div style="padding:5px 7px;background:#FAFAFA;border-left:2px solid #E0E0E0;font-size:11px;line-height:1.4"><b style="color:#333">'+z.jing+'</b>：'+z.bu+'<br><span style="color:#666">'+z.jg+'</span></div>';});
+  html+='</div></div>';
+
+  html+='<div style="margin-bottom:16px"><div style="font-size:12px;font-weight:700;color:#6A1B9A;margin-bottom:4px">🌿 面诊勾稽 — 五行·能量·经络联动</div>';
+  html+='<div style="font-size:10px;color:#888;margin-bottom:8px">能量以日主为基准判过／不及，并联动对应经络状态；按偏离程度排序（大运·流年·流月·流日已计入）</div>';
+  var faceRows=WXS.map(function(wx){
+    var wm=MZ_WM[wx];
+    var ratio=combined[wm]/riS;
+    var st;
+    if(wm===ri)st='本主';
+    else if(ratio>=1.5)st='过旺';
+    else if(ratio>=1.0)st='旺';
+    else if(ratio<=0.2)st='亏虚';
+    else if(ratio<=0.4)st='偏弱';
+    else st='平';
+    var dev=wm===ri?0:(ratio>=1?ratio-1:(1/ratio-1));
+    var merTxt=rows.filter(function(r){return r.wx===wm;}).map(function(r){return r.jing+'('+r.status+')';}).join('、');
+    return {wx:wx,wm:wm,ratio:ratio,st:st,dev:dev,merTxt:merTxt};
+  });
+  faceRows.sort(function(a,b){return b.dev-a.dev;});
+  faceRows.forEach(function(fr){
+    var f=MZ_WX_FACE[fr.wx];
+    var isEx=(fr.st==='过旺'||fr.st==='旺');
+    var isDef=(fr.st==='亏虚'||fr.st==='偏弱');
+    var sign=isEx?f.excess:(isDef?f.def:'面色平和、该部位无特殊异常表现');
+    var tip=isEx?f.exTip:(isDef?f.defTip:'保持作息规律、饮食清淡即可。');
+    html+='<div style="display:flex;gap:8px;align-items:stretch;margin-bottom:6px;padding:6px;border:1px solid #eee;border-radius:6px;background:#fff">';
+    html+='<div style="width:6px;border-radius:3px;background:'+f.color+';flex-shrink:0"></div>';
+    html+='<div style="flex:1">';
+    html+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px">';
+    html+='<span style="font-weight:700;color:'+f.color+';font-size:12px">'+fr.wx+'行</span>';
+    html+='<span style="font-size:10px;color:#888">能量 '+combined[fr.wm]+'（日主 '+riS+'）</span>';
+    html+='<span style="font-size:10px;color:'+stColor(fr.st)+';background:'+stBg(fr.st)+';padding:1px 6px;border-radius:3px;font-weight:700">'+fr.st+'</span>';
+    html+='<span style="font-size:10px;color:#666">部位：'+f.region+'</span>';
+    html+='</div>';
+    html+='<div style="font-size:11px;line-height:1.5;color:#333">表现：'+sign+'</div>';
+    html+='<div style="font-size:10px;line-height:1.5;color:#2E7D32;margin-top:2px">养护：'+tip+'</div>';
+    html+='<div style="font-size:10px;line-height:1.5;color:#6A1B9A;margin-top:2px">经络：'+fr.merTxt+'</div>';
+    html+='</div></div>';
+  });
+  html+='</div>';
+
   html+='<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:#2E7D32;margin-bottom:6px">🌿 您的体质面诊特征（'+ts+'）</div><div style="padding:8px 10px;background:#F1F8E9;border-left:3px solid '+tizhiColor+';border-radius:0 6px 6px 0;font-size:11px;line-height:1.6"><div style="font-weight:700;color:'+tizhiColor+';margin-bottom:3px">典型面色：'+tz.jg+'</div><div style="color:#555">其他特征：'+tz.ys+'</div></div><div style="margin-top:8px;font-size:11px;color:#888">其他体质：</div><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">';
   MZ_TIZHI.forEach(function(t){var isMe=ts.indexOf(t.t.replace('质',''))>=0;html+='<span style="padding:2px 7px;border-radius:10px;font-size:10px;background:'+(isMe?t.col:'#f5f5f5')+';color:'+(isMe?'white':'#666')+';font-weight:'+(isMe?'700':'400')+'">'+t.t+'</span>';});
   html+='</div></div>';
+
   html+='<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:#C62828;margin-bottom:6px">🎨 面色主病（望色诊断）</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px">';
   MZ_COLORS.forEach(function(fc){html+='<div style="padding:6px 8px;background:#FAFAFA;border:1px solid #eee;border-radius:6px;font-size:11px;line-height:1.4"><div style="display:flex;align-items:center;gap:6px;margin-bottom:2px"><div style="width:16px;height:16px;border-radius:50%;background:'+fc.col+';border:1px solid '+fc.b+';flex-shrink:0"></div><span style="font-weight:700;color:#333">'+fc.c+'</span></div><div style="color:#C62828;font-size:10px">实证：'+fc.jg+'</div><div style="color:#E65100;font-size:10px">虚证：'+fc.ys+'</div><div style="color:#2E7D32;font-size:10px">养护：'+fc.jl+'</div></div>';});
   html+='</div></div>';
+
   html+='<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:#1565C0;margin-bottom:6px">🔍 面部细节与脏腑对应</div>';
   MZ_DETAILS.forEach(function(d){html+='<div style="padding:5px 8px;margin-bottom:3px;background:#E3F2FD;border-radius:4px;font-size:11px;line-height:1.5"><b style="color:#1565C0">'+d.bu+'</b>：'+d.jg+(d.ys?' <span style="color:#C62828">| '+d.ys+'</span>':'')+'</div>';});
   html+='</div>';
+
   html+='<div style="margin-bottom:10px"><div style="font-size:12px;font-weight:700;color:#6A1B9A;margin-bottom:6px">🦘 经络与面部循行</div><div style="max-height:300px;overflow-y:auto">';
   MZ_JINGLUO_FACE.forEach(function(jf){html+='<details style="margin-bottom:4px"><summary style="cursor:pointer;font-size:11px;color:#6A1B9A;font-weight:700;padding:4px 0">'+jf.jing+' → '+jf.bu+'</summary><div style="padding:6px 8px;background:#F3E5F5;border-radius:0 0 4px 4px;font-size:11px;line-height:1.5"><div style="color:#4A148C;margin-bottom:2px">📋 面部所过：'+jf.route+'</div><div style="color:#1B5E20">💡 养护：'+jf.fx+'</div></div></details>';});
   html+='</div></div>';
+
   html+='<div style="margin-top:10px;padding:8px;background:#FFF9C4;border-radius:6px;font-size:10px;color:#795548;line-height:1.5">⚠️ 面诊为中医望诊科普参考，非疾病诊断。如有明显不适或面部异常，请及时就医。面色受光线、情绪、饮食影响，单次观察仅供参考，建议多次对照、综合判断。</div>';
   c.innerHTML=html;
 }
+
 
 
 function calculateWuXingForPillars(pillars) {
