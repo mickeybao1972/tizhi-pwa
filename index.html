@@ -2958,7 +2958,7 @@ function runBazi(isReload, rec){
   window.BZ_LAST_RESULT=r;window.BZ_LAST_EIGHTCHAR=e;window.BZ_BIRTH_YEAR=birthYear;window.BZ_LAST_DAYUN=daYun;window.BZ_LAST_BAZI=bazi;
   // 自动存档（同姓名+同生辰则覆盖）—— 提前到渲染之前，避免渲染异常导致漏存
   try{
-    var _beforeCount=(JSON.parse(localStorage.getItem('bazi_records')||'[]')).length;
+    var _beforeCount=(JSON.parse(localStorage.getItem(BZ_LS_KEY)||'[]')).length;
     var _newCount=saveBaziRecordAuto();
     err.textContent='[存档] '+_beforeCount+'->'+_newCount;
   }catch(ex){err.textContent='存档出错：'+ex.message;console.log('auto save err:',ex)}
@@ -2990,7 +2990,7 @@ function runBazi(isReload, rec){
   err.textContent=name?name+'的八字已排好\u2713':'八字已排好\u2713';
   if(window.BZ_INPUT_CAL==='lunar'&&window.BZ_INPUT_LUNAR){var _il=window.BZ_INPUT_LUNAR;var _lm=_il.m;var _lmd=_lm!==Math.floor(_lm)?'闰'+Math.floor(_lm)+'月':_lm+'月';err.textContent+='（阴历'+_il.y+'年'+_lmd+_il.d+'日 → 阳历'+dt.getFullYear()+'年'+(dt.getMonth()+1)+'月'+dt.getDate()+'日）';}
   try{
-    var __list=JSON.parse(localStorage.getItem('bazi_records')||'[]');
+    var __list=JSON.parse(localStorage.getItem(BZ_LS_KEY)||'[]');
     renderBaziHistory();
     err.textContent+=' 共存 '+__list.length+' 条';
   }catch(ex){err.textContent='存档读取错：'+ex.message;console.log('history render err:',ex)}
