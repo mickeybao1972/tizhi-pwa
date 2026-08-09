@@ -3385,7 +3385,13 @@ function renderWuXing(show){
     var totals=[0,0,0,0,0];
     for(var i=0;i<5;i++){for(var k=0;k<5;k++)totals[i]+=layers[i][k];}
     var maxTot=Math.max.apply(null,totals.concat([1]));
-    var layerColors=[WC[i],'#90A4AE','#B0BEC5','#CFD8DC','#ECEFF1'];
+    var layerColors=[
+      ['#2E7D32','#43A047','#66BB6A','#81C784','#A5D6A7'],
+      ['#B71C1C','#D32F2F','#E53935','#EF5350','#E57373'],
+      ['#E65100','#EF6C00','#F57C00','#FB8C00','#FFB74D'],
+      ['#424242','#616161','#757575','#9E9E9E','#BDBDBD'],
+      ['#0D47A1','#1565C0','#1976D2','#42A5F5','#90CAF9']
+    ];
     var layerLabels=["本命","大运","流年","流月","流日"];
     var barW=Math.min(50,(w-20)/5-10);
     var barGap=(w-barW*5)/6;
@@ -3400,7 +3406,7 @@ function renderWuXing(show){
       for(var k=0;k<5;k++){
         var layerH=(layers[i][k]/maxTot)*h*0.92;
         yc-=layerH;
-        var c=layerColors[k];
+        var c=layerColors[i][k];
         ctx.fillStyle=c;
         ctx.globalAlpha=k===0?1:(0.75+k*0.05);
         ctx.fillRect(x,yc,barW,layerH);
