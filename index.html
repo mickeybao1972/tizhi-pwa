@@ -7710,11 +7710,14 @@ function renderSheHuiGuanXi(){
 </script>
 
 
+
+
 <script>
 function renderBaziAnalysis(){
   var box=document.getElementById('bz-analysis');
-  if(!box)return;
-  if(typeof BZ_RI_GAN==='undefined'||!BZ_RI_GAN){ box.style.display='none'; return; }
+  if(!box){console.log('[命理解读] 找不到 bz-analysis 容器'); return;}
+  if(typeof BZ_RI_GAN==='undefined'||!BZ_RI_GAN){ console.log('[命理解读] BZ_RI_GAN 未定义或为空'); box.style.display='none'; return; }
+  console.log('[命理解读] 开始渲染，日主=',BZ_RI_GAN);
   try{
     var riGan=BZ_RI_GAN;
     var dw=BZ_WX[riGan];
@@ -7722,6 +7725,7 @@ function renderBaziAnalysis(){
     var yuan=(gKey===0)?'元女':'元男';
     var pillars=(typeof BZ_PILLARS!=='undefined'&&BZ_PILLARS)?BZ_PILLARS:[];
     var r=(typeof BZ_LAST_RESULT!=='undefined'&&BZ_LAST_RESULT)?BZ_LAST_RESULT:null;
+    var CANG={子:['癸'],丑:['己','癸','辛'],寅:['甲','丙','戊'],卯:['乙'],辰:['戊','乙','癸'],巳:['丙','庚','戊'],午:['丁','己'],未:['己','丁','乙'],申:['庚','壬','戊'],酉:['辛'],戌:['戊','辛','丁'],亥:['壬','甲']};
     var WX_ZANG={木:'肝胆',火:'心与小肠',土:'脾胃',金:'肺与大肠',水:'肾与膀胱'};
     var WX_EX={木:'甲乙·寅卯',火:'丙丁·巳午',土:'戊己·辰戌丑未',金:'庚辛·申酉',水:'壬癸·亥子'};
     var SOC_MAP={比肩:'同辈/同事',劫财:'朋友/竞争者',食神:'晚辈/学生/艺人',伤官:'创意人/表达者',偏财:'客户/商人',正财:'妻子/稳定收入',七杀:'上司/压力源',正官:'丈夫/上级',偏印:'长辈/学术',正印:'母亲/庇护'};
