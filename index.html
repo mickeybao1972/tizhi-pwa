@@ -3951,6 +3951,7 @@ function closeHistModal() {
       </div>
 
       <div id="bz-social" style="display:none"></div>
+      <div id="bz-analysis" style="display:none"></div>
 
       <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
 
@@ -6434,7 +6435,7 @@ function runBazi(isReload, rec){
 
     try{renderJingLuo();}catch(ex){console.log('十二经络渲染错：',ex.message);}
 
-    try{renderSheHuiGuanXi();}catch(ex3){console.log('社会关系渲染错：',ex3&&ex3.message);}
+    try{renderSheHuiGuanXi()renderBaziAnalysis();;}catch(ex3){console.log('社会关系渲染错：',ex3&&ex3.message);}
     try{renderMianZhen();}catch(ex2){console.log('面诊渲染错：',ex2&&ex2.message);}
 
     var wxBox=document.getElementById('bz-wuxing-box');
@@ -7459,7 +7460,7 @@ function selectLiuYue(month){BZ_TIME_STATE.selectedLiuYue=month;closeTimePanel()
 
 function selectLiuRi(offset){BZ_TIME_STATE.selectedLiuRi=offset;closeTimePanel();recalcCaiYun()}
 
-function recalcCaiYun(){var r=window.BZ_LAST_RESULT;var birthYear=window.BZ_BIRTH_YEAR;if(!r)return;var riGan=r.pillars[2][0];var nowYear=new Date().getFullYear();var nowAge=nowYear-birthYear;var curDyIdx=0;r.yun.daYun.forEach(function(d,i){if(d.startAge<=nowAge)curDyIdx=i});if(r.yun.daYun[curDyIdx]&&!r.yun.daYun[curDyIdx].ganZhi)curDyIdx=Math.min(curDyIdx+1,r.yun.daYun.length-1);var curDaYun=BZ_TIME_STATE.selectedDaYunIdx!==null?r.yun.daYun[BZ_TIME_STATE.selectedDaYunIdx]:r.yun.daYun[curDyIdx];var liuNianYear=BZ_TIME_STATE.selectedLiuNianYear!==null?BZ_TIME_STATE.selectedLiuNianYear:nowYear;var curLiuNian=bzYearGZ(liuNianYear);var yy=liuNianYear;var curLiuYue=BZ_TIME_STATE.selectedLiuYue!==null?Lunar.fromYmd(yy,BZ_TIME_STATE.selectedLiuYue,15).getMonthInGanZhi():Lunar.fromDate(new Date()).getMonthInGanZhi();var curLiuRi;if(BZ_TIME_STATE.selectedLiuRi!==null&&BZ_TIME_STATE.selectedLiuYue){var jq=['立春','惊蛰','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪','小寒'];var l0=Lunar.fromYmd(yy,1,1);var jqt=l0.getJieQiTable();var jqName=jq[BZ_TIME_STATE.selectedLiuYue-1];var jqStart=jqt[jqName];if(jqStart){var startL=Lunar.fromSolar(jqStart);var targetL=startL.next(BZ_TIME_STATE.selectedLiuRi-1);curLiuRi=targetL.getDayInGanZhi()}else{curLiuRi=Lunar.fromDate(new Date()).getDayInGanZhi()}}else if(BZ_TIME_STATE.selectedLiuRi!==null){var liuRiDate=new Date();liuRiDate.setDate(liuRiDate.getDate()+BZ_TIME_STATE.selectedLiuRi);curLiuRi=Lunar.fromDate(liuRiDate).getDayInGanZhi()}else{curLiuRi=Lunar.fromDate(new Date()).getDayInGanZhi()}var liuYueIdx=BZ_TIME_STATE.selectedLiuYue!==null?BZ_TIME_STATE.selectedLiuYue:new Date().getMonth()+1;var jieQi=['立春','惊蛰','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪','小寒'];var dyLabel='大运',ynLabel='流年',yueLabel='流月',riLabel='流日';if(BZ_TIME_STATE.selectedDaYunIdx!==null)dyLabel=BZ_TIME_STATE.selectedDaYunIdx+'号大运 '+curDaYun.ganZhi+' '+curDaYun.startAge+'岁';if(BZ_TIME_STATE.selectedLiuNianYear)ynLabel=liuNianYear+'年 '+curLiuNian;if(BZ_TIME_STATE.selectedLiuYue)yueLabel=yy+'年'+BZ_TIME_STATE.selectedLiuYue+'月 '+jieQi[BZ_TIME_STATE.selectedLiuYue-1]+'月';if(BZ_TIME_STATE.selectedLiuRi!==null)riLabel=BZ_TIME_STATE.selectedLiuRi+'日 '+curLiuRi;var cards=[{label:dyLabel,gz:curDaYun.ganZhi,note:'十年大运'},{label:ynLabel,gz:curLiuNian,note:'年度运势'},{label:yueLabel,gz:curLiuYue,note:'月度流转'},{label:riLabel,gz:curLiuRi,note:'当日气运'}];var currentSelHtml='<div style="background:linear-gradient(135deg,#faf8f5 0%,#f5f0e8 100%);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #e8e0d5">'+'<div style="font-size:12px;color:#8B4513;font-weight:600;margin-bottom:8px;border-left:3px solid #8B4513;padding-left:8px">📍 当前时间维度</div>'+'<div style="display:flex;gap:8px;flex-wrap:wrap">';var selItems=[];if(BZ_TIME_STATE.selectedDaYunIdx!==null&&r.yun.daYun[BZ_TIME_STATE.selectedDaYunIdx]){var d=r.yun.daYun[BZ_TIME_STATE.selectedDaYunIdx];selItems.push('<div style="flex:1;min-width:80px;text-align:center;padding:8px;background:#fff8f0;border-radius:6px;border:1px solid #e8d8c8"><div style="font-size:10px;color:#888">大运</div><div style="font-size:14px;font-weight:700;color:#8B4513">'+d.ganZhi+'</div><div style="font-size:9px;color:#666">'+d.startAge+'岁起</div></div>')}if(BZ_TIME_STATE.selectedLiuNianYear){selItems.push('<div style="flex:1;min-width:80px;text-align:center;padding:8px;background:#f0f8ff;border-radius:6px;border:1px solid #d0e0f0"><div style="font-size:10px;color:#888">流年</div><div style="font-size:14px;font-weight:700;color:#1565c0">'+curLiuNian+'</div><div style="font-size:9px;color:#666">'+BZ_TIME_STATE.selectedLiuNianYear+'年</div></div>')}if(BZ_TIME_STATE.selectedLiuYue){selItems.push('<div style="flex:1;min-width:80px;text-align:center;padding:8px;background:#f0fff4;border-radius:6px;border:1px solid #c8e8d0"><div style="font-size:10px;color:#888">流月</div><div style="font-size:14px;font-weight:700;color:#2e7d32">'+curLiuYue+'</div><div style="font-size:9px;color:#666">'+jieQi[BZ_TIME_STATE.selectedLiuYue-1]+'</div></div>')}if(BZ_TIME_STATE.selectedLiuRi!==null){selItems.push('<div style="flex:1;min-width:80px;text-align:center;padding:8px;background:#fff0f0;border-radius:6px;border:1px solid #f0d0d0"><div style="font-size:10px;color:#888">流日</div><div style="font-size:14px;font-weight:700;color:#c62828">'+curLiuRi+'</div><div style="font-size:9px;color:#666">'+BZ_TIME_STATE.selectedLiuRi+'日</div></div>')}currentSelHtml+=selItems.join('')+'</div></div>';var box=document.getElementById('bz-caiyun');box.innerHTML=currentSelHtml;cards.forEach(function(c){var cy=caiYunScore(riGan,c.gz);var color=cy.score>=75?'#2e7d32':cy.score>=60?'#8B4513':cy.score>=45?'#888':cy.score>=30?'#c62828':'#b71c1c';var div=document.createElement('div');div.style.cssText='background:#fafafa;border-radius:8px;padding:10px;margin-bottom:8px';div.innerHTML='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">'+'<span style="font-size:13px;font-weight:700;color:#8B4513">'+c.label+'</span>'+'<span style="font-size:12px;color:'+color+';font-weight:700">'+cy.score+'分 · '+cy.level+'</span>'+'</div>'+'<div style="font-size:11px;color:#666;margin-bottom:4px">干支：'+c.gz+'（'+cy.rel+'）· '+c.note+'</div>'+'<div style="background:#eee;border-radius:4px;height:8px;overflow:hidden;margin-bottom:6px"><div style="height:100%;background:'+color+';border-radius:4px;width:'+cy.score+'%"></div></div>'+'<div style="font-size:11px;color:#555;line-height:1.5">'+cy.tip+'</div>';box.appendChild(div)});var ben=natalWealthScore(riGan,r.pillars);var dyScore=caiYunScore(riGan,curDaYun.ganZhi).score;var ynScore=caiYunScore(riGan,curLiuNian).score;var yueScore=caiYunScore(riGan,curLiuYue).score;var riScore=caiYunScore(riGan,curLiuRi).score;var total=Math.round((ben+dyScore+ynScore+yueScore+riScore)/5);document.getElementById('bz-total').innerHTML='<div style="text-align:center;margin-bottom:10px">'+'<span style="font-size:36px;font-weight:800;color:#8B4513">'+total+'</span>'+'<span style="font-size:13px;color:#666"> 分 · 综合财运指数</span>'+'</div>';var barsEl=document.getElementById('bz-totalbars');barsEl.innerHTML='';var comps=[['本命财',ben],['大运财',dyScore],['流年财',ynScore],['月财',yueScore],['日财',riScore]];comps.forEach(function(c){var div=document.createElement('div');div.style.cssText='margin-bottom:6px';div.innerHTML='<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px">'+'<span style="color:#666">'+c[0]+'</span>'+'<b style="color:#8B4513">'+c[1]+'</b>'+'</div>'+'<div style="background:#eee;border-radius:4px;height:6px;overflow:hidden">'+'<div style="height:100%;background:'+(c[1]>=70?'#8B4513':c[1]>=50?'#c49a6c':'#bbb')+';border-radius:4px;width:'+c[1]+'%"></div>'+'</div>';barsEl.appendChild(div)});updatePanHighlight(curDaYun,curLiuNian);renderCaiTotalDynamic(r,birthYear,curDaYun,curLiuNian,curLiuYue,curLiuRi);refreshDaYunBtn()}
+function recalcCaiYun(){var r=window.BZ_LAST_RESULT;var birthYear=window.BZ_BIRTH_YEAR;if(!r)return;var riGan=r.pillars[2][0];var nowYear=new Date().getFullYear();var nowAge=nowYear-birthYear;var curDyIdx=0;r.yun.daYun.forEach(function(d,i){if(d.startAge<=nowAge)curDyIdx=i});if(r.yun.daYun[curDyIdx]&&!r.yun.daYun[curDyIdx].ganZhi)curDyIdx=Math.min(curDyIdx+1,r.yun.daYun.length-1);var curDaYun=BZ_TIME_STATE.selectedDaYunIdx!==null?r.yun.daYun[BZ_TIME_STATE.selectedDaYunIdx]:r.yun.daYun[curDyIdx];var liuNianYear=BZ_TIME_STATE.selectedLiuNianYear!==null?BZ_TIME_STATE.selectedLiuNianYear:nowYear;var curLiuNian=bzYearGZ(liuNianYear);var yy=liuNianYear;var curLiuYue=BZ_TIME_STATE.selectedLiuYue!==null?Lunar.fromYmd(yy,BZ_TIME_STATE.selectedLiuYue,15).getMonthInGanZhi():Lunar.fromDate(new Date()).getMonthInGanZhi();var curLiuRi;if(BZ_TIME_STATE.selectedLiuRi!==null&&BZ_TIME_STATE.selectedLiuYue){var jq=['立春','惊蛰','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪','小寒'];var l0=Lunar.fromYmd(yy,1,1);var jqt=l0.getJieQiTable();var jqName=jq[BZ_TIME_STATE.selectedLiuYue-1];var jqStart=jqt[jqName];if(jqStart){var startL=Lunar.fromSolar(jqStart);var targetL=startL.next(BZ_TIME_STATE.selectedLiuRi-1);curLiuRi=targetL.getDayInGanZhi()}else{curLiuRi=Lunar.fromDate(new Date()).getDayInGanZhi()}}else if(BZ_TIME_STATE.selectedLiuRi!==null){var liuRiDate=new Date();liuRiDate.setDate(liuRiDate.getDate()+BZ_TIME_STATE.selectedLiuRi);curLiuRi=Lunar.fromDate(liuRiDate).getDayInGanZhi()}else{curLiuRi=Lunar.fromDate(new Date()).getDayInGanZhi()}var liuYueIdx=BZ_TIME_STATE.selectedLiuYue!==null?BZ_TIME_STATE.selectedLiuYue:new Date().getMonth()+1;var jieQi=['立春','惊蛰','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪','小寒'];var dyLabel='大运',ynLabel='流年',yueLabel='流月',riLabel='流日';if(BZ_TIME_STATE.selectedDaYunIdx!==null)dyLabel=BZ_TIME_STATE.selectedDaYunIdx+'号大运 '+curDaYun.ganZhi+' '+curDaYun.startAge+'岁';if(BZ_TIME_STATE.selectedLiuNianYear)ynLabel=liuNianYear+'年 '+curLiuNian;if(BZ_TIME_STATE.selectedLiuYue)yueLabel=yy+'年'+BZ_TIME_STATE.selectedLiuYue+'月 '+jieQi[BZ_TIME_STATE.selectedLiuYue-1]+'月';if(BZ_TIME_STATE.selectedLiuRi!==null)riLabel=BZ_TIME_STATE.selectedLiuRi+'日 '+curLiuRi;var cards=[{label:dyLabel,gz:curDaYun.ganZhi,note:'十年大运'},{label:ynLabel,gz:curLiuNian,note:'年度运势'},{label:yueLabel,gz:curLiuYue,note:'月度流转'},{label:riLabel,gz:curLiuRi,note:'当日气运'}];var currentSelHtml='<div style="background:linear-gradient(135deg,#faf8f5 0%,#f5f0e8 100%);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid #e8e0d5">'+'<div style="font-size:12px;color:#8B4513;font-weight:600;margin-bottom:8px;border-left:3px solid #8B4513;padding-left:8px">📍 当前时间维度</div>'+'<div style="display:flex;gap:8px;flex-wrap:wrap">';var selItems=[];if(BZ_TIME_STATE.selectedDaYunIdx!==null&&r.yun.daYun[BZ_TIME_STATE.selectedDaYunIdx]){var d=r.yun.daYun[BZ_TIME_STATE.selectedDaYunIdx];selItems.push('<div style="flex:1;min-width:80px;text-align:center;padding:8px;background:#fff8f0;border-radius:6px;border:1px solid #e8d8c8"><div style="font-size:10px;color:#888">大运</div><div style="font-size:14px;font-weight:700;color:#8B4513">'+d.ganZhi+'</div><div style="font-size:9px;color:#666">'+d.startAge+'岁起</div></div>')}if(BZ_TIME_STATE.selectedLiuNianYear){selItems.push('<div style="flex:1;min-width:80px;text-align:center;padding:8px;background:#f0f8ff;border-radius:6px;border:1px solid #d0e0f0"><div style="font-size:10px;color:#888">流年</div><div style="font-size:14px;font-weight:700;color:#1565c0">'+curLiuNian+'</div><div style="font-size:9px;color:#666">'+BZ_TIME_STATE.selectedLiuNianYear+'年</div></div>')}if(BZ_TIME_STATE.selectedLiuYue){selItems.push('<div style="flex:1;min-width:80px;text-align:center;padding:8px;background:#f0fff4;border-radius:6px;border:1px solid #c8e8d0"><div style="font-size:10px;color:#888">流月</div><div style="font-size:14px;font-weight:700;color:#2e7d32">'+curLiuYue+'</div><div style="font-size:9px;color:#666">'+jieQi[BZ_TIME_STATE.selectedLiuYue-1]+'</div></div>')}if(BZ_TIME_STATE.selectedLiuRi!==null){selItems.push('<div style="flex:1;min-width:80px;text-align:center;padding:8px;background:#fff0f0;border-radius:6px;border:1px solid #f0d0d0"><div style="font-size:10px;color:#888">流日</div><div style="font-size:14px;font-weight:700;color:#c62828">'+curLiuRi+'</div><div style="font-size:9px;color:#666">'+BZ_TIME_STATE.selectedLiuRi+'日</div></div>')}currentSelHtml+=selItems.join('')+'</div></div>';var box=document.getElementById('bz-caiyun');box.innerHTML=currentSelHtml;cards.forEach(function(c){var cy=caiYunScore(riGan,c.gz);var color=cy.score>=75?'#2e7d32':cy.score>=60?'#8B4513':cy.score>=45?'#888':cy.score>=30?'#c62828':'#b71c1c';var div=document.createElement('div');div.style.cssText='background:#fafafa;border-radius:8px;padding:10px;margin-bottom:8px';div.innerHTML='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">'+'<span style="font-size:13px;font-weight:700;color:#8B4513">'+c.label+'</span>'+'<span style="font-size:12px;color:'+color+';font-weight:700">'+cy.score+'分 · '+cy.level+'</span>'+'</div>'+'<div style="font-size:11px;color:#666;margin-bottom:4px">干支：'+c.gz+'（'+cy.rel+'）· '+c.note+'</div>'+'<div style="background:#eee;border-radius:4px;height:8px;overflow:hidden;margin-bottom:6px"><div style="height:100%;background:'+color+';border-radius:4px;width:'+cy.score+'%"></div></div>'+'<div style="font-size:11px;color:#555;line-height:1.5">'+cy.tip+'</div>';box.appendChild(div)});var ben=natalWealthScore(riGan,r.pillars);var dyScore=caiYunScore(riGan,curDaYun.ganZhi).score;var ynScore=caiYunScore(riGan,curLiuNian).score;var yueScore=caiYunScore(riGan,curLiuYue).score;var riScore=caiYunScore(riGan,curLiuRi).score;var total=Math.round((ben+dyScore+ynScore+yueScore+riScore)/5);document.getElementById('bz-total').innerHTML='<div style="text-align:center;margin-bottom:10px">'+'<span style="font-size:36px;font-weight:800;color:#8B4513">'+total+'</span>'+'<span style="font-size:13px;color:#666"> 分 · 综合财运指数</span>'+'</div>';var barsEl=document.getElementById('bz-totalbars');barsEl.innerHTML='';var comps=[['本命财',ben],['大运财',dyScore],['流年财',ynScore],['月财',yueScore],['日财',riScore]];comps.forEach(function(c){var div=document.createElement('div');div.style.cssText='margin-bottom:6px';div.innerHTML='<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px">'+'<span style="color:#666">'+c[0]+'</span>'+'<b style="color:#8B4513">'+c[1]+'</b>'+'</div>'+'<div style="background:#eee;border-radius:4px;height:6px;overflow:hidden">'+'<div style="height:100%;background:'+(c[1]>=70?'#8B4513':c[1]>=50?'#c49a6c':'#bbb')+';border-radius:4px;width:'+c[1]+'%"></div>'+'</div>';barsEl.appendChild(div)});updatePanHighlight(curDaYun,curLiuNian);renderCaiTotalDynamic(r,birthYear,curDaYun,curLiuNian,curLiuYue,curLiuRi);refreshDaYunBtn();if(typeof renderSheHuiGuanXi==='function'){try{renderSheHuiGuanXi()}catch(e){}}}
 
 function updatePanHighlight(curDy,liuYearGZ){var r=window.BZ_LAST_RESULT;var birthYear=window.BZ_BIRTH_YEAR;var e=window.BZ_LAST_EIGHTCHAR;if(!e||!r)return;var curDyIdx=0;if(curDy)r.yun.daYun.forEach(function(d,i){if(d.startAge===curDy.startAge)curDyIdx=i});renderBaziPanWithHighlight(e,r,birthYear,curDyIdx,liuYearGZ)}
 
@@ -7495,8 +7496,35 @@ function renderSheHuiGuanXi(){
   if(!box)return;
   if(typeof BZ_RI_GAN==='undefined'||!BZ_RI_GAN){box.style.display='none';return;}
   var GW={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+  var ZHI_BENQI={'子':'癸','丑':'己','寅':'甲','卯':'乙','辰':'戊','巳':'丙','午':'丁','未':'己','申':'庚','酉':'辛','戌':'戊','亥':'壬'};
   var dayMaster=BZ_RI_GAN;
   var dayMasterEl=GW[BZ_RI_GAN]||'?';
+  // 十神→脏腑：按日主天干纳甲(甲胆乙肝丙小肠丁心戊胃己脾庚大肠辛肺壬膀胱癸肾)
+  var GAN_WX={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+  var GAN_YIN={'甲':1,'乙':0,'丙':1,'丁':0,'戊':1,'己':0,'庚':1,'辛':0,'壬':1,'癸':0};
+  var GAN_BY_WX={'木':['甲','乙'],'火':['丙','丁'],'土':['戊','己'],'金':['庚','辛'],'水':['壬','癸']};
+  var ZANG_GAN={'甲':'胆','乙':'肝','丙':'小肠','丁':'心','戊':'胃','己':'脾','庚':'大肠','辛':'肺','壬':'膀胱','癸':'肾'};
+  var SHENG={'木':'火','火':'土','土':'金','金':'水','水':'木'};
+  var KE={'木':'土','土':'水','水':'火','火':'金','金':'木'};
+  var KE_ME={'木':'金','金':'火','火':'水','水':'土','土':'木'};
+  var SHENG_ME={'木':'水','火':'木','土':'火','金':'土','水':'金'};
+  function _pickGan(wx, sameYin){ return GAN_BY_WX[wx][sameYin?0:1]; }
+  function _tenToGan(ten, dm){
+    var Wd=GAN_WX[dm], Yd=GAN_YIN[dm]; if(!Wd)return '';
+    if(ten==='比肩') return _pickGan(Wd,Yd);
+    if(ten==='劫财') return _pickGan(Wd,1-Yd);
+    if(ten==='食神') return _pickGan(SHENG[Wd],Yd);
+    if(ten==='伤官') return _pickGan(SHENG[Wd],1-Yd);
+    if(ten==='正财') return _pickGan(KE[Wd],1-Yd);
+    if(ten==='偏财') return _pickGan(KE[Wd],Yd);
+    if(ten==='正官') return _pickGan(KE_ME[Wd],1-Yd);
+    if(ten==='七杀') return _pickGan(KE_ME[Wd],Yd);
+    if(ten==='正印') return _pickGan(SHENG_ME[Wd],1-Yd);
+    if(ten==='偏印') return _pickGan(SHENG_ME[Wd],Yd);
+    return '';
+  }
+  // TEN2ZANG 在 keys 声明后填充(避免 keys 提升为 undefined)
+
   var rels=[
     {id:'比肩', ten:'比肩', soc:'同事/合伙人/同辈', zang:'大肠', liu:'兄弟', color:'#7e57c2'},
     {id:'劫财', ten:'劫财', soc:'竞争对手/朋友分财', zang:'肺', liu:'兄弟', color:'#5e35b1'},
@@ -7509,144 +7537,334 @@ function renderSheHuiGuanXi(){
     {id:'偏印', ten:'偏印', soc:'贵人/学术/偏门', zang:'脾', liu:'母亲', color:'#3949ab'},
     {id:'正印', ten:'正印', soc:'母亲/庇护/贵人', zang:'心', liu:'母亲', color:'#1e88e5'}
   ];
+  var keys=['比肩','劫财','食神','伤官','偏财','正财','七杀','正官','偏印','正印'];
+  var TEN2ZANG={}; keys.forEach(function(k){ TEN2ZANG[k]=ZANG_GAN[_tenToGan(k, dayMaster)]||''; });
+  // 六亲：分男女（与 bzLiuQin 保持一致）
+  var LIUQIN={
+    1:{比肩:'兄弟',劫财:'姐妹',食神:'孙子',伤官:'孙女',正财:'妻',偏财:'父亲',正官:'女儿',七杀:'儿子',正印:'母亲',偏印:'继母'},
+    0:{比肩:'姐妹',劫财:'兄弟',食神:'儿子',伤官:'女儿',正财:'父亲',偏财:'婆婆',正官:'丈夫',七杀:'情人',正印:'母亲',偏印:'继母'}
+  };
+  var gKey=(typeof BZ_GENDER!=='undefined'&&BZ_GENDER===0)?0:1;
+  // 初始化能量表
+  var inner={}, outer={};
+  keys.forEach(function(k){inner[k]=0;outer[k]=0;});
+  // 十神计分：给一组 [天干,地支] 对，按权重累加
+  function addPair(score, gz, w){
+    if(!gz||gz.length<2)return;
+    var g=gz.charAt(0), z=gz.charAt(1);
+    if(g&&GW[g]) score[bzShiShen(BZ_RI_GAN,g)] += w;
+    if(z&&ZHI_BENQI[z]) score[bzShiShen(BZ_RI_GAN,ZHI_BENQI[z])] += w;
+  }
+  // 内圈：本命四柱（4 天干 + 4 地支本气）
+  if(typeof BZ_PILLARS!=='undefined'&&BZ_PILLARS){
+    for(var pi=0;pi<BZ_PILLARS.length;pi++){
+      var p=BZ_PILLARS[pi];
+      if(p&&p.length>=2) addPair(inner, p[0]+p[1], 1);
+    }
+  }
+  // 外圈：跟随基本命盘时间选择器（大运/流年/流月/流日）
+  var st=(typeof BZ_TIME_STATE!=='undefined')?BZ_TIME_STATE:null;
+  var nowYear2=new Date().getFullYear();
+  var nowL2=null; try{ nowL2=Lunar.fromDate(new Date()); }catch(e){ nowL2=null; }
+  var selLy=(st&&st.selectedLiuYue!=null)?st.selectedLiuYue:null;
+  var selLr=(st&&st.selectedLiuRi!=null)?st.selectedLiuRi:null;
+  var selYear=(st&&st.selectedLiuNianYear!=null)?st.selectedLiuNianYear:nowYear2;
+  var dyGZ='';
+  if(st&&st.selectedDaYunIdx!=null&&typeof BZ_DA_YUN!=='undefined'&&BZ_DA_YUN&&BZ_DA_YUN[st.selectedDaYunIdx]){ dyGZ=BZ_DA_YUN[st.selectedDaYunIdx].ganZhi||''; }
+  else if(typeof BZ_DY_GZ!=='undefined'&&BZ_DY_GZ){ dyGZ=BZ_DY_GZ; }
+  if(dyGZ) addPair(outer, dyGZ, 2);
+  if(typeof bzYearGZ==='function'){ addPair(outer, bzYearGZ(selYear), 1); }
+  else if(nowL2&&nowL2.getYearInGanZhi){ addPair(outer, nowL2.getYearInGanZhi(), 1); }
+  if(selLy!=null){ try{ addPair(outer, Lunar.fromYmd(selYear, selLy, 15).getMonthInGanZhi(), 0.5); }catch(e){} }
+  else if(nowL2&&nowL2.getMonthInGanZhi){ addPair(outer, nowL2.getMonthInGanZhi(), 0.5); }
+  if(selLr!=null&&selLy!=null){
+    try{
+      var jqA=['立春','惊蛰','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪','小寒'];
+      var l0a=Lunar.fromYmd(selYear,1,1);
+      var jqta=l0a.getJieQiTable();
+      var jqNa=jqA[selLy-1];
+      var jqSt=jqta[jqNa];
+      if(jqSt){ var startLa=Lunar.fromSolar(jqSt); addPair(outer, startLa.next(selLr-1).getDayInGanZhi(), 0.3); }
+      else if(nowL2&&nowL2.getDayInGanZhi){ addPair(outer, nowL2.getDayInGanZhi(), 0.3); }
+    }catch(e){ if(nowL2&&nowL2.getDayInGanZhi) addPair(outer, nowL2.getDayInGanZhi(), 0.3); }
+  } else if(nowL2&&nowL2.getDayInGanZhi){ addPair(outer, nowL2.getDayInGanZhi(), 0.3); }
+
+  var maxIn=1, maxOut=1;
+  keys.forEach(function(k){ if(inner[k]>maxIn)maxIn=inner[k]; if(outer[k]>maxOut)maxOut=outer[k]; });
+  function nodeR(t){ return 12+16*(t>1?1:(t<0?0:t)); }
+
+  // 关系（十神之间）— 画在内圈，表示你天生的关系结构
   var edges=[
-    ['比肩','劫财','close','同类相合,合作或争夺看旺衰'],
-    ['食神','伤官','close','食伤一家,泄秀同源'],
-    ['偏财','正财','close','财星一家,都主财但来源不同'],
-    ['七杀','正官','close','官杀一家,压力来源相同'],
-    ['偏印','正印','close','印星一家,庇护来源相同'],
-    ['正印','比肩','help','印生身,长者扶同辈'],
-    ['正印','劫财','help','印生身,长者扶朋友'],
-    ['偏印','比肩','help','偏印生身,贵人扶同辈'],
-    ['偏印','劫财','help','偏印生身,贵人扶朋友'],
-    ['正官','正财','help','官护财,体制保护收入'],
-    ['正官','偏财','help','官护财,上级关照生意'],
-    ['正印','七杀','help','印化杀,贵人化解压力'],
-    ['正印','正官','help','印护官,贵人助仕途'],
-    ['食神','正官','help','食神制杀保官,温和约束'],
-    ['伤官','七杀','help','伤官合杀,反制为用'],
-    ['食神','七杀','harm','食神制杀,反制压力'],
-    ['伤官','正官','harm','伤官见官,反叛上级'],
-    ['伤官','正印','harm','伤官见印,才华与庇护冲突'],
-    ['劫财','正财','harm','劫财夺财,竞争夺利'],
-    ['劫财','偏财','harm','劫财夺偏财,大额破财'],
-    ['七杀','比肩','harm','七杀克身,压力来自同辈'],
-    ['七杀','劫财','harm','克身压力大'],
-    ['比肩','食神','neutral','比肩生食神,同辈助晚辈'],
-    ['食神','正财','neutral','食神生财,技艺生收入'],
-    ['伤官','正财','neutral','伤官生财,才华变现'],
-    ['伤官','偏财','neutral','伤官生财,创意变现']
+    ['比肩','劫财','close'],['食神','伤官','close'],['偏财','正财','close'],['七杀','正官','close'],['偏印','正印','close'],
+    ['正印','比肩','help'],['正印','劫财','help'],['偏印','比肩','help'],['偏印','劫财','help'],
+    ['正官','正财','help'],['正官','偏财','help'],['正印','七杀','help'],['正印','正官','help'],['食神','正官','help'],['伤官','七杀','help'],
+    ['食神','七杀','harm'],['伤官','正官','harm'],['伤官','正印','harm'],['劫财','正财','harm'],['劫财','偏财','harm'],['七杀','比肩','harm'],['七杀','劫财','harm'],
+    ['比肩','食神','neutral'],['食神','正财','neutral'],['伤官','正财','neutral'],['伤官','偏财','neutral']
   ];
   var colors={help:'#43a047',harm:'#e53935',neutral:'#fb8c00',close:'#1e88e5'};
-  var edgeMap={};
-  for(var ei=0;ei<edges.length;ei++){
-    var e=edges[ei];
-    var key=e[0]+'|'+e[1];
-    if(edgeMap[key])continue;
-    edgeMap[key]={a:e[0],b:e[1],t:e[2],tip:e[3]};
-  }
-  var N=rels.length;
-  var cx=400, cy=400, R=235;
+
+  var cx=450, cy=450, R1=160, R2=300;
   var pos={};
-  for(var i=0;i<N;i++){
+  for(var i=0;i<rels.length;i++){
     var ang=i*36*Math.PI/180 - Math.PI/2;
-    pos[rels[i].id]={x:cx+Math.cos(ang)*R, y:cy+Math.sin(ang)*R, ang:ang, color:rels[i].color, ten:rels[i].ten, soc:rels[i].soc, zang:rels[i].zang, liu:rels[i].liu};
+    pos[rels[i].id]={ang:ang, color:rels[i].color, ten:rels[i].ten, soc:rels[i].soc,
+      ix:cx+Math.cos(ang)*R1, iy:cy+Math.sin(ang)*R1,
+      ox:cx+Math.cos(ang)*R2, oy:cy+Math.sin(ang)*R2,
+      ir:nodeR(inner[rels[i].id]/maxIn), or:nodeR(outer[rels[i].id]/maxOut),
+      tIn:inner[rels[i].id]/maxIn, tOut:outer[rels[i].id]/maxOut};
   }
-  var svg='<svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:780px;height:auto;background:#fff;border-radius:8px;display:block;margin:0 auto">';
-  var edgeList=Object.keys(edgeMap).map(function(k){return edgeMap[k];});
-  for(var x=0;x<edgeList.length;x++){
-    var e=edgeList[x];
-    if(e.t==='close')continue;
-    var a=pos[e.a], b=pos[e.b];
-    var c=colors[e.t];
-    var dash=e.t==='neutral'?'3,3':'';
-    svg+='<line x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" stroke="'+c+'" stroke-width="0.8" '+(dash?'stroke-dasharray="'+dash+'"':'')+' opacity="0.32"/>';
+
+  var svg='<svg viewBox="0 0 900 900" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:880px;height:auto;background:#fff;border-radius:8px;display:block;margin:0 auto">';
+
+  // 内外圈底色环（淡）
+  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R2+'" fill="none" stroke="#f0f0f0" stroke-width="1"/>';
+  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R1+'" fill="none" stroke="#f0f0f0" stroke-width="1"/>';
+
+  // 内圈关系线（结构）
+  for(var e=0;e<edges.length;e++){
+    var a=pos[edges[e][0]], b=pos[edges[e][1]]; if(!a||!b)continue;
+    var t=edges[e][2];
+    if(t==='close'){
+      svg+='<line x1="'+a.ix+'" y1="'+a.iy+'" x2="'+b.ix+'" y2="'+b.iy+'" stroke="'+colors.close+'" stroke-width="2" opacity="0.85"/>';
+    } else {
+      var dash=t==='neutral'?'3,3':'';
+      svg+='<line x1="'+a.ix+'" y1="'+a.iy+'" x2="'+b.ix+'" y2="'+b.iy+'" stroke="'+colors[t]+'" stroke-width="0.8" '+(dash?'stroke-dasharray="'+dash+'"':'')+' opacity="0.30"/>';
+    }
   }
-  for(var x2=0;x2<edgeList.length;x2++){
-    var e=edgeList[x2];
-    if(e.t!=='close')continue;
-    var a=pos[e.a], b=pos[e.b];
-    svg+='<line x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" stroke="'+colors.close+'" stroke-width="2" opacity="0.85"/>';
-  }
+
+  // 日主→内圈（主骨架，灰粗）
   for(var id in pos){
     var p=pos[id];
-    svg+='<line x1="'+cx+'" y1="'+cy+'" x2="'+p.x+'" y2="'+p.y+'" stroke="#555" stroke-width="3" opacity="0.9"/>';
+    svg+='<line x1="'+cx+'" y1="'+cy+'" x2="'+p.ix+'" y2="'+p.iy+'" stroke="#555" stroke-width="3" opacity="0.9"/>';
   }
+  // 内→外（激活线）：tOut>tIn 橙实线(被激发)，否则灰虚线(沉寂)
   for(var id2 in pos){
     var p=pos[id2];
-    svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="18" fill="'+p.color+'" stroke="#fff" stroke-width="3"/>';
+    var active=p.tOut>p.tIn+0.001;
+    if(active){
+      svg+='<line x1="'+p.ix+'" y1="'+p.iy+'" x2="'+p.ox+'" y2="'+p.oy+'" stroke="#fb8c00" stroke-width="2.5" opacity="0.9"/>';
+    } else {
+      svg+='<line x1="'+p.ix+'" y1="'+p.iy+'" x2="'+p.ox+'" y2="'+p.oy+'" stroke="#bbb" stroke-width="1.2" stroke-dasharray="3,3" opacity="0.4"/>';
+    }
   }
+
+  // 内圈节点
   for(var id3 in pos){
     var p=pos[id3];
+    var fIn=Math.max(8.5,Math.min(22,p.ir*0.7));
+    svg+='<circle cx="'+p.ix+'" cy="'+p.iy+'" r="'+p.ir+'" fill="'+p.color+'" stroke="#fff" stroke-width="3"/>';
+    svg+='<text x="'+p.ix+'" y="'+p.iy+'" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="'+fIn+'" font-weight="bold">'+p.ten+'</text>';
+  }
+  // 外圈节点
+  for(var id4 in pos){
+    var p=pos[id4];
+    svg+='<circle cx="'+p.ox+'" cy="'+p.oy+'" r="'+p.or+'" fill="'+p.color+'" stroke="#fff" stroke-width="3"/>';
+  }
+  // 外圈标签：粗体十神名写在节点圆内;三行小字(六亲/脏腑/社会)改为"竖直堆叠"——上半圈往上排、下半圈往下排、左右两节点靠dy判定,行距18px,字与字之间留6px空隙,绝不重叠
+  for(var id5 in pos){
+    var p=pos[id5];
+    var r=Math.max(12, Math.min(26, p.or));           // 节点圆半径 12–26
+    var fsIn=Math.max(11, Math.min(16, r*0.6));       // 圆内十神名 11–16, 醒目
+    var fsOut=12;                                     // 圆外三行小字统一 12px
     var dx=Math.cos(p.ang), dy=Math.sin(p.ang);
-    var tx=p.x+dx*30, ty=p.y+dy*30;
-    var anchor='start';
-    if(dx<-0.2)anchor='end';
-    else if(dx<0.2)anchor='middle';
-    var yOff=0;
-    if(Math.abs(dy)>0.7)yOff=dy>0?11:-13;
-    else if(Math.abs(dy)<0.3)yOff=-7;
-    svg+='<text x="'+tx+'" y="'+(ty+yOff)+'" text-anchor="'+anchor+'" fill="'+p.color+'" font-size="18" font-weight="bold" style="paint-order:stroke;stroke:#fff;stroke-width:3.5px;stroke-linejoin:round">'+p.ten+'</text>';
-    svg+='<text x="'+tx+'" y="'+(ty+yOff+15)+'" text-anchor="'+anchor+'" fill="#bf360c" font-size="11" style="paint-order:stroke;stroke:#fff;stroke-width:2.5px;stroke-linejoin:round">'+p.soc+'</text>';
+    // 圆内:粗体十神名居中
+    svg+='<text x="'+p.ox+'" y="'+(p.oy+fsIn*0.35)+'" text-anchor="middle" fill="#fff" font-size="'+fsIn+'" font-weight="bold" style="paint-order:stroke;stroke:rgba(0,0,0,.3);stroke-width:.8px">'+p.ten+'</text>';
+    // 圆外:三行小字统一以节点圆心 x 为基线,根据上下半圈竖直堆叠(行距18px),不再沿径向挤
+    var liu=LIUQIN[gKey][p.ten]||'';
+    var zang=TEN2ZANG[p.ten]||'';
+    var soc=p.soc||'';
+    var txt=[[liu,'#0277bd'],[zang,'#2e7d32'],[soc,'#e65100']];
+    var top=(dy<-0.3);                                // 上半圈往节点上方堆,下半圈往下方堆
+    var gap=18;                                       // 行距 18px(字号12 → 6px 净空,清晰)
+    var startY=top ? (p.oy-r-gap) : (p.oy+r+gap);
+    for(var ln=0;ln<txt.length;ln++){
+      var y=startY + (top?-1:1)*ln*gap;
+      svg+='<text x="'+p.ox+'" y="'+y+'" text-anchor="middle" fill="'+txt[ln][1]+'" font-size="'+fsOut+'" style="paint-order:stroke;stroke:#fff;stroke-width:2.5px;stroke-linejoin:round">'+txt[ln][0]+'</text>';
+    }
   }
+
+  // 中央日主
+  var yuan=(typeof BZ_GENDER!=='undefined'&&BZ_GENDER===0)?'元女':'元男';
   svg+='<circle cx="'+cx+'" cy="'+cy+'" r="62" fill="#2e7d32" stroke="#1b5e20" stroke-width="3"/>';
-  svg+='<text x="'+cx+'" y="'+(cy-10)+'" text-anchor="middle" fill="#fff" font-size="36" font-weight="bold">'+dayMaster+'</text>';
-  svg+='<text x="'+cx+'" y="'+(cy+14)+'" text-anchor="middle" fill="#fff" font-size="13">日主</text>';
-  svg+='<text x="'+cx+'" y="'+(cy+36)+'" text-anchor="middle" fill="#c8e6c9" font-size="12">'+dayMasterEl+'</text>';
-  var lgX=24, lgY=28;
-  svg+='<rect x="'+(lgX-12)+'" y="'+(lgY-18)+'" width="188" height="96" fill="#fff" stroke="#e0e0e0" rx="6"/>';
-  svg+='<text x="'+lgX+'" y="'+(lgY+2)+'" fill="#333" font-size="12" font-weight="bold">连线含义（十神之间）</text>';
-  var legend=[['#1e88e5','合化(亲密同类)'],['#43a047','相生(互助)'],['#e53935','相克(对抗)'],['#fb8c00','中性(平衡)']];
-  for(var li=0;li<legend.length;li++){
-    var ly=lgY+22+li*17;
-    svg+='<line x1="'+lgX+'" y1="'+ly+'" x2="'+(lgX+26)+'" y2="'+ly+'" stroke="'+legend[li][0]+'" stroke-width="3"/>';
-    svg+='<text x="'+(lgX+32)+'" y="'+ly+'" fill="#555" font-size="11" dominant-baseline="central">'+legend[li][1]+'</text>';
-  }
-  svg+='<text x="'+lgX+'" y="'+(lgY+94)+'" fill="#999" font-size="10">灰粗线=你(日主)与十神的直接关系</text>';
+  svg+='<text x="'+cx+'" y="'+(cy-18)+'" text-anchor="middle" fill="#fff" font-size="34" font-weight="bold">'+dayMaster+'</text>';
+  svg+='<text x="'+cx+'" y="'+(cy+8)+'" text-anchor="middle" fill="#c8e6c9" font-size="14" font-weight="bold">'+yuan+'</text>';
+  svg+='<text x="'+cx+'" y="'+(cy+28)+'" text-anchor="middle" fill="#c8e6c9" font-size="11">日主</text>';
+  svg+='<text x="'+cx+'" y="'+(cy+46)+'" text-anchor="middle" fill="#c8e6c9" font-size="11">'+dayMasterEl+'</text>';
+
+  // 图例已移至图表下方(HTML 横排)
+
   svg+='</svg>';
-  var adviceMap={
-    '比肩':'平等协作,警惕盲目跟风',
-    '劫财':'防竞争破财,慎合伙大账',
-    '食神':'温和表达,利子女培养',
-    '伤官':'才华变现,防顶撞权威',
-    '偏财':'广结善缘,利经营投资',
-    '正财':'稳健收入,守财为要',
-    '七杀':'承压成长,借力立威',
-    '正官':'循规蹈矩,利体制晋升',
-    '偏印':'学偏门绝技,防孤高',
-    '正印':'借母荫贵人,重学习'
-  };
-  var table='<table style="width:100%;border-collapse:collapse;font-size:13px">';
-  table+='<tr style="background:linear-gradient(90deg,#ede7f6,#e3f2fd,#e8f5e9,#fff3e0)">';
-  table+='<th style="padding:10px;text-align:center;border:1px solid #ddd;color:#5e35b1">十神</th>';
-  table+='<th style="padding:10px;text-align:center;border:1px solid #ddd;color:#0277bd">六亲</th>';
-  table+='<th style="padding:10px;text-align:center;border:1px solid #ddd;color:#2e7d32">脏腑</th>';
-  table+='<th style="padding:10px;text-align:center;border:1px solid #ddd;color:#e65100">社会身份</th>';
-  table+='<th style="padding:10px;text-align:center;border:1px solid #ddd;color:#6a1b9a">典型场景推演建议</th>';
-  table+='</tr>';
-  for(var ri=0;ri<N;ri++){
-    var r=rels[ri];
-    table+='<tr>';
-    table+='<td style="padding:8px;text-align:center;border:1px solid #eee;color:'+r.color+';font-weight:bold;font-size:14px">'+r.ten+'</td>';
-    table+='<td style="padding:8px;text-align:center;border:1px solid #eee;color:#0277bd">'+r.liu+'</td>';
-    table+='<td style="padding:8px;text-align:center;border:1px solid #eee;color:#2e7d32">'+r.zang+'</td>';
-    table+='<td style="padding:8px;text-align:center;border:1px solid #eee;color:#e65100">'+r.soc+'</td>';
-    table+='<td style="padding:8px;text-align:center;border:1px solid #eee;color:#6a1b9a;font-size:12px">'+adviceMap[r.id]+'</td>';
-    table+='</tr>';
-  }
-  table+='</table>';
+
+  // 对照表已取消：六亲/脏腑/社会关系直接画在外圈标签上
+
+  var LEGEND_HTML='<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:11.5px;color:#555;padding:2px 4px;margin-top:2px"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:22px;height:3px;background:#555;display:inline-block"></span>日主→内圈(本命骨架)</span><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:22px;height:3px;background:#1e88e5;display:inline-block"></span>十神合化(亲密同类)</span><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:22px;height:3px;background:#fb8c00;display:inline-block"></span>内→外橙线=当前被激发</span><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:22px;height:0;border-top:2px dashed #bbb;display:inline-block"></span>内→外灰虚=沉寂</span><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:12px;height:0;border-top:2px solid #43a047;display:inline-block"></span><span style="width:12px;height:0;border-top:2px solid #e53935;display:inline-block"></span><span style="width:12px;height:0;border-top:2px solid #fb8c00;display:inline-block"></span>内圈关系:相生/相克/中性</span></div>';
   var html='<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">';
-  html+='<h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">🌐 社会关系总览 — 十神 × 社会身份</h3>';
-  html+='<p style="color:#666;margin:0 0 12px 0;font-size:12px">灰粗线=你(日主)与 10 个十神的直接关系(主骨架);十神之间细线表示互动亲疏(蓝合化/绿相生/红相克/橙中性)</p>';
+  html+='<h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">🌐 社会关系总览 — 十神能量(本命内圈 × 后天外圈)</h3>';
+  html+='<p style="color:#666;margin:0 0 12px 0;font-size:12px">内圈=你天生的十神能量(本命四柱)；外圈=所选大运/流年/流月/流日激发的能量(未选时取今日)。节点越大该十神越强。外圈标签含：十神名·六亲(分男女)·脏腑·社会身份。日主到内圈灰线是本性骨架，内外橙线表示此刻正被运势激发。</p>';
   html+='<div style="display:flex;justify-content:center;flex-wrap:wrap;margin-bottom:16px">'+svg+'</div>';
-  html+='<div style="overflow-x:auto">';
-  html+='<h3 style="margin:0 0 10px 0;color:#2e7d32;font-size:14px">🗂 完整对照表(10 十神 × 5 维度,含典型场景推演建议)</h3>';
-  html+=table;
-  html+='</div>';
+  html+=LEGEND_HTML;
   html+='</div>';
   box.innerHTML=html;
   box.style.display='block';
 }
+</script>
+
+<script>
+function renderBaziAnalysis(){
+  var box=document.getElementById('bz-analysis');
+  if(!box)return;
+  if(typeof BZ_RI_GAN==='undefined'||!BZ_RI_GAN){ box.style.display='none'; return; }
+  try{
+    var riGan=BZ_RI_GAN;
+    var dw=BZ_WX[riGan];
+    var gKey=(typeof BZ_GENDER!=='undefined'&&BZ_GENDER===0)?0:1;
+    var yuan=(gKey===0)?'元女':'元男';
+    var pillars=(typeof BZ_PILLARS!=='undefined'&&BZ_PILLARS)?BZ_PILLARS:[];
+    var r=(typeof BZ_LAST_RESULT!=='undefined'&&BZ_LAST_RESULT)?BZ_LAST_RESULT:null;
+    var WX_ZANG={木:'肝胆',火:'心与小肠',土:'脾胃',金:'肺与大肠',水:'肾与膀胱'};
+    var WX_EX={木:'甲乙·寅卯',火:'丙丁·巳午',土:'戊己·辰戌丑未',金:'庚辛·申酉',水:'壬癸·亥子'};
+    var SOC_MAP={比肩:'同辈/同事',劫财:'朋友/竞争者',食神:'晚辈/学生/艺人',伤官:'创意人/表达者',偏财:'客户/商人',正财:'妻子/稳定收入',七杀:'上司/压力源',正官:'丈夫/上级',偏印:'长辈/学术',正印:'母亲/庇护'};
+    var ZI_NV=(gKey===0)?{食神:'儿子',伤官:'女儿'}:{食神:'孙子',伤官:'孙女'};
+    function tenOf(g){ return (typeof bzShiShen==='function')?bzShiShen(riGan,g):''; }
+    function liuOf(g){ return (typeof bzLiuQin==='function')?bzLiuQin(g):''; }
+    function sec(t,b){ return '<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">'+t+'</h3>'+b+'</div>'; }
+    function p(t){ return '<p style="color:#444;margin:0 0 8px 0;font-size:12.5px;line-height:1.7">'+t+'</p>'; }
+    function uniq(a){ var o={}; a.forEach(function(x){ if(x)o[x]=1; }); return Object.keys(o); }
+
+    var html='';
+    html+='<h3 style="font-size:14px;color:#5D4037;margin:18px 0 8px">📜 命理解读 — '+yuan+'（'+riGan+dw+'日主）</h3>';
+
+    // ===== 旺衰 + 喜用神 =====
+    var st=null,yong=null;
+    if(r&&typeof bzBodyStrength==='function') st=bzBodyStrength(r);
+    if(r&&st&&typeof bzYongShen==='function') yong=bzYongShen(r,st);
+    var body='';
+    if(st){
+      var lv=st.level==='强'?'身强（偏旺）':'身弱（偏弱）';
+      body+=p('日主<b>'+riGan+'</b>（'+dw+'），强弱判定：<b>'+lv+'</b>。得令 '+st.ling+' / 得势 '+st.shi+' / 得地 '+st.di+'（综合分 '+st.score+'）。');
+    } else {
+      body+=p('日主<b>'+riGan+'</b>（'+dw+'）。');
+    }
+    if(yong){
+      body+=p('喜用神（补益日主）：<b>'+yong.xi.map(function(x){return x+'('+WX_EX[x]+')';}).join('、')+'</b>。忌神：'+yong.ji.map(function(x){return x+'('+WX_EX[x]+')';}).join('、')+'。');
+    }
+    html+=sec('一、本命 · 旺衰 · 喜用神', body);
+
+    // ===== 格局 =====
+    var yueZhi=pillars[1]?pillars[1][1]:'';
+    var yueBen=(CANG[yueZhi]&&CANG[yueZhi][0])||'';
+    var yueGod=tenOf(yueBen);
+    var riZhi=pillars[2]?pillars[2][1]:'';
+    var riBen=(CANG[riZhi]&&CANG[riZhi][0])||'';
+    var riGod=tenOf(riBen);
+    var tou=uniq(pillars.map(function(pp){return pp&&pp[0]?tenOf(pp[0]):'';}));
+    var allTen=[];
+    pillars.forEach(function(pp){ if(pp&&pp[0])allTen.push(tenOf(pp[0])); if(pp&&pp[1]){var b=(CANG[pp[1]]&&CANG[pp[1]][0])||''; if(b)allTen.push(tenOf(b));} });
+    allTen=uniq(allTen);
+    var gBody='';
+    gBody+=p('月令<b>'+yueZhi+'</b>本气为<b>'+yueGod+'</b>，立'+yueGod+'格为主；天干透出：'+tou.join('、')+'。');
+    gBody+=p('日支<b>'+riZhi+'</b>（夫妻宫）坐<b>'+riGod+'</b>。');
+    var feats=[];
+    if(allTen.indexOf('七杀')>=0&&(allTen.indexOf('正印')>=0||allTen.indexOf('偏印')>=0)) feats.push('杀印相生（七杀生印、印生身，化压力为权柄）');
+    if(allTen.indexOf('伤官')>=0&&allTen.indexOf('七杀')>=0) feats.push('伤官驾杀（以才华制压力）');
+    if(allTen.indexOf('食神')>=0&&allTen.indexOf('正财')>=0) feats.push('食神生财（才艺生财）');
+    if(allTen.indexOf('正官')>=0&&allTen.indexOf('正印')>=0) feats.push('官印相生（事业得贵人扶持）');
+    if(feats.length) gBody+=p('格局特征：'+feats.join('；')+'。');
+    html+=sec('二、本命 · 格局', gBody);
+
+    // ===== 六亲（内圈）=====
+    var lqBody='';
+    var rows=[];
+    var labels=['年干','月干','日主','时干'];
+    pillars.forEach(function(pp,i){
+      if(!pp||!pp[0])return;
+      var t=tenOf(pp[0]); var l=liuOf(pp[0]);
+      rows.push(labels[i]+'<b>'+pp[0]+'</b>（'+t+'·'+l+'）');
+    });
+    lqBody+=p('四柱天干六亲：'+rows.join('；')+'。');
+    var spGod=tenOf(riBen);
+    var spLiu=liuOf(riBen);
+    lqBody+=p('夫妻宫（日支'+riZhi+'）'+spGod+'，对应'+spLiu+'；夫星看官杀，女命正官为夫、七杀为偏夫。');
+    var hasSon=(allTen.indexOf('食神')>=0), hasDau=(allTen.indexOf('伤官')>=0);
+    lqBody+=p('子女星：'+(hasSon?'食神现（女命为'+ZI_NV['食神']+'）':'食神不显')+'，'+(hasDau?'伤官现（女命为'+ZI_NV['伤官']+'）':'伤官不显')+'。');
+    html+=sec('三、本命 · 六亲', lqBody);
+
+    // ===== 健康（五行脏腑）=====
+    var c={木:0,火:0,土:0,金:0,水:0};
+    pillars.forEach(function(pp){
+      if(pp&&pp[0]&&BZ_WX[pp[0]]) c[BZ_WX[pp[0]]]++;
+      if(pp&&pp[1]){var ben=(CANG[pp[1]]&&CANG[pp[1]][0])||''; if(ben&&BZ_WX[ben]) c[BZ_WX[ben]]++;}
+    });
+    var maxWX=null,maxV=-1,minWX=null,minV=99;
+    for(var k in c){ if(c[k]>maxV){maxV=c[k];maxWX=k;} if(c[k]<minV){minV=c[k];minWX=k;} }
+    var hBody='';
+    hBody+=p('五行分布（天干+地支本气）：'+Object.keys(c).map(function(k){return k+c[k];}).join(' / ')+'。');
+    hBody+=p('最旺为<b>'+maxWX+'</b>（对应'+WX_ZANG[maxWX]+'偏实/活跃），最弱为<b>'+minWX+'</b>（对应'+WX_ZANG[minWX]+'偏弱）。日主属'+dw+'（'+WX_ZANG[dw]+'），'+(c[dw]<=1?'本脏偏弱，需注意养护':'本脏有根气')+'。');
+    hBody+=p('养生方向（仅倾向，非诊断）：'+maxWX+'旺者宜疏泄静养，'+minWX+'弱者宜温补调养；木弱养肝安神、土弱养脾胃、水弱养肾、金旺润肺、火旺清心。');
+    html+=sec('四、本命 · 健康（脏腑倾向）', hBody);
+
+    // ===== 社会关系（内圈）=====
+    var socList=uniq(pillars.map(function(pp){ if(pp&&pp[0]){var t=tenOf(pp[0]); return SOC_MAP[t]?SOC_MAP[t]:'';} return ''; }));
+    var sBody='';
+    sBody+=p('十神映射的社会角色：'+socList.join('、')+'。');
+    if(allTen.indexOf('伤官')>=0) sBody+=p('伤官透出者个性强、有才华、不喜受管，适合靠技艺与表达立足。');
+    if(allTen.indexOf('七杀')>=0) sBody+=p('七杀在局，事业上有压力也有权威机遇，适合带挑战或管理性质的岗位。');
+    if(allTen.indexOf('正印')>=0||allTen.indexOf('偏印')>=0) sBody+=p('印星在局，好钻研、得长辈/学术庇佑，宜以学养立身。');
+    html+=sec('五、本命 · 社会关系', sBody);
+
+    // ===== 外圈：当前大运 + 流年 =====
+    var stt=(typeof BZ_TIME_STATE!=='undefined')?BZ_TIME_STATE:null;
+    var nowYear=new Date().getFullYear();
+    var selYear=(stt&&stt.selectedLiuNianYear!=null)?stt.selectedLiuNianYear:nowYear;
+    var dyGZ='';
+    if(stt&&stt.selectedDaYunIdx!=null&&typeof BZ_DA_YUN!=='undefined'&&BZ_DA_YUN&&BZ_DA_YUN[stt.selectedDaYunIdx]){ dyGZ=BZ_DA_YUN[stt.selectedDaYunIdx].ganZhi||''; }
+    else if(typeof BZ_DY_GZ!=='undefined'&&BZ_DY_GZ){ dyGZ=BZ_DY_GZ; }
+    var lnGZ=(typeof bzYearGZ==='function')?bzYearGZ(selYear):'';
+    if(!dyGZ&&!lnGZ){ html+=sec('六、当前大运 · 流年（外圈）', p('暂无可分析的大运/流年数据。')); }
+    else {
+      function outerInfo(gz,name){
+        if(!gz||gz.length<2) return '';
+        var g=gz.charAt(0), z=gz.charAt(1);
+        var gt=tenOf(g), zt=tenOf((CANG[z]&&CANG[z][0])||'');
+        var out='<b>'+name+' '+gz+'</b>：天干'+gt+'（'+(SOC_MAP[gt]||'')+'），地支'+zt+'。';
+        var gliu=liuOf(g), zliu=liuOf((CANG[z]&&CANG[z][0])||'');
+        out+=' 六亲动向：'+gt+'→'+gliu+(zt?'，'+zt+'→'+zliu:'');
+        var rel=[];
+        pillars.forEach(function(pp){ if(pp&&pp[1]){
+          if(BZ_CHONG[pp[1]]===z) rel.push(pp[1]+'冲'+z);
+          if(BZ_HAI[pp[1]]===z) rel.push(pp[1]+'害'+z);
+        }});
+        if(rel.length) out+='；与命局：'+rel.join('、');
+        return out;
+      }
+      var oBody='';
+      oBody+=p(outerInfo(dyGZ,'当前大运'));
+      oBody+=p(outerInfo(lnGZ,selYear+'流年'));
+      var wOut={木:0,火:0,土:0,金:0,水:0};
+      [dyGZ,lnGZ].forEach(function(gz){ if(gz&&gz.length>=2){ var g=gz.charAt(0),z=gz.charAt(1); if(BZ_WX[g])wOut[BZ_WX[g]]++; var b=(CANG[z]&&CANG[z][0])||''; if(b&&BZ_WX[b])wOut[BZ_WX[b]]++; } });
+      var hw=[];
+      for(var k2 in wOut){ if(wOut[k2]>0){ var eff=(BZ_X_KE[dw]===k2)?'受克':((BZ_X_SHENG[dw]===k2)?'被泄':((BZ_X_SHENG_INV[dw]===k2)?'得生扶':'中性')); hw.push(k2+'（'+WX_ZANG[k2]+'）'+eff); } }
+      oBody+=p('健康动向（外圈五行叠加）：'+hw.join('；')+'。原局最弱'+minWX+'（'+WX_ZANG[minWX]+'）逢克泄之年尤需养护。');
+      var oSoc=[];
+      [dyGZ,lnGZ].forEach(function(gz){ if(gz&&gz.length>=2){ var gt=tenOf(gz.charAt(0)); if(SOC_MAP[gt])oSoc.push(gt+'('+SOC_MAP[gt]+')'); } });
+      oBody+=p('社会关系动向：'+uniq(oSoc).join('、')+'。');
+      var caiWX=BZ_X_KE[dw], shiWX=BZ_X_SHENG[dw];
+      var natCai=0; pillars.forEach(function(pp){ if(pp&&pp[0]&&BZ_WX[pp[0]]===caiWX)natCai++; });
+      var outCai=0,outShi=0;
+      [dyGZ,lnGZ].forEach(function(gz){ if(gz&&gz.length>=2){ var g=gz.charAt(0),b=((CANG[gz.charAt(1)]&&CANG[gz.charAt(1)][0])||''); if(BZ_WX[g]===caiWX)outCai++; if(BZ_WX[g]===shiWX)outShi++; if(b&&BZ_WX[b]===caiWX)outCai++; if(b&&BZ_WX[b]===shiWX)outShi++; } });
+      oBody+=p('财运：原局财星（'+caiWX+'）'+natCai+'现'+(natCai===0?'，财弱需大运流年引动':'')+'；当前大运流年引动财星'+outCai+'、食伤(生财)'+outShi+'。'+(outCai+outShi>0?'利靠才华技艺求财，身弱则求财辛苦，宜稳不宜投机。':'财星未显，财运平淡，宜守。'));
+      html+=sec('六、当前大运 · 流年（外圈）', oBody);
+    }
+
+    html+='<p style="color:#999;font-size:11px;margin:4px 0 16px">以上按本盘五行十神推演，仅为倾向参考，非疾病诊断，亦不开方。</p>';
+    box.innerHTML=html;
+    box.style.display='block';
+  }catch(ex){ if(console&&console.log)console.log('命理解读渲染错：',ex&&ex.message); box.style.display='none'; }
+}
+var BZ_CHONG={子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳'};
+var BZ_HAI={子:'未',未:'子',丑:'午',午:'丑',寅:'巳',巳:'寅',卯:'辰',辰:'卯',申:'亥',亥:'申',酉:'戌',戌:'酉'};
+if(typeof window!=='undefined'){ window.renderBaziAnalysis=renderBaziAnalysis; }
+
 </script>
 </body>
 
