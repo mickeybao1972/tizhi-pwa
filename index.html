@@ -7712,6 +7712,7 @@ function renderSheHuiGuanXi(){
 
 
 
+
 <script>
 function renderBaziAnalysis(){
   var box=document.getElementById('bz-analysis');
@@ -7729,7 +7730,7 @@ function renderBaziAnalysis(){
     var WX_ZANG={木:'肝胆',火:'心与小肠',土:'脾胃',金:'肺与大肠',水:'肾与膀胱'};
     var WX_EX={木:'甲乙·寅卯',火:'丙丁·巳午',土:'戊己·辰戌丑未',金:'庚辛·申酉',水:'壬癸·亥子'};
     var SOC_MAP={比肩:'同辈/同事',劫财:'朋友/竞争者',食神:'晚辈/学生/艺人',伤官:'创意人/表达者',偏财:'客户/商人',正财:'妻子/稳定收入',七杀:'上司/压力源',正官:'丈夫/上级',偏印:'长辈/学术',正印:'母亲/庇护'};
-    var ZI_NV=(gKey===0)?{食神:'儿子',伤官:'女儿'}:{食神:'孙子',伤官:'孙女'};
+    var ZI_NV=(gKey===0)?{食神:'女儿',伤官:'儿子'}:{食神:'孙子',伤官:'孙女'};
     function tenOf(g){ return (typeof bzShiShen==='function')?bzShiShen(riGan,g):''; }
     function liuOf(g){ return (typeof bzLiuQin==='function')?bzLiuQin(g):''; }
     function sec(t,b){ return '<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">'+t+'</h3>'+b+'</div>'; }
