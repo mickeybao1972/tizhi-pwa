@@ -6435,7 +6435,7 @@ function runBazi(isReload, rec){
 
     try{renderJingLuo();}catch(ex){console.log('十二经络渲染错：',ex.message);}
 
-    try{renderSheHuiGuanXi()renderBaziAnalysis();;}catch(ex3){console.log('社会关系渲染错：',ex3&&ex3.message);}
+    try{renderSheHuiGuanXi();renderBaziAnalysis();}catch(ex3){console.log('社会关系渲染错：',ex3&&ex3.message);}
     try{renderMianZhen();}catch(ex2){console.log('面诊渲染错：',ex2&&ex2.message);}
 
     var wxBox=document.getElementById('bz-wuxing-box');
@@ -7708,6 +7708,7 @@ function renderSheHuiGuanXi(){
   box.style.display='block';
 }
 </script>
+
 
 <script>
 function renderBaziAnalysis(){
