@@ -1,10 +1,11 @@
 // Service Worker for �������ʹ��� PWA
-const CACHE_NAME='sizheng-pwa-v47';
+const CACHE_NAME='sizheng-pwa-v53-bomfix';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icon.svg',
+  './favicon.ico',
   './lunar.js'
 ];
 
