@@ -6582,7 +6582,7 @@ const colBg=['','','','','','#fff8f0','#f0f8ff','#f8f0ff','#f0fff8'];
 
   const lq=BZ_LIUQIN_MODE;
 
-  var _zf={甲:'胆',乙:'肝',丙:'小肠',丁:'心',戊:'胃',己:'脾',庚:'大肠',辛:'肺',壬:'膀胱',癸:'肾'};var _lqMap=function(g){return lq===2?(_zf[g]||BZ_WX[g]+'/'+g):lq===1?bzLiuQin(g):BZ_WX[g]+'/'+g};var zhuXing=['主星',_lqMap(bz[0][0]),_lqMap(bz[1][0]),_lqMap(bz[2][0]),_lqMap(bz[3][0]),curDy?_lqMap(curDy.ganZhi[0]):'',_lqMap(liuYear[0]),_lqMap(liuYueGZ[0]),_lqMap(liuRiGZ[0])];
+  var _zf={甲:'胆',乙:'肝',丙:'小肠',丁:'心',戊:'胃',己:'脾',庚:'大肠',辛:'肺',壬:'膀胱',癸:'肾'};var _lqMap=function(g){return lq===2?(_zf[g]||BZ_WX[g]+'/'+g):lq===1?bzLiuQin(g):bzShiShen(BZ_RI_GAN,g)};var zhuXing=['主星',_lqMap(bz[0][0]),_lqMap(bz[1][0]),_lqMap(bz[2][0]),_lqMap(bz[3][0]),curDy?_lqMap(curDy.ganZhi[0]):'',_lqMap(liuYear[0]),_lqMap(liuYueGZ[0]),_lqMap(liuRiGZ[0])];
 
   html+='<tr>'+zhuXing.map(function(x,i){return'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center;font-size:10px;color:#666;background:'+colBg[i]+'">'+x+'</td>'}).join('')+'</tr>';
 
