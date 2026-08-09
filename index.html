@@ -2591,59 +2591,119 @@ function renderWuXingTrend() {
   canvas.width = w * dpr; canvas.height = h * dpr;
   ctx.scale(dpr, dpr);
 
-  // 计算各时间点数据
-  const points = calculateWuXingTimePoints();
-  if (!points || points.length < 2) return;
-
-  // 收集所有值用于归一化
-  var allVals = [];
-  for (var i = 0; i < points.length; i++) {
-    var p = points[i];
-    allVals.push(p['木'], p['火'], p['土'], p['金'], p['水']);
+  if (!BZ_PILLARS) return;
+  const colors = {木:'#4caf50', 火:'#f44336', 土:'#ff9800', 金:'#9e9e9e', 水:'#2196f3'};
+  const order = ['木','火','土','金','水'];
+  const GW = {甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+  const ZW = {寅:'木',卯:'木',巳:'火',午:'火',辰:'土',戌:'土',丑:'土',未:'土',申:'金',酉:'金',亥:'水',子:'水'};
+  const CANG = {
+    子:['癸'], 丑:['己','癸','辛'], 寅:['甲','丙','戊'], 卯:['乙'],
+    辰:['戊','乙','癸'], 巳:['丙','庚','戊'], 午:['丁','己'],
+    未:['己','丁','乙'], 申:['庚','壬','戊'], 酉:['辛'],
+    戌:['戊','辛','丁'], 亥:['壬','甲']
+  };
+  // 单柱（干+支）→ 五行分（按给定权重）
+  function gz2w(g, z, w){
+    const out = {木:0,火:0,土:0,金:0,水:0};
+    if (GW[g]) out[GW[g]] += w;
+    if (ZW[z]) out[ZW[z]] += w * 0.8;
+    if (CANG[z]) CANG[z].forEach(cg => { if (GW[cg]) out[GW[cg]] += w * 0.5; });
+    return out;
   }
+  // 本命四柱分（干10、支8、藏干6/3）
+  function pillars2w(pillars){
+    const out = {木:0,火:0,土:0,金:0,水:0};
+    pillars.forEach(p => {
+      const g = p[0], z = p[1];
+      if (GW[g]) out[GW[g]] += 10;
+      if (ZW[z]) out[ZW[z]] += 8;
+      if (CANG[z]) CANG[z].forEach((cg, i) => { if (GW[cg]) out[GW[cg]] += (i === 0 ? 6 : 3); });
+    });
+    return out;
+  }
+  const natal = pillars2w(BZ_PILLARS);
+  const birthYear = BZ_BIRTH_YEAR || (BZ_INPUT_CAL === 'lunar' && BZ_INPUT_LUNAR ? BZ_INPUT_LUNAR.y : new Date().getFullYear());
+  // 起运年龄：第一大运的 startAge
+  const dyArr = BZ_DA_YUN || [];
+  const startAge = dyArr.length > 0 ? (dyArr[0].startAge || 0) : 0;
+  // 100 个年龄点
+  const points = [];
+  for (let age = 0; age <= 100; age++) {
+    // 本命
+    const wx = {木:natal.木, 火:natal.火, 土:natal.土, 金:natal.金, 水:natal.水};
+    // 大运：起运前为 0；起运后找当前大运
+    let curDY = null;
+    if (age >= startAge) {
+      const idx = Math.floor((age - startAge) / 10);
+      curDY = dyArr[idx] || dyArr[dyArr.length - 1] || null;
+    }
+    if (curDY) {
+      const g = curDY.ganZhi[0], z = curDY.ganZhi[1];
+      const dw = gz2w(g, z, 15);
+      ['木','火','土','金','水'].forEach(k => { wx[k] += dw[k]; });
+    }
+    // 流年：按出生年 + age 算
+    let liuGZ = '';
+    try {
+      const solar = Lunar.fromYmd(birthYear + age, 6, 1);
+      liuGZ = solar.getYearInGanZhi();
+      if (liuGZ) {
+        const lw = gz2w(liuGZ[0], liuGZ[1], 12);
+        ['木','火','土','金','水'].forEach(k => { wx[k] += lw[k]; });
+      }
+    } catch (ex) {}
+    points.push({age, gz: liuGZ, dy: curDY ? curDY.ganZhi : '', wx});
+  }
+
+  // 归一化
+  const allVals = [];
+  points.forEach(pt => order.forEach(k => allVals.push(pt.wx[k])));
   var maxVal = Math.max.apply(null, allVals) || 100;
   var minVal = Math.min.apply(null, allVals) || 0;
   var range = maxVal - minVal || 1;
 
-  // 绘制
-  var pad = {t:20, r:20, b:40, l:50};
+  // 画布
+  var pad = {t:20, r:20, b:44, l:50};
   var W = w - pad.l - pad.r, H = h - pad.t - pad.b;
   ctx.clearRect(0, 0, w, h);
 
-  // 网格线
+  // 网格 + Y 轴数值
   ctx.strokeStyle = '#eee';
   ctx.lineWidth = 0.5;
   for (var i = 0; i <= 4; i++) {
     var y = pad.t + H * i / 4;
     ctx.beginPath();
     ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + W, y); ctx.stroke();
-    ctx.fillStyle = '#aaa'; ctx.font = '9px sans-serif';
+    ctx.fillStyle = '#aaa'; ctx.font = '9px sans-serif'; ctx.textAlign = 'left';
     ctx.fillText(Math.round(maxVal - range * i / 4), 2, y + 3);
   }
 
-  // X轴标签
-  ctx.fillStyle = '#666'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
-  for (var i = 0; i < points.length; i++) {
-    var x = pad.l + W * i / (points.length - 1);
-    ctx.fillText(points[i].label, x, h - 10);
-    ctx.fillStyle = '#999'; ctx.font = '8px sans-serif';
-    if (points[i].subLabel) ctx.fillText(points[i].subLabel, x, h - 2);
-    ctx.fillStyle = '#666'; ctx.font = '10px sans-serif';
+  // 标记起运年龄
+  if (startAge > 0 && startAge <= 100) {
+    const xStart = pad.l + W * startAge / 100;
+    ctx.strokeStyle = '#bbb'; ctx.setLineDash([3, 3]); ctx.lineWidth = 0.8;
+    ctx.beginPath(); ctx.moveTo(xStart, pad.t); ctx.lineTo(xStart, pad.t + H); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#888'; ctx.font = '9px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('起运', xStart + 4, pad.t + 10);
   }
 
-  // 五行颜色和名称
-  var colors = {木:'#4caf50', 火:'#f44336', 土:'#ff9800', 金:'#9e9e9e', 水:'#2196f3'};
-  var order = ['木','火','土','金','水'];
+  // X 轴标签（每 10 岁一标）
+  ctx.fillStyle = '#666'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+  for (var age = 0; age <= 100; age += 10) {
+    var x = pad.l + W * age / 100;
+    ctx.fillText(age + '岁', x, h - 8);
+  }
 
-  // 绘制每条五行曲线
+  // 五行曲线
   for (var vi = 0; vi < order.length; vi++) {
-    var wxKey = order[vi];
+    const wxKey = order[vi];
     ctx.strokeStyle = colors[wxKey];
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1.8;
     ctx.beginPath();
     for (var i = 0; i < points.length; i++) {
-      var val = points[i][wxKey];
-      var x = pad.l + W * i / (points.length - 1);
+      const val = points[i].wx[wxKey];
+      var x = pad.l + W * i / 100;
       var y = pad.t + H * (1 - (val - minVal) / range);
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
@@ -2655,9 +2715,9 @@ function renderWuXingTrend() {
   ctx.font = '10px sans-serif';
   for (var i = 0; i < order.length; i++) {
     ctx.fillStyle = colors[order[i]];
-    ctx.fillRect(pad.l + i * 45, h - pad.b + 5, 10, 3);
+    ctx.fillRect(pad.l + i * 45, h - pad.b + 14, 10, 3);
     ctx.fillStyle = '#555';
-    ctx.fillText(order[i], pad.l + i * 45 + 13, h - pad.b + 9);
+    ctx.fillText(order[i], pad.l + i * 45 + 13, h - pad.b + 18);
   }
 }function calculateWuXingTimePoints() {
   if (!BZ_PILLARS || !BZ_DA_YUN) return null;
