@@ -1,5 +1,5 @@
 // Service Worker for 四诊体质顾问 PWA
-const CACHE_NAME='sizheng-pwa-v61-mianzhen-facemap';
+const CACHE_NAME='sizheng-pwa-v62-mianzhen-jingluo';
 const ASSETS = [
   './',
   './index.html',
