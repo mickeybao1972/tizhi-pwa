@@ -1970,7 +1970,7 @@ function closeHistModal() {
     
     <div id="bz-result" style="display:none">
       <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)" id="bz-basic-panel">
-        <h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">基本命盘</h3><div id="bz-time-control-row" style="display:grid;grid-template-columns:140px repeat(8,1fr);width:100%;gap:0;align-items:center;margin-bottom:8px;font-size:12px"><div style="grid-column:1 / 6;display:flex;align-items:center;gap:8px;white-space:nowrap;min-width:0;overflow:hidden"><span style="color:#8B4513;font-weight:600;white-space:nowrap">时间维度</span><span id="bz-birth-dt-inline" style="color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span><button onclick="bzToggleLiuQin()" style="background:#f5f0e8;border:1px solid #c9b99a;color:#8B4513;border-radius:20px;padding:3px 10px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0" id="bz-liuqin-btn">十神</button><button onclick="toggleMianZhen()" id="bz-mianzhen-btn" style="background:#FFF3E0;border:1px solid #FFCC80;color:#E65100;border-radius:20px;padding:3px 10px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0;margin-left:6px">面诊</button></div><div id="bz-time-btns" style="grid-column:6 / 10;display:grid;grid-template-columns:repeat(4,1fr);gap:0"></div></div><div id="bz-pan" style="overflow-x:auto"></div>
+        <h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">基本命盘</h3><div id="bz-time-control-row" style="display:grid;grid-template-columns:140px repeat(8,1fr);width:100%;gap:0;align-items:center;margin-bottom:8px;font-size:12px"><div style="grid-column:1 / 6;display:flex;align-items:center;gap:8px;white-space:nowrap;min-width:0;overflow:hidden"><span style="color:#8B4513;font-weight:600;white-space:nowrap">时间维度</span><span id="bz-birth-dt-inline" style="color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></span><button onclick="bzToggleLiuQin()" style="background:#f5f0e8;border:1px solid #c9b99a;color:#8B4513;border-radius:20px;padding:3px 10px;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0" id="bz-liuqin-btn">十神</button></div><div id="bz-time-btns" style="grid-column:6 / 10;display:grid;grid-template-columns:repeat(4,1fr);gap:0"></div></div><div id="bz-pan" style="overflow-x:auto"></div>
         <div id="bz-qiyun" style="font-size:11px;color:#666;text-align:center;margin:10px 0;padding:8px;background:#fafafa;border-radius:6px"></div>
         <div id="bz-shensha" style="margin-top:12px;background:#fafafa;border-radius:8px;padding:12px"></div>
       </div>
@@ -2007,11 +2007,10 @@ function closeHistModal() {
       <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
         <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">💎 综合财运指数</h3>
         <div id="bz-total"></div>
-        <div id="bz-mianzhen" style="margin-top:18px;padding:12px;background:#FFFDE7;border:1px solid #FFD54F;border-radius:8px;display:none">
+        <div id="bz-mianzhen" style="margin-top:18px;padding:12px;background:#FFFDE7;border:1px solid #FFD54F;border-radius:8px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
           <span style="font-size:14px">🌿</span>
           <span style="font-weight:700;font-size:14px;color:#E65100">面诊 — 望而知之谓之神</span>
-          <span style="font-size:10px;color:#888;margin-left:auto">点击查看详情</span>
           </div><div id="bz-mianzhen-content"></div></div>
         
         <div id="bz-totalbars"></div>
@@ -3117,6 +3116,7 @@ function runBazi(isReload, rec){
     var wxHtml=renderWuXing(true);
     renderWuXingTrend();
     try{renderJingLuo();}catch(ex){console.log('十二经络渲染错：',ex.message);}
+    try{renderMianZhen();}catch(ex2){console.log('面诊渲染错：',ex2&&ex2.message);}
     var wxBox=document.getElementById('bz-wuxing-box');
     
     if(wxBox)wxBox.innerHTML=wxHtml||'';
