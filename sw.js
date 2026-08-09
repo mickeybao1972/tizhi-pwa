@@ -1,5 +1,5 @@
 // Service Worker for 四诊体质顾问 PWA
-const CACHE_NAME='sizheng-pwa-v63k-zhuxing-fix';
+const CACHE_NAME='sizheng-pwa-v63l-cache-bypass';
 const ASSETS = [
   './',
   './index.html',
@@ -10,12 +10,20 @@ const ASSETS = [
 ];
 self.addEventListener('install', e => {
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
 });
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))));
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))));
   self.clients.claim();
 });
 self.addEventListener('fetch', e => {
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+  // network-first, fallback to cache
+  e.respondWith(
+    fetch(e.request).then(r => {
+      if (r.ok && e.request.method === 'GET') {
+        const clone = r.clone();
+        caches.open(CACHE_NAME).then(c => c.put(e.request, clone)).catch(() => {});
+      }
+      return r;
+    }).catch(() => caches.match(e.request))
+  );
 });
