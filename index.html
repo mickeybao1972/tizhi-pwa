@@ -891,7 +891,7 @@ function rerenderCurrent(){
 
       ✍️ <span data-i18n="dev_designed">设计开发：</span><span class="ds-name">九燊工作室</span>
 
-      <span class="ds-ver">V3.0.10</span>
+      <span class="ds-ver">V3.0.11</span>
 
     </div>
 
@@ -963,7 +963,7 @@ function rerenderCurrent(){
 
   <div class="devsig" style="margin-top:auto;margin-bottom:0;max-width:480px">
 
-    <span class="ds-name">九燊工作室</span> 作品 · V3.0.10 · 创建 2026.07.23 17:00 · 更新 2026.08.10 18:57 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
+    <span class="ds-name">九燊工作室</span> 作品 · V3.0.11 · 创建 2026.07.23 17:00 · 更新 2026.08.10 18:57 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
 
   </div>
 
@@ -7678,14 +7678,14 @@ function renderSheHuiGuanXi(){
     var soc=p.soc||'';
     var tGan=_tenToGan(p.ten, dayMaster)||'';
     var wx=GAN_WX[tGan]||'';
-    var yin=wx and GAN_YIN.get(tGan,'') or '';
-    var yxwx=(yin and wx) and (yin+wx) or wx;
+    var yin=wx?(GAN_YIN[tGan]==1?'阳':'阴'):'';
+    var yxwx=(yin&&wx)?(yin+wx):wx;
     var fsTen=12, fsGan=9, fsYx=9;
     var top=(dy<-0.3);
     var gap=17;
-    var oy1=top and (p.oy-r-gap*1.5) or (p.oy+r+gap*0.5);
-    var oy2=top and (p.oy-r-gap*2.8) or (p.oy+r+gap*1.8);
-    var oy3=top and (p.oy-r-gap*4.1) or (p.oy+r+gap*3.1);
+    var oy1=top?(p.oy-r-gap*1.5):(p.oy+r+gap*0.5);
+    var oy2=top?(p.oy-r-gap*2.8):(p.oy+r+gap*1.8);
+    var oy3=top?(p.oy-r-gap*4.1):(p.oy+r+gap*3.1);
     svg+='<text x="'+p.ox+'" y="'+oy1+'" text-anchor="middle" fill="#fff" font-size="'+fsTen+'" font-weight="bold" style="paint-order:stroke;stroke:rgba(0,0,0,.3);stroke-width:.7px">'+p.ten+'</text>';
     svg+='<text x="'+p.ox+'" y="'+oy2+'" text-anchor="middle" fill="#fff" font-size="'+fsGan+'" style="paint-order:stroke;stroke:rgba(0,0,0,.35);stroke-width:.5px">'+wx+'</text>';
     svg+='<text x="'+p.ox+'" y="'+oy3+'" text-anchor="middle" fill="#c8e6c9" font-size="'+fsYx+'" style="paint-order:stroke;stroke:rgba(0,0,0,.25);stroke-width:.4px">'+yxwx+'</text>';
