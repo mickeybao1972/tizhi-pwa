@@ -7716,47 +7716,32 @@ function renderSheHuiGuanXi(){
 <script>
 function renderBaziAnalysis(){
   var box=document.getElementById('bz-analysis');
-  if(!box){console.log('[命理解读] 找不到 bz-analysis 容器'); return;}
-  if(typeof BZ_RI_GAN==='undefined'||!BZ_RI_GAN){ console.log('[命理解读] BZ_RI_GAN 未定义或为空'); box.style.display='none'; return; }
-  console.log('[命理解读] 开始渲染，日主=',BZ_RI_GAN);
+  if(!box){return;}
+  if(typeof BZ_RI_GAN==='undefined'||!BZ_RI_GAN){box.style.display='none';return;}
   try{
     var riGan=BZ_RI_GAN;
     var dw=BZ_WX[riGan];
     var gKey=(typeof BZ_GENDER!=='undefined'&&BZ_GENDER===0)?0:1;
-    var yuan=(gKey===0)?'元女':'元男';
+    var yuan=(gKey===0)?'YuanNv':'YuanNan';
     var pillars=(typeof BZ_PILLARS!=='undefined'&&BZ_PILLARS)?BZ_PILLARS:[];
-    var r=(typeof BZ_LAST_RESULT!=='undefined'&&BZ_LAST_RESULT)?BZ_LAST_RESULT:null;
     var CANG={子:['癸'],丑:['己','癸','辛'],寅:['甲','丙','戊'],卯:['乙'],辰:['戊','乙','癸'],巳:['丙','庚','戊'],午:['丁','己'],未:['己','丁','乙'],申:['庚','壬','戊'],酉:['辛'],戌:['戊','辛','丁'],亥:['壬','甲']};
-    var WX_ZANG={木:'肝胆',火:'心与小肠',土:'脾胃',金:'肺与大肠',水:'肾与膀胱'};
-    var WX_EX={木:'甲乙·寅卯',火:'丙丁·巳午',土:'戊己·辰戌丑未',金:'庚辛·申酉',水:'壬癸·亥子'};
-    var SOC_MAP={比肩:'同辈/同事',劫财:'朋友/竞争者',食神:'晚辈/学生/艺人',伤官:'创意人/表达者',偏财:'客户/商人',正财:'妻子/稳定收入',七杀:'上司/压力源',正官:'丈夫/上级',偏印:'长辈/学术',正印:'母亲/庇护'};
-    var ZI_NV=(gKey===0)?{食神:'女儿',伤官:'儿子'}:{食神:'孙子',伤官:'孙女'};
-    function tenOf(g){ return (typeof bzShiShen==='function')?bzShiShen(riGan,g):''; }
-    function liuOf(g){ return (typeof bzLiuQin==='function')?bzLiuQin(g):''; }
-    function sec(t,b){ return '<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">'+t+'</h3>'+b+'</div>'; }
-    function p(t){ return '<p style="color:#444;margin:0 0 8px 0;font-size:12.5px;line-height:1.7">'+t+'</p>'; }
-    function uniq(a){ var o={}; a.forEach(function(x){ if(x)o[x]=1; }); return Object.keys(o); }
-
-    var html='';
-    html+='<h3 style="font-size:14px;color:#5D4037;margin:18px 0 8px">📜 命理解读 — '+yuan+'（'+riGan+dw+'日主）</h3>';
-
-    // ===== 旺衰 + 喜用神 =====
-    var st=null,yong=null;
-    if(r&&typeof bzBodyStrength==='function') st=bzBodyStrength(r);
-    if(r&&st&&typeof bzYongShen==='function') yong=bzYongShen(r,st);
-    var body='';
-    if(st){
-      var lv=st.level==='强'?'身强（偏旺）':'身弱（偏弱）';
-      body+=p('日主<b>'+riGan+'</b>（'+dw+'），强弱判定：<b>'+lv+'</b>。得令 '+st.ling+' / 得势 '+st.shi+' / 得地 '+st.di+'（综合分 '+st.score+'）。');
-    } else {
-      body+=p('日主<b>'+riGan+'</b>（'+dw+'）。');
-    }
-    if(yong){
-      body+=p('喜用神（补益日主）：<b>'+yong.xi.map(function(x){return x+'('+WX_EX[x]+')';}).join('、')+'</b>。忌神：'+yong.ji.map(function(x){return x+'('+WX_EX[x]+')';}).join('、')+'。');
-    }
-    html+=sec('一、本命 · 旺衰 · 喜用神', body);
-
-    // ===== 格局 =====
+    var WX_ZANG={木:'GanDan',火:'XinChang',土:'PiWei',金:'FeiChang',水:'ShenPang'};
+    var WX_EX={木:'甲乙寅卯',火:'丙丁巳午',土:'戊己辰戌丑未',金:'庚辛申酉',水:'壬癸亥子'};
+    var LING_MAP={
+      木:{寅:3,卯:3,亥:2,子:2,巳:0,午:0,辰:-1,戌:-1,丑:-1,未:-1,申:-2,酉:-2},
+      火:{寅:2,卯:2,巳:3,午:3,辰:0,戌:0,丑:0,未:0,申:-2,酉:-2,亥:-1,子:-1},
+      土:{寅:-1,卯:-1,巳:2,午:2,辰:3,戌:3,丑:3,未:3,申:0,酉:0,亥:-2,子:-2},
+      金:{寅:0,卯:0,巳:-1,午:-1,辰:2,戌:2,丑:2,未:2,申:3,酉:3,亥:-2,子:-2},
+      水:{寅:-2,卯:-2,巳:-2,午:-2,辰:-1,戌:-1,丑:-1,未:-1,申:2,酉:2,亥:3,子:3}
+    };
+    var LING_DESC={'3':'dangLing',2:'deXiang',0:'xiu',-1:'qiu',-2:'si'};
+    var ZI_NV=(gKey===0)?{食神:'NvEr',伤官:'NanEr'}:{食神:'SunZi',伤官:'SunNv'};
+    function tenOf(g){return(typeof bzShiShen==='function')?bzShiShen(riGan,g):'';}
+    function liuOf(g){return(typeof bzLiuQin==='function')?bzLiuQin(g):'';}
+    function sec(t,b){return'<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">'+t+'</h3>'+b+'</div>';}
+    function p(t){return'<p style="color:#444;margin:0 0 8px 0;font-size:12.5px;line-height:1.7">'+t+'</p>';}
+    function b2(t){return'<b style="color:#8B4513">'+t+'</b>';}
+    function uniq(a){return Object.keys(a.reduce(function(o,x){if(x)o[x]=1;return o;},{}));}
     var yueZhi=pillars[1]?pillars[1][1]:'';
     var yueBen=(CANG[yueZhi]&&CANG[yueZhi][0])||'';
     var yueGod=tenOf(yueBen);
@@ -7765,107 +7750,70 @@ function renderBaziAnalysis(){
     var riGod=tenOf(riBen);
     var tou=uniq(pillars.map(function(pp){return pp&&pp[0]?tenOf(pp[0]):'';}));
     var allTen=[];
-    pillars.forEach(function(pp){ if(pp&&pp[0])allTen.push(tenOf(pp[0])); if(pp&&pp[1]){var b=(CANG[pp[1]]&&CANG[pp[1]][0])||''; if(b)allTen.push(tenOf(b));} });
+    pillars.forEach(function(pp){if(pp&&pp[0])allTen.push(tenOf(pp[0]));if(pp&&pp[1]){var bx=(CANG[pp[1]]&&CANG[pp[1]][0])||'';if(bx)allTen.push(tenOf(bx));}});
     allTen=uniq(allTen);
-    var gBody='';
-    gBody+=p('月令<b>'+yueZhi+'</b>本气为<b>'+yueGod+'</b>，立'+yueGod+'格为主；天干透出：'+tou.join('、')+'。');
-    gBody+=p('日支<b>'+riZhi+'</b>（夫妻宫）坐<b>'+riGod+'</b>。');
-    var feats=[];
-    if(allTen.indexOf('七杀')>=0&&(allTen.indexOf('正印')>=0||allTen.indexOf('偏印')>=0)) feats.push('杀印相生（七杀生印、印生身，化压力为权柄）');
-    if(allTen.indexOf('伤官')>=0&&allTen.indexOf('七杀')>=0) feats.push('伤官驾杀（以才华制压力）');
-    if(allTen.indexOf('食神')>=0&&allTen.indexOf('正财')>=0) feats.push('食神生财（才艺生财）');
-    if(allTen.indexOf('正官')>=0&&allTen.indexOf('正印')>=0) feats.push('官印相生（事业得贵人扶持）');
-    if(feats.length) gBody+=p('格局特征：'+feats.join('；')+'。');
-    html+=sec('二、本命 · 格局', gBody);
-
-    // ===== 六亲（内圈）=====
+    var lingScore=LING_MAP[dw]?LING_MAP[dw][yueZhi]:0;
+    var tenYin=0,tenBi=0;
+    pillars.forEach(function(pp){if(pp&&pp[0]){var gw=BZ_WX[pp[0]];if(gw===dw)tenBi++;else if(BZ_X_SHENG[dw]===gw)tenYin++;}});
+    var diRoot=0,diYin=0;
+    pillars.forEach(function(pp){if(pp&&pp[1]){var h=CANG[pp[1]]||[];for(var i=0;i<h.length;i++){if(BZ_WX[h[i]]===dw)diRoot++;else if(BZ_X_SHENG_INV[dw]===BZ_WX[h[i]])diYin++;}}});
+    var diScore=0;
+    pillars.forEach(function(pp){if(pp&&pp[1]&&CANG[pp[1]]){var h=CANG[pp[1]];if(BZ_WX[h[0]]===dw)diScore+=1;}});
+    var totalScore=lingScore+tenBi+tenYin+diRoot+diYin+diScore;
+    var level=totalScore>=6?'Qiang':'Ruo';
+    var levelTxt=level==='Qiang'?'ShenQiang':'ShenRuo';
+    var xi=[],ji=[];
+    if(level==='Qiang'){xi.push(BZ_X_SHENG[dw]);xi.push(BZ_X_KE[dw]);xi.push(BZ_X_KE_INV[dw]);ji.push(BZ_X_SHENG_INV[dw]);ji.push(dw);}
+    else{xi.push(BZ_X_SHENG_INV[dw]);xi.push(dw);ji.push(BZ_X_KE[dw]);ji.push(BZ_X_SHENG[dw]);ji.push(BZ_X_KE_INV[dw]);}
+    var mainGod=xi[0];
+    var avoidGods=ji.slice(0,2);
+    var yong={xi:xi,ji:ji};
+    var html='<h3 style="font-size:14px;color:#5D4037;margin:18px 0 8px">ANALYSIS '+yuan+' RiZhu:'+riGan+'</h3>';
+    var body='';
+    body+=p('RiZhu:'+riGan+' dw:'+dw+' yueZhi:'+yueZhi+' lingScore:'+lingScore);
+    var hp=[];
+    if(tenYin>0)hp.push('TianGanYin:'+tenYin);
+    if(tenBi>0)hp.push('TianGanBi:'+tenBi);
+    if(diRoot>0)hp.push('DiZhiGen:'+diRoot);
+    if(diYin>0)hp.push('DiZhiYin:'+diYin);
+    if(hp.length)body+=p('BangShen:'+hp.join(','));
+    var sp=[];
+    if(tenBi>0)sp.push('TGBi+'+(tenBi+tenYin));
+    if(diRoot>0)sp.push('Gen+'+diRoot);
+    if(diYin>0)sp.push('Yin+'+diYin);
+    if(sp.length)body+=p('DeShi:'+sp.join('+')+'='+(tenBi+tenYin+diRoot+diYin));
+    body+=p('ZongHe:'+levelTxt+' Score:'+(lingScore+tenBi+tenYin+diRoot+diYin+diScore).toFixed(0));
+    body+=p('YongShen:Main:'+mainGod+' Avoid:'+avoidGods.join(','));
+    html+=sec('1_WangShuai',body);
+    var geBody='';
+    geBody+=p('yueGod:'+yueGod+' riGod:'+riGod+' tou:'+tou.join(','));
+    html+=sec('2_GeJu',geBody);
     var lqBody='';
-    var rows=[];
-    var labels=['年干','月干','日主','时干'];
-    pillars.forEach(function(pp,i){
-      if(!pp||!pp[0])return;
-      var t=tenOf(pp[0]); var l=liuOf(pp[0]);
-      rows.push(labels[i]+'<b>'+pp[0]+'</b>（'+t+'·'+l+'）');
-    });
-    lqBody+=p('四柱天干六亲：'+rows.join('；')+'。');
-    var spGod=tenOf(riBen);
-    var spLiu=liuOf(riBen);
-    lqBody+=p('夫妻宫（日支'+riZhi+'）'+spGod+'，对应'+spLiu+'；夫星看官杀，女命正官为夫、七杀为偏夫。');
-    var hasSon=(allTen.indexOf('食神')>=0), hasDau=(allTen.indexOf('伤官')>=0);
-    lqBody+=p('子女星：'+(hasSon?'食神现（女命为'+ZI_NV['食神']+'）':'食神不显')+'，'+(hasDau?'伤官现（女命为'+ZI_NV['伤官']+'）':'伤官不显')+'。');
-    html+=sec('三、本命 · 六亲', lqBody);
-
-    // ===== 健康（五行脏腑）=====
+    var rows=[],labels=['N','Y','R','S'];
+    pillars.forEach(function(pp,i){if(!pp||!pp[0])return;var t=tenOf(pp[0]);var l=liuOf(pp[0]);rows.push(labels[i]+pp[0]+'('+t+'/'+l+')');});
+    lqBody+=p('LiuQin:'+rows.join(';'));
+    lqBody+=p('FuStar:'+(allTen.indexOf('正官')>=0?'ZhengGuan':(allTen.indexOf('七杀')>=0?'QiSha':'BuXian')));
+    var hasShi=(allTen.indexOf('食神')>=0),hasShang=(allTen.indexOf('伤官')>=0);
+    lqBody+=p('ZiNv:'+(hasShi?'ShiShen:'+ZI_NV['食神']:'')+(hasShang?' ShangGuan:'+ZI_NV['伤官']:''));
+    html+=sec('3_LiuQin',lqBody);
     var c={木:0,火:0,土:0,金:0,水:0};
-    pillars.forEach(function(pp){
-      if(pp&&pp[0]&&BZ_WX[pp[0]]) c[BZ_WX[pp[0]]]++;
-      if(pp&&pp[1]){var ben=(CANG[pp[1]]&&CANG[pp[1]][0])||''; if(ben&&BZ_WX[ben]) c[BZ_WX[ben]]++;}
-    });
+    pillars.forEach(function(pp){if(pp&&pp[0]&&BZ_WX[pp[0]])c[BZ_WX[pp[0]]]++;if(pp&&pp[1]&&CANG[pp[1]]){var h=CANG[pp[1]];for(var i=0;i<h.length;i++){if(BZ_WX[h[i]])c[BZ_WX[h[i]]]++;}}});
     var maxWX=null,maxV=-1,minWX=null,minV=99;
-    for(var k in c){ if(c[k]>maxV){maxV=c[k];maxWX=k;} if(c[k]<minV){minV=c[k];minWX=k;} }
-    var hBody='';
-    hBody+=p('五行分布（天干+地支本气）：'+Object.keys(c).map(function(k){return k+c[k];}).join(' / ')+'。');
-    hBody+=p('最旺为<b>'+maxWX+'</b>（对应'+WX_ZANG[maxWX]+'偏实/活跃），最弱为<b>'+minWX+'</b>（对应'+WX_ZANG[minWX]+'偏弱）。日主属'+dw+'（'+WX_ZANG[dw]+'），'+(c[dw]<=1?'本脏偏弱，需注意养护':'本脏有根气')+'。');
-    hBody+=p('养生方向（仅倾向，非诊断）：'+maxWX+'旺者宜疏泄静养，'+minWX+'弱者宜温补调养；木弱养肝安神、土弱养脾胃、水弱养肾、金旺润肺、火旺清心。');
-    html+=sec('四、本命 · 健康（脏腑倾向）', hBody);
-
-    // ===== 社会关系（内圈）=====
-    var socList=uniq(pillars.map(function(pp){ if(pp&&pp[0]){var t=tenOf(pp[0]); return SOC_MAP[t]?SOC_MAP[t]:'';} return ''; }));
-    var sBody='';
-    sBody+=p('十神映射的社会角色：'+socList.join('、')+'。');
-    if(allTen.indexOf('伤官')>=0) sBody+=p('伤官透出者个性强、有才华、不喜受管，适合靠技艺与表达立足。');
-    if(allTen.indexOf('七杀')>=0) sBody+=p('七杀在局，事业上有压力也有权威机遇，适合带挑战或管理性质的岗位。');
-    if(allTen.indexOf('正印')>=0||allTen.indexOf('偏印')>=0) sBody+=p('印星在局，好钻研、得长辈/学术庇佑，宜以学养立身。');
-    html+=sec('五、本命 · 社会关系', sBody);
-
-    // ===== 外圈：当前大运 + 流年 =====
+    for(var k in c){if(c[k]>maxV){maxV=c[k];maxWX=k;}if(c[k]<minV){minV=c[k];minWX=k;}}
+    html+=sec('4_Health','WuXing:'+JSON.stringify(c)+' Max:'+maxWX+' Min:'+minWX);
     var stt=(typeof BZ_TIME_STATE!=='undefined')?BZ_TIME_STATE:null;
     var nowYear=new Date().getFullYear();
     var selYear=(stt&&stt.selectedLiuNianYear!=null)?stt.selectedLiuNianYear:nowYear;
-    var dyGZ='';
-    if(stt&&stt.selectedDaYunIdx!=null&&typeof BZ_DA_YUN!=='undefined'&&BZ_DA_YUN&&BZ_DA_YUN[stt.selectedDaYunIdx]){ dyGZ=BZ_DA_YUN[stt.selectedDaYunIdx].ganZhi||''; }
-    else if(typeof BZ_DY_GZ!=='undefined'&&BZ_DY_GZ){ dyGZ=BZ_DY_GZ; }
+    var dyGZ='',dyIdx=-1;
+    if(stt&&stt.selectedDaYunIdx!=null&&typeof BZ_DA_YUN!=='undefined'&&BZ_DA_YUN&&BZ_DA_YUN[stt.selectedDaYunIdx]){dyGZ=BZ_DA_YUN[stt.selectedDaYunIdx].ganZhi||'';dyIdx=stt.selectedDaYunIdx;}
     var lnGZ=(typeof bzYearGZ==='function')?bzYearGZ(selYear):'';
-    if(!dyGZ&&!lnGZ){ html+=sec('六、当前大运 · 流年（外圈）', p('暂无可分析的大运/流年数据。')); }
-    else {
-      function outerInfo(gz,name){
-        if(!gz||gz.length<2) return '';
-        var g=gz.charAt(0), z=gz.charAt(1);
-        var gt=tenOf(g), zt=tenOf((CANG[z]&&CANG[z][0])||'');
-        var out='<b>'+name+' '+gz+'</b>：天干'+gt+'（'+(SOC_MAP[gt]||'')+'），地支'+zt+'。';
-        var gliu=liuOf(g), zliu=liuOf((CANG[z]&&CANG[z][0])||'');
-        out+=' 六亲动向：'+gt+'→'+gliu+(zt?'，'+zt+'→'+zliu:'');
-        var rel=[];
-        pillars.forEach(function(pp){ if(pp&&pp[1]){
-          if(BZ_CHONG[pp[1]]===z) rel.push(pp[1]+'冲'+z);
-          if(BZ_HAI[pp[1]]===z) rel.push(pp[1]+'害'+z);
-        }});
-        if(rel.length) out+='；与命局：'+rel.join('、');
-        return out;
-      }
-      var oBody='';
-      oBody+=p(outerInfo(dyGZ,'当前大运'));
-      oBody+=p(outerInfo(lnGZ,selYear+'流年'));
-      var wOut={木:0,火:0,土:0,金:0,水:0};
-      [dyGZ,lnGZ].forEach(function(gz){ if(gz&&gz.length>=2){ var g=gz.charAt(0),z=gz.charAt(1); if(BZ_WX[g])wOut[BZ_WX[g]]++; var b=(CANG[z]&&CANG[z][0])||''; if(b&&BZ_WX[b])wOut[BZ_WX[b]]++; } });
-      var hw=[];
-      for(var k2 in wOut){ if(wOut[k2]>0){ var eff=(BZ_X_KE[dw]===k2)?'受克':((BZ_X_SHENG[dw]===k2)?'被泄':((BZ_X_SHENG_INV[dw]===k2)?'得生扶':'中性')); hw.push(k2+'（'+WX_ZANG[k2]+'）'+eff); } }
-      oBody+=p('健康动向（外圈五行叠加）：'+hw.join('；')+'。原局最弱'+minWX+'（'+WX_ZANG[minWX]+'）逢克泄之年尤需养护。');
-      var oSoc=[];
-      [dyGZ,lnGZ].forEach(function(gz){ if(gz&&gz.length>=2){ var gt=tenOf(gz.charAt(0)); if(SOC_MAP[gt])oSoc.push(gt+'('+SOC_MAP[gt]+')'); } });
-      oBody+=p('社会关系动向：'+uniq(oSoc).join('、')+'。');
-      var caiWX=BZ_X_KE[dw], shiWX=BZ_X_SHENG[dw];
-      var natCai=0; pillars.forEach(function(pp){ if(pp&&pp[0]&&BZ_WX[pp[0]]===caiWX)natCai++; });
-      var outCai=0,outShi=0;
-      [dyGZ,lnGZ].forEach(function(gz){ if(gz&&gz.length>=2){ var g=gz.charAt(0),b=((CANG[gz.charAt(1)]&&CANG[gz.charAt(1)][0])||''); if(BZ_WX[g]===caiWX)outCai++; if(BZ_WX[g]===shiWX)outShi++; if(b&&BZ_WX[b]===caiWX)outCai++; if(b&&BZ_WX[b]===shiWX)outShi++; } });
-      oBody+=p('财运：原局财星（'+caiWX+'）'+natCai+'现'+(natCai===0?'，财弱需大运流年引动':'')+'；当前大运流年引动财星'+outCai+'、食伤(生财)'+outShi+'。'+(outCai+outShi>0?'利靠才华技艺求财，身弱则求财辛苦，宜稳不宜投机。':'财星未显，财运平淡，宜守。'));
-      html+=sec('六、当前大运 · 流年（外圈）', oBody);
-    }
-
-    html+='<p style="color:#999;font-size:11px;margin:4px 0 16px">以上按本盘五行十神推演，仅为倾向参考，非疾病诊断，亦不开方。</p>';
+    var oBody='';
+    if(dyGZ)oBody+=p('DaYun:'+dyGZ+' Step'+(dyIdx+1));
+    if(lnGZ)oBody+=p('LiuNian'+selYear+':'+lnGZ);
+    if(oBody)html+=sec('6_DaYunLiuNian',oBody);
     box.innerHTML=html;
     box.style.display='block';
-  }catch(ex){ if(console&&console.log)console.log('命理解读渲染错：',ex&&ex.message); box.style.display='none'; }
+  }catch(ex){box.style.display='none';}
 }
 var BZ_CHONG={子:'午',午:'子',丑:'未',未:'丑',寅:'申',申:'寅',卯:'酉',酉:'卯',辰:'戌',戌:'辰',巳:'亥',亥:'巳'};
 var BZ_HAI={子:'未',未:'子',丑:'午',午:'丑',寅:'巳',巳:'寅',卯:'辰',辰:'卯',申:'亥',亥:'申',酉:'戌',戌:'酉'};
