@@ -891,7 +891,7 @@ function rerenderCurrent(){
 
       ✍️ <span data-i18n="dev_designed">设计开发：</span><span class="ds-name">九燊工作室</span>
 
-      <span class="ds-ver">V3.1.2</span>
+      <span class="ds-ver">V3.1.3</span>
 
     </div>
 
@@ -962,7 +962,7 @@ function rerenderCurrent(){
 
   <div class="devsig" style="margin-top:auto;margin-bottom:0;max-width:480px">
 
-    <span class="ds-name">九燊工作室</span> 作品 · V3.1.2 · 创建 2026.07.23 17:00 · 更新 2026.08.10 20:05 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
+    <span class="ds-name">九燊工作室</span> 作品 · V3.1.3 · 创建 2026.07.23 17:00 · 更新 2026.08.10 20:05 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
 
   </div>
 
@@ -4303,18 +4303,18 @@ function renderChildrenV2(r, birthYear) {
     var gz = bzYearGanZhi(year);
     var yGan = gz[0], yZhi = gz[1];
     
-    var score = 50; // 基础分
+    var score = 50;
     var reasons = [];
-    var childType = ''; // 'son' or 'daughter'
+    var childType = '';
     
     // 1. 天干出现子女星
     if (yGan === sonGan) {
       score += 25;
-      reasons.push('流年天干出儿子星+' + 25);
+      reasons.push('喜用到');
       childType = 'son';
     } else if (yGan === daughterGan) {
       score += 25;
-      reasons.push('流年天干出女儿星+' + 25);
+      reasons.push('喜用到');
       childType = 'daughter';
     }
     
@@ -4325,11 +4325,11 @@ function renderChildrenV2(r, birthYear) {
     
     if (hasSonInZhi && !childType) {
       score += 15;
-      reasons.push('流年地支藏儿子星+' + 15);
+      reasons.push('藏干有根');
       childType = 'son';
     } else if (hasDauInZhi && !childType) {
       score += 15;
-      reasons.push('流年地支藏女儿星+' + 15);
+      reasons.push('藏干有根');
       childType = 'daughter';
     }
     
@@ -4345,69 +4345,61 @@ function renderChildrenV2(r, birthYear) {
     if (dy) {
       var dyGan = dy.ganZhi[0], dyZhi = dy.ganZhi[1];
       
-      // 大运天干是子女星
       if (dyGan === sonGan || dyGan === daughterGan) {
         score += 10;
-        reasons.push('大运透子女星+' + 10);
+        reasons.push('大运透子女星');
       }
       
-      // 流年与大运天干相同（伏吟）
       if (yGan === dyGan && (yGan === sonGan || yGan === daughterGan)) {
         score += 15;
-        reasons.push('大运流年伏吟子女星+' + 15);
+        reasons.push('大运流年伏吟');
       }
       
-      // 合化关系
       var dyCang = BZ_CANG[dyZhi] || [];
       if ((dyCang.indexOf(sonGan) >= 0 || dyCang.indexOf(daughterGan) >= 0) &&
           (yCang.indexOf(sonGan) >= 0 || yCang.indexOf(daughterGan) >= 0)) {
         score += 8;
-        reasons.push('大运流年合动子女星+' + 8);
+        reasons.push('年支和合');
       }
     }
     
     // 4. 与子女宫（时支）关系
     var hourZhi = pillars[3] ? pillars[3][1] : '';
     if (hourZhi) {
-      // 冲子女宫
       var chong = {'子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅',
                    '卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳'};
       if (chong[yZhi] === hourZhi) {
         score -= 10;
-        reasons.push('冲子女宫-10');
+        reasons.push('年支刑冲');
       }
-      // 合子女宫
+      
       var he = {'子':'丑','丑':'子','寅':'亥','亥':'寅','卯':'戌','戌':'卯',
                 '辰':'酉','酉':'辰','巳':'申','申':'巳','午':'未','未':'午'};
       if (he[yZhi] === hourZhi) {
         score += 8;
-        reasons.push('合动子女宫+' + 8);
+        reasons.push('年支和合');
       }
     }
     
-    // 5. 刑害减分
+    // 5. 刑害
     var xing = {'子':'卯','卯':'子','寅':'巳','巳':'寅','丑':'未','未':'丑','丑':'戌','戌':'丑','未':'戌','戌':'未'};
     if (xing[yZhi] === hourZhi) {
       score -= 5;
-      reasons.push('刑子女宫-5');
+      reasons.push('年支刑冲');
     }
     
-    // 6. 日主强弱调整
+    // 6. 日主强弱
     var bodyStrength = bzBodyStrength({pillars:pillars,dayGan:dayGan,tenGods:r.tenGods});
     if (bodyStrength.level === '强' || bodyStrength.level === '旺') {
-      // 身强喜泄，食伤为子女星则加分
       if (childType && (sonStar === '伤官' || sonStar === '食神')) {
         score += 5;
-        reasons.push('身强喜泄+' + 5);
+        reasons.push('身强喜泄');
       }
     }
     
-    // 确定最终分数和类型
     score = Math.max(0, Math.min(100, score));
     
-    // 如果没有明确类型，根据分数倾向判断
     if (!childType) {
-      // 检查原局倾向
       var sonCnt = r.tenGods[sonStar] || 0;
       var dauCnt = r.tenGods[daughterStar] || 0;
       if (sonCnt > dauCnt) childType = 'son';
@@ -4426,11 +4418,10 @@ function renderChildrenV2(r, birthYear) {
     }
   }
   
-  // 排序并取前5
   yearScores.sort(function(a, b) { return b.score - a.score; });
   var top5 = yearScores.slice(0, 5);
   
-  // 生成HTML
+  // 生成HTML - 和原算法格式一致
   var html = '<div style="font-size:12px;color:#4A7C59;font-weight:600;margin-bottom:8px">🔮 子女缘深度分析 V2（应期推算）</div>';
   
   if (top5.length === 0) {
@@ -4448,7 +4439,7 @@ function renderChildrenV2(r, birthYear) {
       
       html += '<div style="margin:6px 0;padding:10px;background:' + bgColor + ';border-left:4px solid ' + borderColor + ';border-radius:6px;font-size:11px">';
       html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-      html += '<span style="font-weight:600;color:#333">' + y.year + '年 ' + y.gz + ' ' + childIcon + ' ' + childText + '</span>';
+      html += '<span style="font-weight:600;color:#333">' + y.year + '年 ' + y.age + '岁·' + y.gz + ' ' + childIcon + ' ' + childText + '</span>';
       html += '<span style="font-size:14px;font-weight:700;color:' + borderColor + '">' + y.score + '分</span>';
       html += '</div>';
       html += '<div style="color:#666;font-size:10px;line-height:1.5">' + y.reasons.join(' · ') + '</div>';
