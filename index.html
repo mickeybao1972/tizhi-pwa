@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache-bust: 2026-08-10 16:38 UTC+8 -->
+<!-- cache-bust: 2026-08-10 16:45 UTC+8 -->
 
 <html lang="zh-CN">
 
@@ -891,7 +891,7 @@ function rerenderCurrent(){
 
       ✍️ <span data-i18n="dev_designed">设计开发：</span><span class="ds-name">九燊工作室</span>
 
-      <span class="ds-ver">V3.0.4</span>
+      <span class="ds-ver">V3.0.5</span>
 
     </div>
 
@@ -961,7 +961,7 @@ function rerenderCurrent(){
 
   <div class="devsig" style="margin-top:auto;margin-bottom:0;max-width:480px">
 
-    <span class="ds-name">九燊工作室</span> 作品 · V3.0.4 · 2026.8.10 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
+    <span class="ds-name">九燊工作室</span> 作品 · V3.0.5 · 2026.8.10 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
 
   </div>
 
@@ -7719,6 +7719,8 @@ function renderBaziAnalysis(){
   var box=document.getElementById('bz-analysis');
   if(!box){return;}
   if(typeof BZ_RI_GAN==='undefined'||!BZ_RI_GAN){box.style.display='none';return;}
+  // Define SOC_MAP early to avoid undefined errors
+  var SOC_MAP={'比肩':'自我与同辈','劫财':'竞争与合伙','食神':'才艺与享受','伤官':'表达与叛逆','偏财':'投资与人脉','正财':'薪酬与稳健','七杀':'压力与权柄','正官':'责任与声望','偏印':'玄学与孤高','正印':'庇护与学识'};
   try{
     var riGan=BZ_RI_GAN;
     var dw=BZ_WX[riGan];
@@ -7728,17 +7730,7 @@ function renderBaziAnalysis(){
     var LING_MAP={'木':{寅:'3',卯:'3',亥:'2',子:'-2',午:'-1',巳:'-1',申:'-2',酉:'-2',辰:'0',戌:'0',丑:'0',未:'0'},'火':{寅:'2',卯:'2',巳:'3',午:'3',子:'-2',亥:'-2',申:'-1',酉:'-1',辰:'0',戌:'0',丑:'0',未:'0'},'土':{巳:'2',午:'2',辰:'3',戌:'3',丑:'3',未:'3',寅:'-1',卯:'-1',申:'-2',酉:'-2',子:'0',亥:'0'},'金':{辰:'2',戌:'2',丑:'2',未:'2',申:'3',酉:'3',巳:'-1',午:'-1',寅:'-2',卯:'-2',子:'0',亥:'0'},'水':{申:'2',酉:'2',亥:'3',子:'3',辰:'0',戌:'0',丑:'0',未:'0',寅:'-1',卯:'-1',巳:'-2',午:'-2'}};
     var LING_DESC={'3':'得令','2':'得相','0':'休囚','-1':'囚死','-2':'死绝'};
     var WX_ZANG={'木':'肝胆','火':'心小肠','土':'脾胃','金':'肺大肠','水':'肾膀胱'};
-    var SOC_MAP={};
-    SOC_MAP['比肩']='自我与同辈';
-    SOC_MAP['劫财']='竞争与合伙';
-    SOC_MAP['食神']='才艺与享受';
-    SOC_MAP['伤官']='表达与叛逆';
-    SOC_MAP['偏财']='投资与人脉';
-    SOC_MAP['正财']='薪酬与稳健';
-    SOC_MAP['七杀']='压力与权柄';
-    SOC_MAP['正官']='责任与声望';
-    SOC_MAP['偏印']='玄学与孤高';
-    SOC_MAP['正印']='庇护与学识';
+    // SOC_MAP already defined above
     var ZI_NV=(gKey===0)?{'食神':'女儿','伤官':'儿子'}:{'食神':'孙子','伤官':'孙女'};
     function tenOf(g){return(typeof bzShiShen==='function')?bzShiShen(riGan,g):'';}
     function liuOf(g){return(typeof bzLiuQin==='function')?bzLiuQin(g):'';}
