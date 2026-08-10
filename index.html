@@ -3962,7 +3962,6 @@ function closeHistModal() {
         <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">👶 子女推算</h3>
 
         <div id="bz-children"></div>
-        <div id="bz-children-v2" style="margin-top:12px;padding:12px;background:#f8f9fa;border-radius:8px;border-left:3px solid #4A7C59;display:none"></div>
 
         <p style="font-size:10px;color:#888;text-align:center;margin-top:8px">子女星以大运、流年寻应期（15–50岁生育窗口），月份流日仅作参考，纯娱乐</p>
 
@@ -4216,7 +4215,7 @@ window.BZ_QI=['雨水','春分','谷雨','小满','夏至','大暑','处暑','�
 
 function bzYueLabel(i){if(!i)return '';var ii=Math.floor(i);if(ii<1||ii>12)return '';return window.BZ_JIE[ii-1]+'·'+window.BZ_QI[ii-1];}
 
-function renderChildren(r,birthYear); renderChildrenV2(r, birthYear){var monthZhi=r.pillars[1][1];var el=document.getElementById('bz-children');if(!el||!r||!birthYear)return;var dayGan=r.dayGan;var isFemale=(r.gender==='女');var stars=isFemale?{daughter:'伤官',son:'食神'}:{daughter:'正官',son:'七杀'};function gzOf(ss){return BZ_GAN.filter(function(g){return bzShiShen(dayGan,g)===ss;});}function zhiBenOf(ss){var a=[];BZ_ZHI.forEach(function(z){var h=BZ_CANG[z]||[];for(var _i=0;_i<h.length;_i++){if(bzShiShen(dayGan,h[_i])===ss)a.push(h[_i]);}});return a;}var dG=gzOf(stars.daughter),sG=gzOf(stars.son),dZ=zhiBenOf(stars.daughter),sZ=zhiBenOf(stars.son);var natal=false;var sunCnt=(r.tenGods['食神']||0);if((r.tenGods[stars.daughter]||0)>0||(r.tenGods[stars.son]||0)>0)natal=true;if(r.pillars){r.pillars.forEach(function(p){var h=BZ_CANG[p[1]]||[];h.forEach(function(c){var ss=bzShiShen(dayGan,c);if(ss===stars.daughter||ss===stars.son)natal=true;if(ss==='食神')sunCnt++;});});}function detectGeMing(){
+function renderChildren(r,birthYear); renderChildrenV2(r,birthYear){var monthZhi=r.pillars[1][1];var el=document.getElementById('bz-children');if(!el||!r||!birthYear)return;var dayGan=r.dayGan;var isFemale=(r.gender==='女');var stars=isFemale?{daughter:'伤官',son:'食神'}:{daughter:'正官',son:'七杀'};function gzOf(ss){return BZ_GAN.filter(function(g){return bzShiShen(dayGan,g)===ss;});}function zhiBenOf(ss){var a=[];BZ_ZHI.forEach(function(z){var h=BZ_CANG[z]||[];for(var _i=0;_i<h.length;_i++){if(bzShiShen(dayGan,h[_i])===ss)a.push(h[_i]);}});return a;}var dG=gzOf(stars.daughter),sG=gzOf(stars.son),dZ=zhiBenOf(stars.daughter),sZ=zhiBenOf(stars.son);var natal=false;var sunCnt=(r.tenGods['食神']||0);if((r.tenGods[stars.daughter]||0)>0||(r.tenGods[stars.son]||0)>0)natal=true;if(r.pillars){r.pillars.forEach(function(p){var h=BZ_CANG[p[1]]||[];h.forEach(function(c){var ss=bzShiShen(dayGan,c);if(ss===stars.daughter||ss===stars.son)natal=true;if(ss==='食神')sunCnt++;});});}function detectGeMing(){
 
   var tgS=0,zhS=0,tgY=0,zhY=0,tgF=0,zhF=0;
 
@@ -4240,31 +4239,22 @@ function renderChildren(r,birthYear); renderChildrenV2(r, birthYear){var monthZh
 
 var geM=detectGeMing();var dauCnt=0,sonCnt=0;if(r.pillars){r.pillars.forEach(function(p){var gss=bzShiShen(dayGan,p[0]);if(gss===stars.daughter)dauCnt++;if(gss===stars.son)sonCnt++;var h=BZ_CANG[p[1]]||[];h.forEach(function(cc){var ss=bzShiShen(dayGan,cc);if(ss===stars.daughter)dauCnt++;if(ss===stars.son)sonCnt++;});});}var st=bzBodyStrength(r);var yong=bzYongShen(r,st);var cs={daughter:dG,son:sG,dZ:dZ,sZ:sZ};var dyHits=[];if(r.yun&&r.yun.daYun){r.yun.daYun.forEach(function(d){var gz=d.ganZhi;var g=gz[0],z=gz[1];var zb=(BZ_CANG[z]||[])[0]||'';var allZhi=(BZ_CANG[z]||[]);var ganHitD=dG.indexOf(g)>=0;var ganHitS=sG.indexOf(g)>=0;var zhiHitD=allZhi.some(function(h){return dZ.indexOf(h)>=0;});var zhiHitS=allZhi.some(function(h){return sZ.indexOf(h)>=0;});var isD=ganHitD||(zhiHitD&&!ganHitS);var isS=ganHitS||(zhiHitS&&!ganHitD);if(isD||isS)dyHits.push({gz:gz,sy:d.startYear,ey:d.startYear+9,age:d.startAge,type:isD?'daughter':'son'});});}var arr=[];var a0=isFemale?22:25,a1=isFemale?40:45;for(var age=a0;age<=a1;age++){var yy=birthYear+age;var gz=bzYearGZ(yy);var c=classifyYear(gz,r,st,yong,cs);if(!c)continue;if(c.cat==='弱')continue;var ganHitD=dG.indexOf(gz[0])>=0;var ganHitS=sG.indexOf(gz[0])>=0;var allZhi2=(BZ_CANG[gz[1]]||[]);var zhiHitD=allZhi2.some(function(h){return dZ.indexOf(h)>=0;});var zhiHitS=allZhi2.some(function(h){return sZ.indexOf(h)>=0;});var isD=ganHitD||(zhiHitD&&!ganHitS);var isS=ganHitS||(zhiHitS&&!ganHitD);var type=isD?'daughter':'son';var gmMod=0;if(isFemale){if(geM.shang&&type==='son')gmMod=12;else if(geM.yin&&type==='daughter')gmMod=-15;else if(geM.shi&&type==='daughter')gmMod=10;}else{if(geM.shang&&type==='daughter')gmMod=12;else if(geM.yin&&type==='son')gmMod=-10;else if(geM.shi&&type==='son')gmMod=10;}var gb=(type==='son'?(sonCnt-1)*5:(dauCnt-1)*5)+(sonCnt>0&&dauCnt>0?3:0);var pb=Math.max(8,Math.min(97,c.prob+gb+gmMod));arr.push({year:yy,age:age,gz:gz,type:type,cat:c.cat,nianRel:c.nianRel,ganRel:c.ganRel,prob:pb,gBias:gb,geom:gmMod});}var html='';html+='<div style="font-size:12px;color:#666;margin-bottom:8px">'+(isFemale?'女命':'男命')+'：日主强弱=<b>'+st.level+'</b>（喜用神：'+yong.xi.join('、')+'）｜女儿星=<b>'+stars.daughter+'</b>，儿子星=<b>'+stars.son+'</b><br>原局子女星：'+(natal?'<b style="color:#2e7d32">有</b>，此生必有子女':'<span style="color:#c62828">弱/无</span>，须借大运流年引动')+(sunCnt>0?'（食神'+sunCnt+'个为孙星，易有孙辈）':'')+'</div>';if(dyHits.length>0){var dyShow=dyHits.filter(function(h){return h.age+9>=a0&&h.age<=a1;});if(dyShow.length>0){html+='<div style="font-size:12px;color:#8B4513;font-weight:600;margin:8px 0 4px">大运应期（'+a0+'–'+a1+'岁窗口）</div>';dyShow.forEach(function(h){var dz=h.gz[1];var oz=[r.pillars[0][1],r.pillars[1][1],r.pillars[2][1],r.pillars[3][1]];var dr=diRelation(dz,oz);var tag=dr>0?'<span style="color:#2e7d32">（地支和合·利）</span>':(dr<0?'<span style="color:#c62828">（地支刑冲·慎）</span>':'');html+='<div style="font-size:11px;color:#666;padding:3px 0;border-bottom:1px solid #f0f0f0">'+h.gz+'大运（'+h.sy+'–'+h.ey+'年，'+h.age+'岁起）：易生'+(h.type==='daughter'?'女儿':'儿子')+tag+'</div>';});}}function renderYearList(arr,title,col,bg,bd){if(!arr.length)return'';var s='<div style="font-size:12px;color:#8B4513;font-weight:600;margin:8px 0 4px">'+title+'</div>';s+='<div style="display:flex;flex-wrap:wrap;gap:4px">';arr.forEach(function(h){var lab=h.type==='daughter'?'女':'子';s+='<div style="background:'+bg+';border:1px solid '+bd+';border-radius:6px;padding:3px 6px;font-size:10px;color:'+col+';text-align:center">'+h.year+'<br>'+h.age+'岁·'+h.gz+'·'+lab+'</div>';});s+='</div>';return s;}if(arr.length>0){html+=renderProbRank(arr,a0,a1,sonCnt>0&&dauCnt>0);}else{html+='<div style="font-size:11px;color:#888;margin-top:8px">'+a0+'–'+a1+'岁窗口内无明确子女星应期（可结合大运或放宽年龄）</div>';}el.innerHTML=html;}
 
-
-
-
-
-
-
-
-// 人元司令查表：月令 -> [ (天数截止, 十神), ... ]
-// 格式：从交节日起，第几天为止由哪个十神掌权
+// 人元司令查表
 var REN_YUAN_SILING = {
-  '寅': [[7, '戊土'], [14, '丙火'], [30, '甲木']],  // 立春后
-  '卯': [[10, '甲木'], [30, '乙木']],  // 惊蛰后
-  '辰': [[9, '乙木'], [18, '癸水'], [30, '戊土']],  // 清明后
-  '巳': [[9, '戊土'], [15, '庚金'], [30, '丙火']],  // 立夏后
-  '午': [[10, '丙火'], [19, '己土'], [30, '丁火']],  // 芒种后
-  '未': [[9, '丁火'], [18, '乙木'], [30, '己土']],  // 小暑后
-  '申': [[7, '己土'], [16, '戊土'], [26, '壬水'], [30, '庚金']],  // 立秋后
-  '酉': [[10, '庚金'], [30, '辛金']],  // 白露后
-  '戌': [[9, '辛金'], [18, '丁火'], [30, '戊土']],  // 寒露后
-  '亥': [[8, '戊土'], [18, '甲木'], [30, '壬水']],  // 立冬后
-  '子': [[10, '壬水'], [30, '癸水']],  // 大雪后
-  '丑': [[9, '癸水'], [18, '辛金'], [30, '己土']],  // 小寒后
+  '寅': [[7, '戊土'], [14, '丙火'], [30, '甲木']],
+  '卯': [[10, '甲木'], [30, '乙木']],
+  '辰': [[9, '乙木'], [18, '癸水'], [30, '戊土']],
+  '巳': [[9, '戊土'], [15, '庚金'], [30, '丙火']],
+  '午': [[10, '丙火'], [19, '己土'], [30, '丁火']],
+  '未': [[9, '丁火'], [18, '乙木'], [30, '己土']],
+  '申': [[7, '己土'], [16, '戊土'], [26, '壬水'], [30, '庚金']],
+  '酉': [[10, '庚金'], [30, '辛金']],
+  '戌': [[9, '辛金'], [18, '丁火'], [30, '戊土']],
+  '亥': [[8, '戊土'], [18, '甲木'], [30, '壬水']],
+  '子': [[10, '壬水'], [30, '癸水']],
+  '丑': [[9, '癸水'], [18, '辛金'], [30, '己土']],
 };
 
-// 根据月令和交节后天数，查当前掌权十神
 function getRenYuanSiLing(yueZhi, daysAfterJie) {
   var arr = REN_YUAN_SILING[yueZhi] || [];
   for (var i = 0; i < arr.length; i++) {
@@ -4273,9 +4263,7 @@ function getRenYuanSiLing(yueZhi, daysAfterJie) {
   return arr.length ? arr[arr.length - 1][1] : '';
 }
 
-
 function renderChildrenV2(r, birthYear, liuYueDays) {
-  // liuYueDays: 流月交节后天数，用于人元司令查表
   var el = document.getElementById('bz-children-v2');
   if (!el || !r || !birthYear) return;
   
@@ -4285,23 +4273,14 @@ function renderChildrenV2(r, birthYear, liuYueDays) {
   var yun = r.yun || {};
   var daYun = yun.daYun || [];
   
-  // ========== 基础定义 ==========
-  // 子女星
   var sonStar = isFemale ? '伤官' : '七杀';
   var daughterStar = isFemale ? '食神' : '正官';
-  var sonGan = isFemale ? getShiShenGan(dayGan, '伤官') : getShiShenGan(dayGan, '七杀');
-  var daughterGan = isFemale ? getShiShenGan(dayGan, '食神') : getShiShenGan(dayGan, '正官');
-  
-  // 凶神（克制子女星）
   var xiongShen = isFemale ? ['正官', '七杀'] : ['食神', '伤官'];
   
-  // 时柱 = 子女宫
   var hourPillar = pillars[3] || ['', ''];
-  var hourGan = hourPillar[0];
   var hourZhi = hourPillar[1];
   var hourCang = BZ_CANG[hourZhi] || [];
   
-  // 当前大运
   var currentDaYun = null;
   var currentYear = new Date().getFullYear();
   for (var i = 0; i < daYun.length; i++) {
@@ -4311,40 +4290,18 @@ function renderChildrenV2(r, birthYear, liuYueDays) {
     }
   }
   
-  // 流年、流月、流日、流时（简化：用当前时间或传入参数）
   var liuYear = r.liuNian || [];
   var liuYearGZ = liuYear.length > 0 ? liuYear[0].ganZhi : ['', ''];
   
-  // ========== 辅助函数 ==========
-  function getShiShenGan(dg, ss) {
-    for (var i = 0; i < BZ_GAN.length; i++) {
-      if (bzShiShen(dg, BZ_GAN[i]) === ss) return BZ_GAN[i];
-    }
-    return '';
-  }
-  
   function hasGen(gan) {
-    // 检查某天干在地支是否有根（包括藏干）
     for (var i = 0; i < pillars.length; i++) {
-      var zhi = pillars[i][1];
-      var cang = BZ_CANG[zhi] || [];
+      var cang = BZ_CANG[pillars[i][1]] || [];
       if (cang.indexOf(gan) >= 0) return true;
     }
     return false;
   }
   
-  function isQiangGen(zhi) {
-    // 强根：巳午为火根，寅卯为木根，申酉为金根，亥子为水根，辰戌丑未为土根
-    var wx = BZ_WX[zhi];
-    if (wx === '火' && (zhi === '巳' || zhi === '午')) return true;
-    if (wx === '木' && (zhi === '寅' || zhi === '卯')) return true;
-    if (wx === '金' && (zhi === '申' || zhi === '酉')) return true;
-    if (wx === '水' && (zhi === '亥' || zhi === '子')) return true;
-    return false;
-  }
-  
   function countWuXing(wx) {
-    // 统计某五行在四柱中出现的次数
     var cnt = 0;
     for (var i = 0; i < pillars.length; i++) {
       if (BZ_WX[pillars[i][0]] === wx) cnt++;
@@ -4357,331 +4314,173 @@ function renderChildrenV2(r, birthYear, liuYueDays) {
     return cnt;
   }
   
-  function isYuanJuShuiWang() {
-    // 原局水旺判断
-    return countWuXing('水') >= 3;
-  }
-  
-  function isXiongShenWang() {
-    // 凶神旺判断
-    var cnt = 0;
-    for (var i = 0; i < xiongShen.length; i++) {
-      cnt += r.tenGods[xiongShen[i]] || 0;
+  function getShiShenGan(dg, ss) {
+    for (var i = 0; i < BZ_GAN.length; i++) {
+      if (bzShiShen(dg, BZ_GAN[i]) === ss) return BZ_GAN[i];
     }
-    return cnt >= 2;
+    return '';
   }
   
-  // ========== 模块1：子女星本身评估（25分） ==========
-  var m1Score = 0;
-  var m1Reasons = [];
+  var sonGan = getShiShenGan(dayGan, sonStar);
+  var daughterGan = getShiShenGan(dayGan, daughterStar);
   
-  // 1.1 子女星透干且有根
-  var sonInGan = (pillars[0][0] === sonGan || pillars[1][0] === sonGan || 
-                  pillars[2][0] === sonGan || pillars[3][0] === sonGan);
-  var daughterInGan = (pillars[0][0] === daughterGan || pillars[1][0] === daughterGan || 
-                       pillars[2][0] === daughterGan || pillars[3][0] === daughterGan);
-  var sonHasGen = hasGen(sonGan);
-  var daughterHasGen = hasGen(daughterGan);
-  
-  if ((sonInGan && sonHasGen) || (daughterInGan && daughterHasGen)) {
-    m1Score += 8;
-    m1Reasons.push('子女星透干得地+8');
-  } else if (sonHasGen || daughterHasGen) {
-    m1Score += 4;
-    m1Reasons.push('子女星藏支有根+4');
+  // 模块1
+  var m1Score = 0, m1Reasons = [];
+  var sonInGan = false, daughterInGan = false;
+  for (var i = 0; i < pillars.length; i++) {
+    if (pillars[i][0] === sonGan) sonInGan = true;
+    if (pillars[i][0] === daughterGan) daughterInGan = true;
   }
+  var sonHasGen = hasGen(sonGan), daughterHasGen = hasGen(daughterGan);
   
-  // 1.2 子女星无根无气
-  if (!sonHasGen && !daughterHasGen) {
-    m1Score -= 12;
-    m1Reasons.push('子女星无根无气-12');
-  }
+  if ((sonInGan && sonHasGen) || (daughterInGan && daughterHasGen)) { m1Score += 8; m1Reasons.push('透干得地+8'); }
+  else if (sonHasGen || daughterHasGen) { m1Score += 4; m1Reasons.push('藏支有根+4'); }
   
-  // 1.3 人元司令（需要传入 liuYueDays）
+  if (!sonHasGen && !daughterHasGen) { m1Score -= 12; m1Reasons.push('无根无气-12'); }
+  
   if (liuYueDays && pillars[1]) {
-    var yueZhi = pillars[1][1];
-    var siLing = getRenYuanSiLing(yueZhi, liuYueDays);
-    if (siLing === sonStar || siLing === daughterStar) {
-      m1Score += 7;
-      m1Reasons.push('子女星得月令司令+7');
-    }
+    var siLing = getRenYuanSiLing(pillars[1][1], liuYueDays);
+    if (siLing === sonStar || siLing === daughterStar) { m1Score += 7; m1Reasons.push('得月令司令+7'); }
   }
   
-  // 1.4 凶神克子女星
   for (var i = 0; i < xiongShen.length; i++) {
-    var xsCnt = r.tenGods[xiongShen[i]] || 0;
-    if (xsCnt >= 2) {
-      m1Score -= 10;
-      m1Reasons.push(xiongShen[i] + '克子女星-10');
-      break;
-    } else if (xsCnt === 1) {
-      m1Score -= 4;
-      m1Reasons.push(xiongShen[i] + '轻微克子女星-4');
-    }
+    var cnt = r.tenGods[xiongShen[i]] || 0;
+    if (cnt >= 2) { m1Score -= 10; m1Reasons.push(xiongShen[i] + '克-10'); break; }
+    else if (cnt === 1) { m1Score -= 4; m1Reasons.push(xiongShen[i] + '轻微克-4'); }
   }
   
-  // 1.5 财星生助子女星
-  var caiXing = isFemale ? '正财' : '偏财'; // 男命财生官杀，女命财生...不同
-  // 简化：看是否有财星
-  var hasCai = (r.tenGods['正财'] || 0) + (r.tenGods['偏财'] || 0) > 0;
-  if (hasCai) {
-    m1Score += 5;
-    m1Reasons.push('财星生助+5');
-  }
-  
+  var hasCai = ((r.tenGods['正财'] || 0) + (r.tenGods['偏财'] || 0)) > 0;
+  if (hasCai) { m1Score += 5; m1Reasons.push('财星生助+5'); }
   m1Score = Math.max(0, Math.min(25, m1Score));
   
-  // ========== 模块2：子女宫评估（25分） ==========
-  var m2Score = 0;
-  var m2Reasons = [];
-  
-  // 2.1 合拱子女宫
-  var heJu = [];
-  var sanHe = {
-    '亥卯未': '木', '寅午戌': '火', '巳酉丑': '金', '申子辰': '水',
-    '寅卯辰': '木', '巳午未': '火', '申酉戌': '金', '亥子丑': '水'
-  };
-  
-  // 检查大运、流年与子女宫的合
+  // 模块2
+  var m2Score = 0, m2Reasons = [];
+  var liuHe = {'子': '丑', '丑': '子', '寅': '亥', '亥': '寅', '卯': '戌', '戌': '卯', 
+               '辰': '酉', '酉': '辰', '巳': '申', '申': '巳', '午': '未', '未': '午'};
   var checkZhi = [];
   if (currentDaYun) checkZhi.push(currentDaYun.ganZhi[1]);
   checkZhi.push(liuYearGZ[1]);
   
   for (var i = 0; i < checkZhi.length; i++) {
-    var z = checkZhi[i];
-    if (!z) continue;
-    // 六合
-    var liuHe = {'子': '丑', '丑': '子', '寅': '亥', '亥': '寅', '卯': '戌', '戌': '卯', 
-                 '辰': '酉', '酉': '辰', '巳': '申', '申': '巳', '午': '未', '未': '午'};
-    if (liuHe[z] === hourZhi) {
-      m2Score += 10;
-      m2Reasons.push('合拱子女宫+10');
-    }
+    if (liuHe[checkZhi[i]] === hourZhi) { m2Score += 10; m2Reasons.push('合拱子女宫+10'); }
   }
   
-  // 2.2 合化结果是凶神（简化检查）
-  // 检查三合
+  var sanHe = {'亥卯未': '木', '寅午戌': '火', '巳酉丑': '金', '申子辰': '水'};
   for (var key in sanHe) {
     if (key.indexOf(hourZhi) >= 0) {
-      var otherTwo = key.replace(hourZhi, '');
-      // 检查是否有其他两个地支
-      var hasOther = 0;
+      var others = key.replace(hourZhi, '').split('');
+      var hasOthers = 0;
       for (var i = 0; i < pillars.length; i++) {
-        if (otherTwo.indexOf(pillars[i][1]) >= 0) hasOther++;
+        if (others.indexOf(pillars[i][1]) >= 0) hasOthers++;
       }
-      if (hasOther >= 2) {
-        // 合化结果
+      if (hasOthers >= 2) {
         var resultWX = sanHe[key];
-        // 凶神五行
         var xiongWX = xiongShen.map(function(xs) {
           return xs === '食神' || xs === '伤官' ? BZ_X_SHENG[BZ_WX[dayGan]] : BZ_X_KE[BZ_WX[dayGan]];
         });
-        if (xiongWX.indexOf(resultWX) >= 0) {
-          m2Score -= 12;
-          m2Reasons.push('合化结果为凶神-12');
-        }
-        // 库被合锁
+        if (xiongWX.indexOf(resultWX) >= 0) { m2Score -= 12; m2Reasons.push('合化凶神-12'); }
         if (hourCang.indexOf(sonGan) >= 0 || hourCang.indexOf(daughterGan) >= 0) {
-          m2Score -= 8;
-          m2Reasons.push('子女星库被合锁-8');
+          m2Score -= 8; m2Reasons.push('库被合锁-8');
         }
       }
     }
   }
   
-  // 2.3 冲子女宫
   var chongMap = {'子': '午', '午': '子', '丑': '未', '未': '丑', '寅': '申', '申': '寅',
                   '卯': '酉', '酉': '卯', '辰': '戌', '戌': '辰', '巳': '亥', '亥': '巳'};
   for (var i = 0; i < checkZhi.length; i++) {
-    if (chongMap[checkZhi[i]] === hourZhi) {
-      m2Score -= 8;
-      m2Reasons.push('冲子女宫-8');
-    }
+    if (chongMap[checkZhi[i]] === hourZhi) { m2Score -= 8; m2Reasons.push('冲子女宫-8'); }
   }
   
-  // 2.4 刑子女宫（简化）
-  var xingMap = {'子': '卯', '卯': '子', '寅': '巳', '巳': '寅', '丑': '未', '未': '丑', 
-                 '丑': '戌', '戌': '丑', '寅': '申', '申': '寅'};
-  for (var i = 0; i < checkZhi.length; i++) {
-    if (xingMap[checkZhi[i]] === hourZhi) {
-      m2Score -= 5;
-      m2Reasons.push('刑子女宫-5');
-    }
-  }
-  
-  // 2.5 子女星入子女宫
   if (hourCang.indexOf(sonGan) >= 0 || hourCang.indexOf(daughterGan) >= 0) {
-    m2Score += 10;
-    m2Reasons.push('子女星入子女宫+10');
+    m2Score += 10; m2Reasons.push('星入子女宫+10');
   }
-  
   m2Score = Math.max(0, Math.min(25, m2Score));
   
-  // ========== 模块3：凶神处置（20分） ==========
-  var m3Score = 0;
-  var m3Reasons = [];
-  var route = ''; // 'A' 或 'B'
+  // 模块3
+  var m3Score = 0, m3Reasons = [], route = '';
+  var isXiongWang = ((r.tenGods[xiongShen[0]] || 0) + (r.tenGods[xiongShen[1]] || 0)) >= 2;
   
-  if (isXiongShenWang()) {
-    // 路线A：印制
-    var yinXing = ['正印', '偏印'];
+  if (isXiongWang) {
     var yinCnt = (r.tenGods['正印'] || 0) + (r.tenGods['偏印'] || 0);
     var yinHasGen = hasGen(getShiShenGan(dayGan, '正印')) || hasGen(getShiShenGan(dayGan, '偏印'));
     
-    if (yinCnt >= 2 && yinHasGen) {
-      m3Score = 20;
-      m3Reasons.push('印制凶神（路线A）+20');
-      route = 'A';
-    } else if (yinCnt >= 1) {
-      m3Score = 5;
-      m3Reasons.push('印星弱被反耗（路线A）+5');
-      route = 'A';
-    }
+    if (yinCnt >= 2 && yinHasGen) { m3Score = 20; m3Reasons.push('印制凶神+20'); route = 'A'; }
+    else if (yinCnt >= 1) { m3Score = 5; m3Reasons.push('印弱被反耗+5'); route = 'A'; }
     
-    // 路线B：财泄（如果A没走通）
     if (!route) {
-      var caiHasQiangGen = false;
-      var caiZhi = isFemale ? ['巳', '午'] : ['巳', '午']; // 火为财星（假设）
+      var shuiWang = countWuXing('水') >= 3;
+      var huoHasGen = false;
       for (var i = 0; i < pillars.length; i++) {
-        if (caiZhi.indexOf(pillars[i][1]) >= 0) caiHasQiangGen = true;
+        if (pillars[i][1] === '巳' || pillars[i][1] === '午') huoHasGen = true;
       }
       
-      if (isYuanJuShuiWang() && !caiHasQiangGen) {
-        m3Score = 3;
-        m3Reasons.push('湿木无焰，财泄无效（路线B）+3');
-        route = 'B-fail';
-      } else if (caiHasQiangGen) {
-        m3Score = 14;
-        m3Reasons.push('财星有强根泄凶神（路线B）+14');
-        route = 'B';
-        
-        // 火多土焦检查
-        var huoCnt = countWuXing('火');
-        if (huoCnt >= 4) {
-          m3Score -= 8;
-          m3Reasons.push('火多土焦-8');
-        }
+      if (shuiWang && !huoHasGen) { m3Score = 3; m3Reasons.push('湿木无焰+3'); route = 'B-fail'; }
+      else if (huoHasGen) {
+        m3Score = 14; m3Reasons.push('财泄有根+14'); route = 'B';
+        if (countWuXing('火') >= 4) { m3Score -= 8; m3Reasons.push('火多土焦-8'); }
       }
     }
-  } else {
-    m3Score = 10; // 凶神不旺，默认给分
-    m3Reasons.push('凶神不旺+10');
-  }
-  
+  } else { m3Score = 10; m3Reasons.push('凶神不旺+10'); }
   m3Score = Math.max(0, Math.min(20, m3Score));
   
-  // ========== 模块4：人元司令校验（15分） ==========
-  var m4Score = 0;
-  var m4Reasons = [];
-  
+  // 模块4
+  var m4Score = 0, m4Reasons = [];
   if (liuYueDays && pillars[1]) {
-    var yueZhi = pillars[1][1];
-    var siLing = getRenYuanSiLing(yueZhi, liuYueDays);
-    
-    // 4.1 司令 = 子女星
-    if (siLing === sonStar || siLing === daughterStar) {
-      m4Score = 15;
-      m4Reasons.push('司令为子女星+15');
-    }
-    // 4.2 司令 = 通关桥梁
+    var siLing = getRenYuanSiLing(pillars[1][1], liuYueDays);
+    if (siLing === sonStar || siLing === daughterStar) { m4Score = 15; m4Reasons.push('司令为子女星+15'); }
     else if ((route === 'A' && (siLing === '正印' || siLing === '偏印')) ||
              (route === 'B' && (siLing === '正财' || siLing === '偏财'))) {
-      m4Score = 7;
-      m4Reasons.push('司令为通关桥梁+7');
+      m4Score = 7; m4Reasons.push('司令为桥梁+7');
     }
-    
-    // 4.3 时序错配检查（简化）
-    // 如果需要印和子女星同时作用，但司令把它们分开了
-    if (route === 'A' && m4Score < 15) {
-      m4Score -= 6;
-      m4Reasons.push('时序错配-6');
-    }
+    if (route === 'A' && m4Score < 15) { m4Score -= 6; m4Reasons.push('时序错配-6'); }
   }
-  
   m4Score = Math.max(0, Math.min(15, m4Score));
   
-  // ========== 模块5：力量层级（10分） ==========
-  var m5Score = 0;
-  var m5Reasons = [];
-  var levelNote = '';
-  
-  // 检查做功来源
+  // 模块5
+  var m5Score = 0, m5Reasons = [], levelNote = '';
   var daYunGong = currentDaYun && (currentDaYun.ganZhi[0] === sonGan || currentDaYun.ganZhi[0] === daughterGan);
   var liuNianGong = liuYearGZ[0] === sonGan || liuYearGZ[0] === daughterGan;
   
-  if (daYunGong) {
-    m5Score = 10;
-    m5Reasons.push('大运层面做功+10');
-  } else if (liuNianGong) {
-    m5Score = 6;
-    m5Reasons.push('流年层面做功+6');
-  } else {
-    m5Score = 2;
-    m5Reasons.push('流日/时层面做功+2');
-    levelNote = '仅时辰短暂起效，原局大格局未破除，根基虚浮';
-  }
+  if (daYunGong) { m5Score = 10; m5Reasons.push('大运做功+10'); }
+  else if (liuNianGong) { m5Score = 6; m5Reasons.push('流年做功+6'); }
+  else { m5Score = 2; m5Reasons.push('流日/时做功+2'); levelNote = '仅时辰短暂起效，根基虚浮'; }
   
-  // ========== 模块6：调候附加（5分） ==========
-  var m6Score = 0;
-  var m6Reasons = [];
-  
-  var shuiCnt = countWuXing('水');
-  var huoCnt = countWuXing('火');
-  
-  // 寒湿局调候
-  if (shuiCnt >= 3 && huoCnt >= 2 && huoCnt <= 3) {
-    m6Score = 5;
-    m6Reasons.push('寒湿得调候+5');
-  } else if (shuiCnt >= 3 && huoCnt > 3) {
-    m6Score = -4;
-    m6Reasons.push('调候过旺反伤-4');
-  }
-  // 燥热局调候
-  else if (huoCnt >= 4 && shuiCnt >= 2 && shuiCnt <= 3) {
-    m6Score = 5;
-    m6Reasons.push('燥热得调候+5');
-  }
-  
+  // 模块6
+  var m6Score = 0, m6Reasons = [];
+  var shuiCnt = countWuXing('水'), huoCnt = countWuXing('火');
+  if (shuiCnt >= 3 && huoCnt >= 2 && huoCnt <= 3) { m6Score = 5; m6Reasons.push('寒湿得调候+5'); }
+  else if (shuiCnt >= 3 && huoCnt > 3) { m6Score = -4; m6Reasons.push('调候过旺-4'); }
+  else if (huoCnt >= 4 && shuiCnt >= 2 && shuiCnt <= 3) { m6Score = 5; m6Reasons.push('燥热得调候+5'); }
   m6Score = Math.max(-5, Math.min(5, m6Score));
   
-  // ========== 总分计算 ==========
-  var totalScore = m1Score + m2Score + m3Score + m4Score + m5Score + m6Score;
-  totalScore = Math.max(0, Math.min(100, totalScore));
+  var total = m1Score + m2Score + m3Score + m4Score + m5Score + m6Score;
+  total = Math.max(0, Math.min(100, total));
   
-  // 等级判断
-  var level = '';
-  if (totalScore >= 80) level = '理论最佳应期';
-  else if (totalScore >= 60) level = '优良候选应期';
-  else if (totalScore >= 30) level = '有机会，瑕疵多';
-  else level = '虚象，有象难落地';
+  var level = total >= 80 ? '理论最佳应期' : (total >= 60 ? '优良候选应期' : (total >= 30 ? '有机会，瑕疵多' : '虚象，有象难落地'));
   
-  // ========== 生成 HTML ==========
   var html = '<div style="font-size:12px;color:#4A7C59;font-weight:600;margin-bottom:8px">🔮 子女缘深度分析 V2（六模块评分）</div>';
-  
-  html += '<div style="font-size:11px;color:#666;margin:4px 0;"><b>子女星：</b>儿子星=' + sonStar + '(' + sonGan + ') · 女儿星=' + daughterStar + '(' + daughterGan + ')</div>';
-  html += '<div style="font-size:11px;color:#666;margin:4px 0;"><b>凶神：</b>' + xiongShen.join('、') + '</div>';
-  
-  // 各模块得分
-  html += '<div style="margin:8px 0;padding:8px;background:#fff;border-radius:6px;">';
-  html += '<div style="font-size:11px;color:#8B4513;margin-bottom:4px"><b>各模块得分</b></div>';
-  html += '<div style="font-size:10px;color:#666;line-height:1.6">';
-  html += '①子女星评估：' + m1Score + '/25 · ' + m1Reasons.join('、') + '<br/>';
-  html += '②子女宫评估：' + m2Score + '/25 · ' + m2Reasons.join('、') + '<br/>';
+  html += '<div style="font-size:11px;color:#666;margin:4px 0;"><b>子女星：</b>儿子=' + sonStar + '·女儿=' + daughterStar + '</div>';
+  html += '<div style="margin:8px 0;padding:8px;background:#fff;border-radius:6px;font-size:10px;color:#666;line-height:1.6">';
+  html += '①子女星：' + m1Score + '/25 · ' + m1Reasons.join('、') + '<br/>';
+  html += '②子女宫：' + m2Score + '/25 · ' + m2Reasons.join('、') + '<br/>';
   html += '③凶神处置：' + m3Score + '/20 · ' + m3Reasons.join('、') + '<br/>';
   html += '④人元司令：' + m4Score + '/15 · ' + m4Reasons.join('、') + '<br/>';
   html += '⑤力量层级：' + m5Score + '/10 · ' + m5Reasons.join('、') + '<br/>';
-  html += '⑥调候附加：' + (m6Score > 0 ? '+' : '') + m6Score + '/5 · ' + m6Reasons.join('、');
-  html += '</div></div>';
-  
-  // 总分
+  html += '⑥调候：' + (m6Score > 0 ? '+' : '') + m6Score + '/5 · ' + m6Reasons.join('、');
+  html += '</div>';
   html += '<div style="font-size:14px;color:#8B4513;font-weight:600;margin:8px 0;padding:8px;background:#FFE0B2;border-radius:6px;text-align:center">';
-  html += '综合评分：<span style="font-size:18px">' + totalScore + '</span>/100 · ' + level;
+  html += '评分：<span style="font-size:18px">' + total + '</span>/100 · ' + level;
   if (levelNote) html += '<br/><span style="font-size:10px;color:#c62828">' + levelNote + '</span>';
   html += '</div>';
   
   el.innerHTML = html;
   el.style.display = 'block';
 }
+
+
+
+
 
 function startBazi(){
 
@@ -6896,7 +6695,7 @@ function runBazi(isReload, rec){
 
   try{renderCaiTotal(r, birthYear)}catch(ex){err.textContent='综合财运错：'+ex.message;return}
 
-  try{renderChildren(r, birthYear)}catch(ex){console.log('children render:',ex)}
+  try{renderChildren(r,birthYear); renderChildrenV2(r,birthYear)}catch(ex){console.log('children render:',ex)}
 
   try{initTimeSwitch()}catch(ex){console.log('time switch init:',ex)}
 
