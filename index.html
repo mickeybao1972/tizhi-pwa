@@ -891,7 +891,7 @@ function rerenderCurrent(){
 
       ✍️ <span data-i18n="dev_designed">设计开发：</span><span class="ds-name">九燊工作室</span>
 
-      <span class="ds-ver">V3.0.7</span>
+      <span class="ds-ver">V3.0.8</span>
 
     </div>
 
@@ -961,7 +961,7 @@ function rerenderCurrent(){
 
   <div class="devsig" style="margin-top:auto;margin-bottom:0;max-width:480px">
 
-    <span class="ds-name">九燊工作室</span> 作品 · V3.0.7 · 2026.8.10 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
+    <span class="ds-name">九燊工作室</span> 作品 · V3.0.8 · 2026.8.10 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
 
   </div>
 
@@ -7543,7 +7543,7 @@ function renderSheHuiGuanXi(){
   // 六亲：分男女（与 bzLiuQin 保持一致）
   var LIUQIN={
     1:{比肩:'兄弟',劫财:'姐妹',食神:'孙子',伤官:'孙女',正财:'妻',偏财:'父亲',正官:'女儿',七杀:'儿子',正印:'母亲',偏印:'继母'},
-    0:{比肩:'姐妹',劫财:'兄弟',食神:'儿子',伤官:'女儿',正财:'父亲',偏财:'婆婆',正官:'丈夫',七杀:'情人',正印:'母亲',偏印:'继母'}
+    0:{比肩:'姐妹',劫财:'兄弟',食神:'女儿',伤官:'儿子',正财:'父亲',偏财:'婆婆',正官:'丈夫',七杀:'情人',正印:'母亲',偏印:'继母'}
   };
   var gKey=(typeof BZ_GENDER!=='undefined'&&BZ_GENDER===0)?0:1;
   // 初始化能量表
@@ -7604,7 +7604,7 @@ function renderSheHuiGuanXi(){
   ];
   var colors={help:'#43a047',harm:'#e53935',neutral:'#fb8c00',close:'#1e88e5'};
 
-  var cx=450, cy=450, R1=160, R2=300;
+  var cx=450, cy=450, R1=160, R2=340;
   var pos={};
   for(var i=0;i<rels.length;i++){
     var ang=i*36*Math.PI/180 - Math.PI/2;
@@ -7645,7 +7645,7 @@ function renderSheHuiGuanXi(){
     if(active){
       svg+='<line x1="'+p.ix+'" y1="'+p.iy+'" x2="'+p.ox+'" y2="'+p.oy+'" stroke="#fb8c00" stroke-width="2.5" opacity="0.9"/>';
     } else {
-      svg+='<line x1="'+p.ix+'" y1="'+p.iy+'" x2="'+p.ox+'" y2="'+p.oy+'" stroke="#bbb" stroke-width="1.2" stroke-dasharray="3,3" opacity="0.4"/>';
+      svg+='<line x1="'+p.ix+'" y1="'+p.iy+'" x2="'+p.ox+'" y2="'+p.oy+'" stroke="#bbb" stroke-width="2.5" stroke-dasharray="4,4" opacity="0.55"/>';
     }
   }
 
@@ -7686,11 +7686,11 @@ function renderSheHuiGuanXi(){
 
   // 中央日主
   var yuan=(typeof BZ_GENDER!=='undefined'&&BZ_GENDER===0)?'元女':'元男';
-  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="62" fill="#2e7d32" stroke="#1b5e20" stroke-width="3"/>';
-  svg+='<text x="'+cx+'" y="'+(cy-18)+'" text-anchor="middle" fill="#fff" font-size="34" font-weight="bold">'+dayMaster+'</text>';
-  svg+='<text x="'+cx+'" y="'+(cy+8)+'" text-anchor="middle" fill="#c8e6c9" font-size="14" font-weight="bold">'+yuan+'</text>';
-  svg+='<text x="'+cx+'" y="'+(cy+28)+'" text-anchor="middle" fill="#c8e6c9" font-size="11">日主</text>';
-  svg+='<text x="'+cx+'" y="'+(cy+46)+'" text-anchor="middle" fill="#c8e6c9" font-size="11">'+dayMasterEl+'</text>';
+  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="50" fill="#2e7d32" stroke="#1b5e20" stroke-width="3"/>';
+  svg+='<text x="'+cx+'" y="'+(cy-14)+'" text-anchor="middle" fill="#fff" font-size="34" font-weight="bold">'+dayMaster+'</text>';
+  svg+='<text x="'+cx+'" y="'+(cy+6)+'" text-anchor="middle" fill="#c8e6c9" font-size="14" font-weight="bold">'+yuan+'</text>';
+  // 日主标注已删除
+  svg+='<text x="'+cx+'" y="'+(cy+28)+'" text-anchor="middle" fill="#c8e6c9" font-size="11">'+dayMasterEl+'</text>';
 
   // 图例已移至图表下方(HTML 横排)
 
