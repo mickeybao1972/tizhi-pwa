@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- cache-bust: 2026-08-10 16:15 UTC+8 -->
+<!-- cache-bust: 2026-08-10 16:38 UTC+8 -->
 
 <html lang="zh-CN">
 
@@ -7822,7 +7822,7 @@ function renderBaziAnalysis(){
     html+='</div>';
     html+='<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">五、社会关系</h3>';
     var socT=[];
-    allTen.forEach(function(t){if(SOC_MAP[t])socT.push(b2(t)+'：'+SOC_MAP[t]);});
+    allTen.forEach(function(t){if(t&&SOC_MAP&&SOC_MAP[t])socT.push(b2(t)+'：'+SOC_MAP[t]);});
     html+=p('十神角色：'+(socT.length?socT.join('；'):'—')+'。');
     var chN=[];
     if(allTen.indexOf('伤官')>=0)chN.push('伤官透——表达力强、不喜束缚');
