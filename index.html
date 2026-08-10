@@ -891,7 +891,7 @@ function rerenderCurrent(){
 
       ✍️ <span data-i18n="dev_designed">设计开发：</span><span class="ds-name">九燊工作室</span>
 
-      <span class="ds-ver">V3.0.14</span>
+      <span class="ds-ver">V3.1.0</span>
 
     </div>
 
@@ -962,7 +962,7 @@ function rerenderCurrent(){
 
   <div class="devsig" style="margin-top:auto;margin-bottom:0;max-width:480px">
 
-    <span class="ds-name">九燊工作室</span> 作品 · V3.0.14 · 创建 2026.07.23 17:00 · 更新 2026.08.10 20:05 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
+    <span class="ds-name">九燊工作室</span> 作品 · V3.1.0 · 创建 2026.07.23 17:00 · 更新 2026.08.10 20:05 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
 
   </div>
 
@@ -3962,6 +3962,7 @@ function closeHistModal() {
         <h3 style="font-size:13px;color:#8B4513;margin:0 0 10px;border-left:3px solid #8B4513;padding-left:8px">👶 子女推算</h3>
 
         <div id="bz-children"></div>
+        <div id="bz-children-v2" style="margin-top:12px;padding:12px;background:#f8f9fa;border-radius:8px;border-left:3px solid #4A7C59;display:none"></div>
 
         <p style="font-size:10px;color:#888;text-align:center;margin-top:8px">子女星以大运、流年寻应期（15–50岁生育窗口），月份流日仅作参考，纯娱乐</p>
 
@@ -4215,7 +4216,7 @@ window.BZ_QI=['雨水','春分','谷雨','小满','夏至','大暑','处暑','�
 
 function bzYueLabel(i){if(!i)return '';var ii=Math.floor(i);if(ii<1||ii>12)return '';return window.BZ_JIE[ii-1]+'·'+window.BZ_QI[ii-1];}
 
-function renderChildren(r,birthYear){var monthZhi=r.pillars[1][1];var el=document.getElementById('bz-children');if(!el||!r||!birthYear)return;var dayGan=r.dayGan;var isFemale=(r.gender==='女');var stars=isFemale?{daughter:'伤官',son:'食神'}:{daughter:'正官',son:'七杀'};function gzOf(ss){return BZ_GAN.filter(function(g){return bzShiShen(dayGan,g)===ss;});}function zhiBenOf(ss){var a=[];BZ_ZHI.forEach(function(z){var h=BZ_CANG[z]||[];for(var _i=0;_i<h.length;_i++){if(bzShiShen(dayGan,h[_i])===ss)a.push(h[_i]);}});return a;}var dG=gzOf(stars.daughter),sG=gzOf(stars.son),dZ=zhiBenOf(stars.daughter),sZ=zhiBenOf(stars.son);var natal=false;var sunCnt=(r.tenGods['食神']||0);if((r.tenGods[stars.daughter]||0)>0||(r.tenGods[stars.son]||0)>0)natal=true;if(r.pillars){r.pillars.forEach(function(p){var h=BZ_CANG[p[1]]||[];h.forEach(function(c){var ss=bzShiShen(dayGan,c);if(ss===stars.daughter||ss===stars.son)natal=true;if(ss==='食神')sunCnt++;});});}function detectGeMing(){
+function renderChildren(r,birthYear); renderChildrenV2(r, birthYear){var monthZhi=r.pillars[1][1];var el=document.getElementById('bz-children');if(!el||!r||!birthYear)return;var dayGan=r.dayGan;var isFemale=(r.gender==='女');var stars=isFemale?{daughter:'伤官',son:'食神'}:{daughter:'正官',son:'七杀'};function gzOf(ss){return BZ_GAN.filter(function(g){return bzShiShen(dayGan,g)===ss;});}function zhiBenOf(ss){var a=[];BZ_ZHI.forEach(function(z){var h=BZ_CANG[z]||[];for(var _i=0;_i<h.length;_i++){if(bzShiShen(dayGan,h[_i])===ss)a.push(h[_i]);}});return a;}var dG=gzOf(stars.daughter),sG=gzOf(stars.son),dZ=zhiBenOf(stars.daughter),sZ=zhiBenOf(stars.son);var natal=false;var sunCnt=(r.tenGods['食神']||0);if((r.tenGods[stars.daughter]||0)>0||(r.tenGods[stars.son]||0)>0)natal=true;if(r.pillars){r.pillars.forEach(function(p){var h=BZ_CANG[p[1]]||[];h.forEach(function(c){var ss=bzShiShen(dayGan,c);if(ss===stars.daughter||ss===stars.son)natal=true;if(ss==='食神')sunCnt++;});});}function detectGeMing(){
 
   var tgS=0,zhS=0,tgY=0,zhY=0,tgF=0,zhF=0;
 
@@ -4239,6 +4240,175 @@ function renderChildren(r,birthYear){var monthZhi=r.pillars[1][1];var el=documen
 
 var geM=detectGeMing();var dauCnt=0,sonCnt=0;if(r.pillars){r.pillars.forEach(function(p){var gss=bzShiShen(dayGan,p[0]);if(gss===stars.daughter)dauCnt++;if(gss===stars.son)sonCnt++;var h=BZ_CANG[p[1]]||[];h.forEach(function(cc){var ss=bzShiShen(dayGan,cc);if(ss===stars.daughter)dauCnt++;if(ss===stars.son)sonCnt++;});});}var st=bzBodyStrength(r);var yong=bzYongShen(r,st);var cs={daughter:dG,son:sG,dZ:dZ,sZ:sZ};var dyHits=[];if(r.yun&&r.yun.daYun){r.yun.daYun.forEach(function(d){var gz=d.ganZhi;var g=gz[0],z=gz[1];var zb=(BZ_CANG[z]||[])[0]||'';var allZhi=(BZ_CANG[z]||[]);var ganHitD=dG.indexOf(g)>=0;var ganHitS=sG.indexOf(g)>=0;var zhiHitD=allZhi.some(function(h){return dZ.indexOf(h)>=0;});var zhiHitS=allZhi.some(function(h){return sZ.indexOf(h)>=0;});var isD=ganHitD||(zhiHitD&&!ganHitS);var isS=ganHitS||(zhiHitS&&!ganHitD);if(isD||isS)dyHits.push({gz:gz,sy:d.startYear,ey:d.startYear+9,age:d.startAge,type:isD?'daughter':'son'});});}var arr=[];var a0=isFemale?22:25,a1=isFemale?40:45;for(var age=a0;age<=a1;age++){var yy=birthYear+age;var gz=bzYearGZ(yy);var c=classifyYear(gz,r,st,yong,cs);if(!c)continue;if(c.cat==='弱')continue;var ganHitD=dG.indexOf(gz[0])>=0;var ganHitS=sG.indexOf(gz[0])>=0;var allZhi2=(BZ_CANG[gz[1]]||[]);var zhiHitD=allZhi2.some(function(h){return dZ.indexOf(h)>=0;});var zhiHitS=allZhi2.some(function(h){return sZ.indexOf(h)>=0;});var isD=ganHitD||(zhiHitD&&!ganHitS);var isS=ganHitS||(zhiHitS&&!ganHitD);var type=isD?'daughter':'son';var gmMod=0;if(isFemale){if(geM.shang&&type==='son')gmMod=12;else if(geM.yin&&type==='daughter')gmMod=-15;else if(geM.shi&&type==='daughter')gmMod=10;}else{if(geM.shang&&type==='daughter')gmMod=12;else if(geM.yin&&type==='son')gmMod=-10;else if(geM.shi&&type==='son')gmMod=10;}var gb=(type==='son'?(sonCnt-1)*5:(dauCnt-1)*5)+(sonCnt>0&&dauCnt>0?3:0);var pb=Math.max(8,Math.min(97,c.prob+gb+gmMod));arr.push({year:yy,age:age,gz:gz,type:type,cat:c.cat,nianRel:c.nianRel,ganRel:c.ganRel,prob:pb,gBias:gb,geom:gmMod});}var html='';html+='<div style="font-size:12px;color:#666;margin-bottom:8px">'+(isFemale?'女命':'男命')+'：日主强弱=<b>'+st.level+'</b>（喜用神：'+yong.xi.join('、')+'）｜女儿星=<b>'+stars.daughter+'</b>，儿子星=<b>'+stars.son+'</b><br>原局子女星：'+(natal?'<b style="color:#2e7d32">有</b>，此生必有子女':'<span style="color:#c62828">弱/无</span>，须借大运流年引动')+(sunCnt>0?'（食神'+sunCnt+'个为孙星，易有孙辈）':'')+'</div>';if(dyHits.length>0){var dyShow=dyHits.filter(function(h){return h.age+9>=a0&&h.age<=a1;});if(dyShow.length>0){html+='<div style="font-size:12px;color:#8B4513;font-weight:600;margin:8px 0 4px">大运应期（'+a0+'–'+a1+'岁窗口）</div>';dyShow.forEach(function(h){var dz=h.gz[1];var oz=[r.pillars[0][1],r.pillars[1][1],r.pillars[2][1],r.pillars[3][1]];var dr=diRelation(dz,oz);var tag=dr>0?'<span style="color:#2e7d32">（地支和合·利）</span>':(dr<0?'<span style="color:#c62828">（地支刑冲·慎）</span>':'');html+='<div style="font-size:11px;color:#666;padding:3px 0;border-bottom:1px solid #f0f0f0">'+h.gz+'大运（'+h.sy+'–'+h.ey+'年，'+h.age+'岁起）：易生'+(h.type==='daughter'?'女儿':'儿子')+tag+'</div>';});}}function renderYearList(arr,title,col,bg,bd){if(!arr.length)return'';var s='<div style="font-size:12px;color:#8B4513;font-weight:600;margin:8px 0 4px">'+title+'</div>';s+='<div style="display:flex;flex-wrap:wrap;gap:4px">';arr.forEach(function(h){var lab=h.type==='daughter'?'女':'子';s+='<div style="background:'+bg+';border:1px solid '+bd+';border-radius:6px;padding:3px 6px;font-size:10px;color:'+col+';text-align:center">'+h.year+'<br>'+h.age+'岁·'+h.gz+'·'+lab+'</div>';});s+='</div>';return s;}if(arr.length>0){html+=renderProbRank(arr,a0,a1,sonCnt>0&&dauCnt>0);}else{html+='<div style="font-size:11px;color:#888;margin-top:8px">'+a0+'–'+a1+'岁窗口内无明确子女星应期（可结合大运或放宽年龄）</div>';}el.innerHTML=html;}
 
+
+
+
+function renderChildrenV2(r, birthYear) {
+  var el = document.getElementById('bz-children-v2');
+  if (!el || !r || !birthYear) return;
+  
+  var dayGan = r.dayGan;
+  var isFemale = (r.gender === '女');
+  var pillars = r.pillars || [];
+  
+  // 子女星定义（与原算法一致）
+  var stars = isFemale 
+    ? { daughter: '伤官', son: '食神' }
+    : { daughter: '正官', son: '七杀' };
+  
+  // 时柱 = 子女宫
+  var hourPillar = pillars[3] || ['', ''];
+  var hourGan = hourPillar[0];
+  var hourZhi = hourPillar[1];
+  var hourCang = (BZ_CANG[hourZhi] || []);
+  
+  // 时柱十神
+  var hourShen = bzShiShen(dayGan, hourGan);
+  
+  // 分析时柱藏干中子女星
+  var childInHour = { daughter: false, son: false, count: 0 };
+  hourCang.forEach(function(c) {
+    var ss = bzShiShen(dayGan, c);
+    if (ss === stars.daughter) { childInHour.daughter = true; childInHour.count++; }
+    if (ss === stars.son) { childInHour.son = true; childInHour.count++; }
+  });
+  
+  // 十二长生状态（简化版）
+  var changShengMap = {
+    '甲': { '亥': '长生', '子': '沐浴', '丑': '冠带', '寅': '临官', '卯': '帝旺' },
+    '乙': { '午': '长生', '巳': '沐浴', '辰': '冠带', '卯': '临官', '寅': '帝旺' },
+    '丙': { '寅': '长生', '卯': '沐浴', '辰': '冠带', '巳': '临官', '午': '帝旺' },
+    '丁': { '酉': '长生', '申': '沐浴', '未': '冠带', '午': '临官', '巳': '帝旺' },
+    '戊': { '寅': '长生', '卯': '沐浴', '辰': '冠带', '巳': '临官', '午': '帝旺' },
+    '己': { '酉': '长生', '申': '沐浴', '未': '冠带', '午': '临官', '巳': '帝旺' },
+    '庚': { '巳': '长生', '午': '沐浴', '未': '冠带', '申': '临官', '酉': '帝旺' },
+    '辛': { '子': '长生', '亥': '沐浴', '戌': '冠带', '酉': '临官', '申': '帝旺' },
+    '壬': { '申': '长生', '酉': '沐浴', '戌': '冠带', '亥': '临官', '子': '帝旺' },
+    '癸': { '卯': '长生', '寅': '沐浴', '丑': '冠带', '子': '临官', '亥': '帝旺' }
+  };
+  
+  // 子女星在时支的长生状态
+  var childGan = childInHour.daughter ? stars.daughter : (childInHour.son ? stars.son : null);
+  var changSheng = '';
+  if (childGan) {
+    var childGanChar = isFemale 
+      ? (childInHour.daughter ? '伤官' : '食神')
+      : (childInHour.daughter ? '正官' : '七杀');
+    // 简化：看日主在时支的长生状态作为参考
+    var csMap = changShengMap[dayGan] || {};
+    changSheng = csMap[hourZhi] || '平';
+  }
+  
+  // 空亡检查（简化：时柱地支在空亡表中）
+  var xunKong = BZ_XU_KONG[r.pillars[0]] || []; // 用年柱查旬空
+  var isKong = xunKong.indexOf(hourZhi) >= 0;
+  
+  // 神煞检查（简化版）
+  var shenSha = [];
+  // 天乙贵人
+  var tianYiGuiRen = {
+    '甲': ['丑', '未'], '戊': ['丑', '未'], '庚': ['丑', '未'],
+    '乙': ['子', '申'], '己': ['子', '申'],
+    '丙': ['亥', '酉'], '丁': ['亥', '酉'],
+    '壬': ['卯', '巳'], '癸': ['卯', '巳'],
+    '辛': ['寅', '午']
+  };
+  if ((tianYiGuiRen[dayGan] || []).indexOf(hourZhi) >= 0) shenSha.push('天乙贵人');
+  
+  // 桃花
+  var taoHua = { '申': '酉', '子': '酉', '辰': '酉', '寅': '卯', '午': '卯', '戌': '卯', '巳': '午', '酉': '午', '丑': '午', '亥': '子', '卯': '子', '未': '子' };
+  if (taoHua[r.pillars[0][1]] === hourZhi) shenSha.push('桃花');
+  
+  // 华盖
+  var huaGai = { '申': '辰', '子': '辰', '辰': '辰', '寅': '戌', '午': '戌', '戌': '戌', '巳': '丑', '酉': '丑', '丑': '丑', '亥': '未', '卯': '未', '未': '未' };
+  if (huaGai[r.pillars[0][1]] === hourZhi) shenSha.push('华盖');
+  
+  // 五行流通分析
+  var dayWX = BZ_WX[dayGan];
+  var childWX = isFemale ? dayWX : BZ_X_KE[dayWX]; // 女命食伤为子女，同我/我生；男命官杀为子女，克我
+  if (isFemale) childWX = BZ_X_SHENG[dayWX]; // 我生者为食伤
+  
+  var flowPath = [];
+  var current = dayWX;
+  var target = childWX;
+  var steps = 0;
+  var maxSteps = 5;
+  while (current !== target && steps < maxSteps) {
+    var next = BZ_X_SHENG[current];
+    if (!next) break;
+    flowPath.push(current + '→' + next);
+    current = next;
+    steps++;
+  }
+  var flowOK = (current === target);
+  
+  // 冲合检查（简化）
+  var chongHe = [];
+  var chongMap = { '子': '午', '午': '子', '丑': '未', '未': '丑', '寅': '申', '申': '寅', '卯': '酉', '酉': '卯', '辰': '戌', '戌': '辰', '巳': '亥', '亥': '巳' };
+  pillars.forEach(function(p, idx) {
+    if (idx === 3) return; // 跳过自己
+    if (chongMap[hourZhi] === p[1]) chongHe.push('时支冲' + ['年', '月', '日'][idx] + '支');
+  });
+  
+  // 生成 HTML
+  var html = '<div style="font-size:12px;color:#4A7C59;font-weight:600;margin-bottom:8px">🔮 子女缘深度分析（新算法）</div>';
+  
+  // 时柱子女宫
+  html += '<div style="font-size:11px;color:#666;margin:6px 0;">';
+  html += '<b>时柱子女宫：</b>时干' + hourGan + '（' + hourShen + '）· 时支' + hourZhi;
+  html += '<br/>藏干：' + (hourCang.join('、') || '无') + ' · 子女星：';
+  if (childInHour.daughter && childInHour.son) html += '伤官+食神（儿女双全）';
+  else if (childInHour.daughter) html += '伤官（女儿星）';
+  else if (childInHour.son) html += '食神（儿子星）';
+  else html += '<span style="color:#999">无显透</span>';
+  html += ' · 空亡：' + (isKong ? '<span style="color:#c62828">是</span>' : '<span style="color:#2e7d32">否</span>');
+  html += '</div>';
+  
+  // 十二长生
+  if (changSheng) {
+    var csDesc = { '长生': '生发有力', '沐浴': '生机初萌', '冠带': '成长茁壮', '临官': '成熟当令', '帝旺': '极盛之态', '衰': '渐趋衰退', '病': '生机受制', '死': '生机断绝', '墓': '收藏归库', '绝': '绝处逢生', '胎': '酝酿待发', '养': '培育成长', '平': '平稳无奇' };
+    html += '<div style="font-size:11px;color:#666;margin:6px 0;">';
+    html += '<b>十二长生：</b>日主在时支处「<b>' + changSheng + '</b>」之地 → ' + (csDesc[changSheng] || '');
+    html += '</div>';
+  }
+  
+  // 神煞
+  html += '<div style="font-size:11px;color:#666;margin:6px 0;">';
+  html += '<b>子女宫神煞：</b>' + (shenSha.length ? shenSha.join('、') : '<span style="color:#999">无特殊神煞</span>');
+  html += '</div>';
+  
+  // 五行流通
+  html += '<div style="font-size:11px;color:#666;margin:6px 0;">';
+  html += '<b>五行流通：</b>日主' + dayWX;
+  if (flowPath.length) html += ' → ' + flowPath.join(' → ');
+  html += ' → 子女星' + childWX + ' · ';
+  html += flowOK ? '<span style="color:#2e7d32">流通通畅</span>' : '<span style="color:#c62828">流通受阻</span>';
+  html += '</div>';
+  
+  // 冲合
+  html += '<div style="font-size:11px;color:#666;margin:6px 0;">';
+  html += '<b>冲合刑害：</b>' + (chongHe.length ? chongHe.join('、') : '<span style="color:#999">时柱无冲</span>');
+  html += '</div>';
+  
+  // 综合判断
+  var score = 0;
+  if (childInHour.count > 0) score += 30;
+  if (!isKong) score += 20;
+  if (['长生', '临官', '帝旺', '冠带'].indexOf(changSheng) >= 0) score += 20;
+  if (flowOK) score += 15;
+  if (chongHe.length === 0) score += 15;
+  
+  var result = score >= 80 ? '子女缘深厚' : (score >= 60 ? '子女缘中等' : '子女缘较浅');
+  var advice = score >= 80 ? '顺其自然，易得子女' : (score >= 60 ? '调理身心，静待佳音' : '宜早规划，多方调理');
+  
+  html += '<div style="font-size:11px;color:#8B4513;margin-top:8px;padding-top:8px;border-top:1px dashed #ddd;">';
+  html += '<b>综合评分：' + score + '/100 · ' + result + '</b><br/>';
+  html += '💡 建议：' + advice;
+  html += '</div>';
+  
+  el.innerHTML = html;
+  el.style.display = 'block';
+}
 
 
 function startBazi(){
