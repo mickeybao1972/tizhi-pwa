@@ -891,7 +891,7 @@ function rerenderCurrent(){
 
       ✍️ <span data-i18n="dev_designed">设计开发：</span><span class="ds-name">九燊工作室</span>
 
-      <span class="ds-ver">V3.1.3</span>
+      <span class="ds-ver">V3.1.4</span>
 
     </div>
 
@@ -962,7 +962,7 @@ function rerenderCurrent(){
 
   <div class="devsig" style="margin-top:auto;margin-bottom:0;max-width:480px">
 
-    <span class="ds-name">九燊工作室</span> 作品 · V3.1.3 · 创建 2026.07.23 17:00 · 更新 2026.08.10 20:05 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
+    <span class="ds-name">九燊工作室</span> 作品 · V3.1.4 · 创建 2026.07.23 17:00 · 更新 2026.08.10 20:05 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
 
   </div>
 
@@ -4300,8 +4300,10 @@ function renderChildrenV2(r, birthYear) {
   
   for (var year = startYear; year <= endYear; year++) {
     var age = year - birthYear;
-    var gz = bzYearGanZhi(year);
-    var yGan = gz[0], yZhi = gz[1];
+    var tGan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+      var tZhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+      var yGan = tGan[(year - 4) % 10];
+      var yZhi = tZhi[(year - 4) % 12];
     
     var score = 50;
     var reasons = [];
