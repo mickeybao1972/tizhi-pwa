@@ -891,7 +891,7 @@ function rerenderCurrent(){
 
       ✍️ <span data-i18n="dev_designed">设计开发：</span><span class="ds-name">九燊工作室</span>
 
-      <span class="ds-ver">V3.1.4</span>
+      <span class="ds-ver">V3.1.5</span>
 
     </div>
 
@@ -905,7 +905,7 @@ function rerenderCurrent(){
 
       <span>📅 创建 2026.07.23 17:00</span>
 
-      <span>🛠️ 更新 2026.08.10 20:05</span>
+      <span>🛠️ 更新 2026.08.11 11:30</span>
       <span data-i18n="dev_meta">🌿 中医体质评估</span>
 
     </div>
@@ -962,7 +962,7 @@ function rerenderCurrent(){
 
   <div class="devsig" style="margin-top:auto;margin-bottom:0;max-width:480px">
 
-    <span class="ds-name">九燊工作室</span> 作品 · V3.1.4 · 创建 2026.07.23 17:00 · 更新 2026.08.10 20:05 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
+    <span class="ds-name">九燊工作室</span> 作品 · V3.1.5 · 创建 2026.07.23 17:00 · 更新 2026.08.10 20:05 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
 
   </div>
 
@@ -7748,16 +7748,16 @@ function renderSheHuiGuanXi(){
   // TEN2ZANG 在 keys 声明后填充(避免 keys 提升为 undefined)
 
   var rels=[
-    {id:'比肩', ten:'比肩', soc:'同事/合伙人/同辈', zang:'大肠', liu:'兄弟', color:'#7e57c2'},
-    {id:'劫财', ten:'劫财', soc:'竞争对手/朋友分财', zang:'肺', liu:'兄弟', color:'#5e35b1'},
-    {id:'食神', ten:'食神', soc:'晚辈/艺人/学生', zang:'胃', liu:'子孙', color:'#26a69a'},
-    {id:'伤官', ten:'伤官', soc:'创意人/表达者/技术', zang:'大肠', liu:'子孙', color:'#00897b'},
-    {id:'偏财', ten:'偏财', soc:'客户/商人/父亲', zang:'胃', liu:'父亲', color:'#fb8c00'},
-    {id:'正财', ten:'正财', soc:'妻子/稳定收入', zang:'大肠', liu:'妻子', color:'#f57c00'},
-    {id:'七杀', ten:'七杀', soc:'上司/对手/压力源', zang:'肝', liu:'儿子', color:'#e53935'},
-    {id:'正官', ten:'正官', soc:'上级/体制/正当约束', zang:'心', liu:'女儿', color:'#c62828'},
-    {id:'偏印', ten:'偏印', soc:'贵人/学术/偏门', zang:'脾', liu:'母亲', color:'#3949ab'},
-    {id:'正印', ten:'正印', soc:'母亲/庇护/贵人', zang:'心', liu:'母亲', color:'#1e88e5'}
+    {id:'比肩', ten:'比肩', soc:'同事/合伙人/同辈', zang:'大肠', liu:'兄弟', color:'#4CAF50'},
+    {id:'劫财', ten:'劫财', soc:'竞争对手/朋友分财', zang:'肺', liu:'兄弟', color:'#66BB6A'},
+    {id:'食神', ten:'食神', soc:'晚辈/艺人/学生', zang:'胃', liu:'子孙', color:'#FF5722'},
+    {id:'伤官', ten:'伤官', soc:'创意人/表达者/技术', zang:'大肠', liu:'子孙', color:'#F44336'},
+    {id:'偏财', ten:'偏财', soc:'客户/商人/父亲', zang:'胃', liu:'父亲', color:'#FFC107'},
+    {id:'正财', ten:'正财', soc:'妻子/稳定收入', zang:'大肠', liu:'妻子', color:'#FF9800'},
+    {id:'七杀', ten:'七杀', soc:'上司/对手/压力源', zang:'肝', liu:'儿子', color:'#FFFFFF'},
+    {id:'正官', ten:'正官', soc:'上级/体制/正当约束', zang:'心', liu:'女儿', color:'#E0E0E0'},
+    {id:'偏印', ten:'偏印', soc:'贵人/学术/偏门', zang:'脾', liu:'母亲', color:'#2196F3'},
+    {id:'正印', ten:'正印', soc:'母亲/庇护/贵人', zang:'心', liu:'母亲', color:'#03A9F4'}
   ];
   var keys=['比肩','劫财','食神','伤官','偏财','正财','七杀','正官','偏印','正印'];
   var TEN2ZANG={}; keys.forEach(function(k){ TEN2ZANG[k]=ZANG_GAN[_tenToGan(k, dayMaster)]||''; });
@@ -7825,7 +7825,7 @@ function renderSheHuiGuanXi(){
   ];
   var colors={help:'#43a047',harm:'#e53935',neutral:'#fb8c00',close:'#1e88e5'};
 
-  var cx=450, cy=450, R1=160, R2=250;
+  var cx=585, cy=585, R1=208, R2=325;
   var pos={};
   for(var i=0;i<rels.length;i++){
     var ang=i*36*Math.PI/180 - Math.PI/2;
@@ -7836,7 +7836,7 @@ function renderSheHuiGuanXi(){
       tIn:inner[rels[i].id]/maxIn, tOut:outer[rels[i].id]/maxOut};
   }
 
-  var svg='<svg viewBox="0 0 900 900" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:880px;height:auto;background:#fff;border-radius:8px;display:block;margin:0 auto">';
+  var svg='<svg viewBox="0 0 1170 1170" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:1144px;height:auto;background:#fff;border-radius:8px;display:block;margin:0 auto">';
 
   // 内外圈底色环（淡）
   svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R2+'" fill="none" stroke="#f0f0f0" stroke-width="1"/>';
@@ -7873,7 +7873,7 @@ function renderSheHuiGuanXi(){
   // 内圈节点
   for(var id3 in pos){
     var p=pos[id3];
-    var fIn=Math.max(8.5,Math.min(22,p.ir*0.7));
+    var fIn=Math.max(11,Math.min(29,p.ir*0.7));
     svg+='<circle cx="'+p.ix+'" cy="'+p.iy+'" r="'+p.ir+'" fill="'+p.color+'" stroke="#fff" stroke-width="3"/>';
     svg+='<text x="'+p.ix+'" y="'+p.iy+'" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="'+fIn+'" font-weight="bold">'+p.ten+'</text>';
   }
@@ -7882,7 +7882,7 @@ function renderSheHuiGuanXi(){
     var p=pos[id4];
     svg+='<circle cx="'+p.ox+'" cy="'+p.oy+'" r="'+p.or+'" fill="'+p.color+'" stroke="#fff" stroke-width="3"/>';
   }
-  // 外圈标签：粗体十神名写在节点圆内;三行小字(六亲/脏腑/社会)改为"竖直堆叠"——上半圈往上排、下半圈往下排、左右两节点靠dy判定,行距18px,字与字之间留6px空隙,绝不重叠
+  // 外圈标签：粗体十神名写在节点圆内;三行小字(六亲/脏腑/社会)改为"竖直堆叠"——上半圈往上排、下半圈往下排、左右两节点靠dy判定,行距23px,字与字之间留6px空隙,绝不重叠
   for(var id5 in pos){
     var p=pos[id5];
     var r=Math.max(12, Math.min(26, p.or));           // 节点圆半径 12–26
@@ -7891,13 +7891,13 @@ function renderSheHuiGuanXi(){
     var dx=Math.cos(p.ang), dy=Math.sin(p.ang);
     // 圆内:粗体十神名居中
     svg+='<text x="'+p.ox+'" y="'+(p.oy+fsIn*0.35)+'" text-anchor="middle" fill="#fff" font-size="'+fsIn+'" font-weight="bold" style="paint-order:stroke;stroke:rgba(0,0,0,.3);stroke-width:.8px">'+p.ten+'</text>';
-    // 圆外:三行小字统一以节点圆心 x 为基线,根据上下半圈竖直堆叠(行距18px),不再沿径向挤
+    // 圆外:三行小字统一以节点圆心 x 为基线,根据上下半圈竖直堆叠(行距23px),不再沿径向挤
     var liu=LIUQIN[gKey][p.ten]||'';
     var zang=TEN2ZANG[p.ten]||'';
     var soc=p.soc||'';
     var txt=[[liu,'#0277bd'],[zang,'#2e7d32'],[soc,'#e65100']];
     var top=(dy<-0.3);                                // 上半圈往节点上方堆,下半圈往下方堆
-    var gap=18;                                       // 行距 18px(字号12 → 6px 净空,清晰)
+    var gap=23;                                       // 行距 23px(字号12 → 6px 净空,清晰)
     var startY=top ? (p.oy-r-gap) : (p.oy+r+gap);
     for(var ln=0;ln<txt.length;ln++){
       var y=startY + (top?-1:1)*ln*gap;
@@ -7907,11 +7907,11 @@ function renderSheHuiGuanXi(){
 
   // 中央日主
   var yuan=(typeof BZ_GENDER!=='undefined'&&BZ_GENDER===0)?'元女':'元男';
-  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="50" fill="#2e7d32" stroke="#1b5e20" stroke-width="3"/>';
-  svg+='<text x="'+cx+'" y="'+(cy-14)+'" text-anchor="middle" fill="#fff" font-size="34" font-weight="bold">'+dayMaster+'</text>';
-  svg+='<text x="'+cx+'" y="'+(cy+6)+'" text-anchor="middle" fill="#c8e6c9" font-size="14" font-weight="bold">'+yuan+'</text>';
+  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="65" fill="#2e7d32" stroke="#1b5e20" stroke-width="3"/>';
+  svg+='<text x="'+cx+'" y="'+(cy-14)+'" text-anchor="middle" fill="#fff" font-size="44" font-weight="bold">'+dayMaster+'</text>';
+  svg+='<text x="'+cx+'" y="'+(cy+6)+'" text-anchor="middle" fill="#c8e6c9" font-size="23" font-weight="bold">'+yuan+'</text>';
   // 日主标注已删除
-  svg+='<text x="'+cx+'" y="'+(cy+28)+'" text-anchor="middle" fill="#c8e6c9" font-size="11">'+dayMasterEl+'</text>';
+  svg+='<text x="'+cx+'" y="'+(cy+28)+'" text-anchor="middle" fill="#c8e6c9" font-size="14">'+dayMasterEl+'</text>';
 
   // 图例已移至图表下方(HTML 横排)
 
@@ -7921,7 +7921,7 @@ function renderSheHuiGuanXi(){
 
   var LEGEND_HTML='<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:11.5px;color:#555;padding:2px 4px;margin-top:2px"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:22px;height:3px;background:#555;display:inline-block"></span>日主→内圈(本命骨架)</span><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:22px;height:3px;background:#1e88e5;display:inline-block"></span>十神合化(亲密同类)</span><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:22px;height:3px;background:#fb8c00;display:inline-block"></span>内→外橙线=当前被激发</span><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:22px;height:0;border-top:2px dashed #bbb;display:inline-block"></span>内→外灰虚=沉寂</span><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:12px;height:0;border-top:2px solid #43a047;display:inline-block"></span><span style="width:12px;height:0;border-top:2px solid #e53935;display:inline-block"></span><span style="width:12px;height:0;border-top:2px solid #fb8c00;display:inline-block"></span>内圈关系:相生/相克/中性</span></div>';
   var html='<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">';
-  html+='<h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">🌐 社会关系总览 — 十神能量(本命内圈 × 后天外圈)</h3>';
+  html+='<h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">🌐 十神能量及象意 — 本命内圈 × 后天外圈</h3>';
   html+='<p style="color:#666;margin:0 0 12px 0;font-size:12px">内圈=你天生的十神能量(本命四柱)；外圈=所选大运/流年/流月/流日激发的能量(未选时取今日)。节点越大该十神越强。外圈标签含：十神名·六亲(分男女)·脏腑·社会身份。日主到内圈灰线是本性骨架，内外橙线表示此刻正被运势激发。</p>';
   html+='<div style="display:flex;justify-content:center;flex-wrap:wrap;margin-bottom:16px">'+svg+'</div>';
   html+=LEGEND_HTML;
