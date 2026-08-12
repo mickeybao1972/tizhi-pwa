@@ -7742,16 +7742,16 @@ function renderSheHuiGuanXi(){
   // TEN2ZANG 在 keys 声明后填充(避免 keys 提升为 undefined)
 
   var rels=[
-    {id:'比肩', ten:'比肩', soc:'同事/合伙人/同辈', zang:'大肠', liu:'兄弟', color:'#e53935'},
-    {id:'劫财', ten:'劫财', soc:'竞争对手/朋友分财', zang:'肺', liu:'兄弟', color:'#e53935'},
-    {id:'食神', ten:'食神', soc:'晚辈/艺人/学生', zang:'胃', liu:'子孙', color:'#fb8c00'},
-    {id:'伤官', ten:'伤官', soc:'创意人/表达者/技术', zang:'大肠', liu:'子孙', color:'#fb8c00'},
-    {id:'偏财', ten:'偏财', soc:'客户/商人/父亲', zang:'胃', liu:'父亲', color:'#fdd835'},
-    {id:'正财', ten:'正财', soc:'妻子/稳定收入', zang:'大肠', liu:'妻子', color:'#fdd835'},
-    {id:'七杀', ten:'七杀', soc:'上司/对手/压力源', zang:'肝', liu:'儿子', color:'#1e88e5'},
-    {id:'正官', ten:'正官', soc:'上级/体制/正当约束', zang:'心', liu:'女儿', color:'#1e88e5'},
-    {id:'偏印', ten:'偏印', soc:'贵人/学术/偏门', zang:'脾', liu:'母亲', color:'#00897b'},
-    {id:'正印', ten:'正印', soc:'母亲/庇护/贵人', zang:'心', liu:'母亲', color:'#00897b'}
+    {id:'比肩', ten:'比肩', soc:'同事/合伙人/同辈', zang:'大肠', liu:'兄弟'},
+    {id:'劫财', ten:'劫财', soc:'竞争对手/朋友分财', zang:'肺', liu:'兄弟'},
+    {id:'食神', ten:'食神', soc:'晚辈/艺人/学生', zang:'胃', liu:'子孙'},
+    {id:'伤官', ten:'伤官', soc:'创意人/表达者/技术', zang:'大肠', liu:'子孙'},
+    {id:'偏财', ten:'偏财', soc:'客户/商人/父亲', zang:'胃', liu:'父亲'},
+    {id:'正财', ten:'正财', soc:'妻子/稳定收入', zang:'大肠', liu:'妻子'},
+    {id:'七杀', ten:'七杀', soc:'上司/对手/压力源', zang:'肝', liu:'儿子'},
+    {id:'正官', ten:'正官', soc:'上级/体制/正当约束', zang:'心', liu:'女儿'},
+    {id:'偏印', ten:'偏印', soc:'贵人/学术/偏门', zang:'脾', liu:'母亲'},
+    {id:'正印', ten:'正印', soc:'母亲/庇护/贵人', zang:'心', liu:'母亲'}
   ];
   var keys=['比肩','劫财','食神','伤官','偏财','正财','七杀','正官','偏印','正印'];
   var TEN2ZANG={}; keys.forEach(function(k){ TEN2ZANG[k]=ZANG_GAN[_tenToGan(k, dayMaster)]||''; });
@@ -7821,9 +7821,22 @@ function renderSheHuiGuanXi(){
 
   var cx=450, cy=450, R1=160, R2=250;
   var pos={};
-  for(var i=0;i<rels.length;i++){
+  for(var i=0;i<rels.length;i+
+  // 日主五行色
+  var DM_WX=(GW[BZ_RI_GAN]||'').charAt(0);
+  var WX_COLOR_MAP={'木':'#e53935','火':'#fb8c00','土':'#fdd835','金':'#1e88e5','水':'#00897b'};
+  var DM_COLOR=WX_COLOR_MAP[DM_WX]||'#7e57c2';
+  // 十神→五行（以日主五行为基准）
+  var TEN_WX={'比肩':'同','劫财':'同','食神':'生','伤官':'生','偏财':'我克','正财':'我克','七杀':'克我','正官':'克我','偏印':'生我','正印':'生我'};
+  var WX_CYCLE={'木':{'同':'木','生':'火','我克':'土','克我':'金','生我':'水'},
+                '火':{'同':'火','生':'土','我克':'金','克我':'水','生我':'木'},
+                '土':{'同':'土','生':'金','我克':'水','克我':'木','生我':'火'},
+                '金':{'同':'金','生':'水','我克':'木','克我':'火','生我':'土'},
+                '水':{'同':'水','生':'木','我克':'火','克我':'土','生我':'金'}};
++){
     var ang=i*36*Math.PI/180 - Math.PI/2;
-    pos[rels[i].id]={ang:ang, color:rels[i].color, ten:rels[i].ten, soc:rels[i].soc,
+    var twx=TEN_WX[rels[i].id]; var wx=twx?((WX_CYCLE[DM_WX]||{})[twx]||DM_WX):DM_WX; var nodeColor=WX_COLOR_MAP[wx]||DM_COLOR;
+    pos[rels[i].id]={ang:ang, color:nodeColor, ten:rels[i].ten, soc:rels[i].soc,
       ix:cx+Math.cos(ang)*R1, iy:cy+Math.sin(ang)*R1,
       ox:cx+Math.cos(ang)*R2, oy:cy+Math.sin(ang)*R2,
       ir:nodeR(inner[rels[i].id]/maxIn), or:nodeR(outer[rels[i].id]/maxOut),
@@ -7901,7 +7914,7 @@ function renderSheHuiGuanXi(){
 
   // 中央日主
   var yuan=(typeof BZ_GENDER!=='undefined'&&BZ_GENDER===0)?'元女':'元男';
-  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="50" fill="#2e7d32" stroke="#1b5e20" stroke-width="3"/>';
+  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="50" fill="'+DM_COLOR+'" stroke="'+DM_COLOR+'" stroke-width="3"/>';
   svg+='<text x="'+cx+'" y="'+(cy-14)+'" text-anchor="middle" fill="#fff" font-size="34" font-weight="bold">'+dayMaster+'</text>';
   svg+='<text x="'+cx+'" y="'+(cy+6)+'" text-anchor="middle" fill="#c8e6c9" font-size="14" font-weight="bold">'+yuan+'</text>';
   // 日主标注已删除
