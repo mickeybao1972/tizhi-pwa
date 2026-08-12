@@ -7821,8 +7821,7 @@ function renderSheHuiGuanXi(){
 
   var cx=450, cy=450, R1=160, R2=250;
   var pos={};
-  for(var i=0;i<rels.length;i+
-  // 日主五行色
+    // 日主五行色
   var DM_WX=(GW[BZ_RI_GAN]||'').charAt(0);
   var WX_COLOR_MAP={'木':'#e53935','火':'#fb8c00','土':'#fdd835','金':'#1e88e5','水':'#00897b'};
   var DM_COLOR=WX_COLOR_MAP[DM_WX]||'#7e57c2';
@@ -7833,7 +7832,7 @@ function renderSheHuiGuanXi(){
                 '土':{'同':'土','生':'金','我克':'水','克我':'木','生我':'火'},
                 '金':{'同':'金','生':'水','我克':'木','克我':'火','生我':'土'},
                 '水':{'同':'水','生':'木','我克':'火','克我':'土','生我':'金'}};
-+){
+for(var i=0;i<rels.length;i++){
     var ang=i*36*Math.PI/180 - Math.PI/2;
     var twx=TEN_WX[rels[i].id]; var wx=twx?((WX_CYCLE[DM_WX]||{})[twx]||DM_WX):DM_WX; var nodeColor=WX_COLOR_MAP[wx]||DM_COLOR;
     pos[rels[i].id]={ang:ang, color:nodeColor, ten:rels[i].ten, soc:rels[i].soc,
