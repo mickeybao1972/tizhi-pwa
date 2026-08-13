@@ -891,7 +891,7 @@ function rerenderCurrent(){
 
       ✍️ <span data-i18n="dev_designed">设计开发：</span><span class="ds-name">九燊工作室</span>
 
-      <span class="ds-ver">V3.2.3</span>
+      <span class="ds-ver">V3.2.4</span>
 
     </div>
 
@@ -956,7 +956,7 @@ function rerenderCurrent(){
 
   <div class="devsig" style="margin-top:auto;margin-bottom:0;max-width:480px">
 
-    <span class="ds-name">九燊工作室</span> 作品 · V3.2.3 · 创建 2026.07.23 17:00 · 更新 2026.08.10 20:05 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
+    <span class="ds-name">九燊工作室</span> 作品 · V3.2.4 · 创建 2026.07.23 17:00 · 更新 2026.08.10 20:05 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
 
   </div>
 
@@ -3596,7 +3596,7 @@ function renderHistoryPage() {
 
       return `
 
-        <div class="hist-card hist-disc-card" onclick="showDiscRecordDetail(${r.id})">
+        <div class="hist-card hist-disc-card" onclick="loadBazi('${r.id}')">
 
           <div class="hist-card-left">
 
@@ -5141,13 +5141,12 @@ function saveBaziRecordAuto(){
 
   var loc=document.getElementById('bz-loc').value.trim();
 
-  var cal=document.getElementById('bz-cal').value;
 
   var y=+document.getElementById('bz-y').value,m=+document.getElementById('bz-m').value,d=+document.getElementById('bz-d').value,h=+document.getElementById('bz-h').value,mi=+document.getElementById('bz-mi').value;
 
   var rec={
 
-    name:name,cal:cal,y:y,m:m,d:d,h:h,mi:mi,loc:loc,
+    name:name,y:y,m:m,d:d,h:h,mi:mi,loc:loc,
 
     g:document.getElementById('bz-g').value,
 
@@ -5247,10 +5246,6 @@ function _fillFormAndRun(rec){
 
   document.getElementById('bz-loc').value=rec.loc||'';
 
-  document.getElementById('bz-cal').value=rec.cal||'solar';
-
-  toggleCal();
-
   document.getElementById('bz-y').value=rec.y||1990;
 
   document.getElementById('bz-m').value=rec.m||1;
@@ -5313,7 +5308,7 @@ function _renderHistoryList(el, list){
 
   list.forEach(function(r){
 
-    var dateStr=r.cal==='lunar'?'阴'+r.y+'年'+r.m+'月'+r.d+'日':'公'+r.y+'年'+r.m+'月'+r.d+'日';
+    var dateStr='公历'+r.y+'年'+r.m+'月'+r.d+'日';
 
     html+='<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #f0f0f0;gap:8px">';
 
