@@ -4781,9 +4781,9 @@ function _lsUpsert(rec){
 
   var arr = _lsReadAll();
 
-  var sig = (rec.name||'')+'|'+(rec.cal||'')+'|'+(rec.y||'')+'|'+(rec.m||'')+'|'+(rec.d||'')+'|'+(rec.h||'')+'|'+(rec.mi||'')+'|'+(rec.g||'');
+  var sig = (rec.name||'')+'|'+(rec.y||'')+'|'+(rec.m||'')+'|'+(rec.d||'')+'|'+(rec.h||'')+'|'+(rec.mi||'')+'|'+(rec.g||'');
 
-  var idx = arr.findIndex(function(r){ return ((r.name||'')+'|'+(r.cal||'')+'|'+(r.y||'')+'|'+(r.m||'')+'|'+(r.d||'')+'|'+(r.h||'')+'|'+(r.mi||'')+'|'+(r.g||'')) === sig; });
+  var idx = arr.findIndex(function(r){ return ((r.name||'')+'|'+(r.y||'')+'|'+(r.m||'')+'|'+(r.d||'')+'|'+(r.h||'')+'|'+(r.mi||'')+'|'+(r.g||'')) === sig; });
 
   rec.id = rec.id || ('ls_'+Date.now()+'_'+Math.random().toString(36).slice(2,7));
 
