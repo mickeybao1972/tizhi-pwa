@@ -7618,12 +7618,26 @@ function bzUpdateSelDtInline(){
   if(!st){el.textContent='';return;}
   var now=new Date();
   var yy=(st.selectedLiuNianYear!==null&&st.selectedLiuNianYear!==undefined)?st.selectedLiuNianYear:now.getFullYear();
-  var parts=[];
   var jieName=['立春','惊蛮','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪','小寒'];
-  if(st.selectedLiuNianYear!==null&&st.selectedLiuNianYear!==undefined){parts.push('流年 '+yy);}
-  if(st.selectedLiuYue){var jqName=jieName[st.selectedLiuYue-1];var jqDate='';try{var l0=Lunar.fromYmd(yy,1,1);var jqt=l0.getJieQiTable();var sol=jqt[jqName];if(sol){jqDate=' '+sol.getFullYear()+'-'+(sol.getMonth()+1)+'-'+sol.getDate()}}catch(e){}parts.push('流月 '+jqName+jqDate)}
-  if(st.selectedLiuRi!==null&&st.selectedLiuRi!==undefined){var riDate='';try{if(st.selectedLiuYue){var l0=Lunar.fromYmd(yy,1,1);var jqt=l0.getJieQiTable();var s=jqt[jieName[st.selectedLiuYue-1]];if(s){var stL=Lunar.fromSolar(s);var tg=stL.next(st.selectedLiuRi-1);var s2=tg.getSolar();riDate=' '+s2.getFullYear()+'-'+(s2.getMonth()+1)+'-'+s2.getDate()}}else{var d2=new Date();d2.setDate(d2.getDate()+st.selectedLiuRi);riDate=' '+d2.getFullYear()+'-'+(d2.getMonth()+1)+'-'+d2.getDate()}}catch(e){}parts.push('流日 '+st.selectedLiuRi+'日'+riDate)}
-  el.textContent=parts.length?parts.join(' \u00b7 '):'请选择流年/流月/流日';
+  // find month day of selected jieqi in yy
+  var selYueIdx=st.selectedLiuYue;  // 1-12
+  var selRi=st.selectedLiuRi;  // 1-30
+  var jqSolar=null;
+  try{var l0=Lunar.fromYmd(yy,1,1);var jqt=l0.getJieQiTable();if(selYueIdx){var jqn=jieName[selYueIdx-1];if(jqt[jqn])jqSolar=jqt[jqn];}}catch(e){}
+  var monthDay='';
+  if(jqSolar){monthDay=(jqSolar.getMonth()+1)+'月'+jqSolar.getDate()+'日';}
+  // use jqSolar + (selRi-1) days
+  var riSolar=null;
+  if(jqSolar&&selRi!==null&&selRi!==undefined&&selRi>=1){var d=new Date(jqSolar.getFullYear(),jqSolar.getMonth(),jqSolar.getDate()+selRi-1);riSolar=d;}
+  var riMonthDay='';
+  if(riSolar){riMonthDay=(riSolar.getMonth()+1)+'月'+riSolar.getDate()+'日';}
+  // build output
+  var parts=[];
+  if(st.selectedLiuNianYear){parts.push(yy+'年');}
+  if(selYueIdx&&monthDay){parts.push(monthDay+' ('+jieName[selYueIdx-1]+')');}
+  else if(selYueIdx){parts.push(jieName[selYueIdx-1]);}
+  if(selRi!==null&&selRi!==undefined){if(riMonthDay){parts.push('第'+selRi+'日 ('+riMonthDay+')');}else{parts.push('第'+selRi+'日');}}
+  el.textContent=parts.length?parts.join(' ● '):'请选择流年/流月/流日';
 }
 
 function switchTimeMode(mode){BZ_TIME_STATE.mode=mode;var titles={dayun:'选择大运',liunian:'选择流年',liuyue:'选择流月',liuri:'选择流日'};var colors={dayun:'#8B4513',liunian:'#1565c0',liuyue:'#2e7d32',liuri:'#c62828'};document.querySelectorAll('#bz-time-btns button').forEach(function(btn){if(btn.dataset.mode===mode){btn.style.background=colors[mode];btn.style.color='#fff'}else{btn.style.background='#fff';btn.style.color=colors[btn.dataset.mode]}});var selector=document.getElementById('bz-time-selector');if(!selector){selector=document.createElement('div');selector.id='bz-time-selector';selector.style.display='none';document.body.appendChild(selector)}if(selector.style.display==='block'){selector.style.display='none';var ov0=document.getElementById('bz-overlay');if(ov0)ov0.style.display='none';return}var overlay=document.getElementById('bz-overlay');if(!overlay){overlay=document.createElement('div');overlay.id='bz-overlay';overlay.style='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:998;';overlay.addEventListener('click',closeTimePanel);document.body.appendChild(overlay)}overlay.style.display='block';var hdr='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #eee">'+'<span style="font-size:14px;font-weight:700;color:'+colors[mode]+'">'+titles[mode]+'</span>'+'<button onclick="closeTimePanel()" style="padding:4px 10px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;font-size:12px">关闭</button></div>';var body='';if(mode==='dayun')body=getDaYunBody();else if(mode==='liunian')body=getLiuNianBody();else if(mode==='liuyue')body=getLiuYueBody();else if(mode==='liuri')body=getLiuRiBody();selector.innerHTML=hdr+body;selector.style.display='block';selector.style.position='fixed';selector.style.top='50%';selector.style.left='50%';selector.style.transform='translate(-50%,-50%)';selector.style.width='90%';selector.style.maxWidth='480px';selector.style.maxHeight='80vh';selector.style.overflowY='auto';selector.style.background='#fff';selector.style.borderRadius='12px';selector.style.padding='16px';selector.style.zIndex='999';selector.style.boxShadow='0 8px 32px rgba(0,0,0,0.15)'}
@@ -7937,7 +7951,7 @@ function renderBaziAnalysis(){
     var allTen=[];
     pillars.forEach(function(pp){if(pp&&pp[0])allTen.push(tenOf(pp[0]));if(pp&&pp[1]){var bx=(CANG[pp[1]]&&CANG[pp[1]][0])||'';if(bx)allTen.push(tenOf(bx));}});
     allTen=uniq(allTen);
-    // V3.2.16a 统一调 bzBodyStrength + bzYongShen（与图2 子女推算同一算法，方案C 保留分数展示）
+    // V3.2.17a 统一调 bzBodyStrength + bzYongShen（与图2 子女推算同一算法，方案C 保留分数展示）
     var _tenGods={};
     allTen.forEach(function(t){if(t){_tenGods[t]=(_tenGods[t]||0)+1;}});
     var tenBi=(_tenGods['比肩']||0)+(_tenGods['劫财']||0);
