@@ -7925,8 +7925,6 @@ function renderBaziAnalysis(){
     var gKey=(typeof BZ_GENDER!=='undefined'&&BZ_GENDER===0)?0:1;
     var pillars=(typeof BZ_PILLARS!=='undefined'&&BZ_PILLARS)?BZ_PILLARS:[];
     var CANG={'子':['癸'],'丑':['己','癸','辛'],'寅':['甲','丙','戊'],'卯':['乙'],'辰':['戊','乙','癸'],'巳':['丙','庚','戊'],'午':['丁','己'],'未':['己','丁','乙'],'申':['庚','壬','戊'],'酉':['辛'],'戌':['戊','辛','丁'],'亥':['壬','甲']};
-    var LING_MAP={'木':{寅:'3',卯:'3',亥:'2',子:'-2',午:'-1',巳:'-1',申:'-2',酉:'-2',辰:'0',戌:'0',丑:'0',未:'0'},'火':{寅:'2',卯:'2',巳:'3',午:'3',子:'-2',亥:'-2',申:'-1',酉:'-1',辰:'0',戌:'0',丑:'0',未:'0'},'土':{巳:'2',午:'2',辰:'3',戌:'3',丑:'3',未:'3',寅:'-1',卯:'-1',申:'-2',酉:'-2',子:'0',亥:'0'},'金':{辰:'2',戌:'2',丑:'2',未:'2',申:'3',酉:'3',巳:'-1',午:'-1',寅:'-2',卯:'-2',子:'0',亥:'0'},'水':{申:'2',酉:'2',亥:'3',子:'3',辰:'0',戌:'0',丑:'0',未:'0',寅:'-1',卯:'-1',巳:'-2',午:'-2'}};
-    var LING_DESC={'3':'得令','2':'得相','0':'休囚','-1':'囚死','-2':'死绝'};
     var WX_ZANG={'木':'肝胆','火':'心小肠','土':'脾胃','金':'肺大肠','水':'肾膀胱'};
     // SOC_MAP already defined above
     var ZI_NV=(gKey===0)?{'食神':'女儿','伤官':'儿子'}:{'食神':'孙子','伤官':'孙女'};
@@ -7944,21 +7942,22 @@ function renderBaziAnalysis(){
     var allTen=[];
     pillars.forEach(function(pp){if(pp&&pp[0])allTen.push(tenOf(pp[0]));if(pp&&pp[1]){var bx=(CANG[pp[1]]&&CANG[pp[1]][0])||'';if(bx)allTen.push(tenOf(bx));}});
     allTen=uniq(allTen);
-    var lingMap=LING_MAP[dw];
-    var lingScore=Number((lingMap&&lingMap[yueZhi])||0);
-    var tenYin=0,tenBi=0;
-    pillars.forEach(function(pp){if(pp&&pp[0]){var gw=BZ_WX[pp[0]];if(gw===dw)tenBi++;else if(BZ_X_SHENG[dw]===gw)tenYin++;}});
+    // V3.2.8a: 统一调 bzBodyStrength + bzYongShen（与图2 子女推算同一算法，方案C 保留分数展示）
+    var _tenGods={};
+    allTen.forEach(function(t){if(t){_tenGods[t]=(_tenGods[t]||0)+1;}});
+    var tenBi=(_tenGods['比肩']||0)+(_tenGods['劫财']||0);
+    var tenYin=(_tenGods['正印']||0)+(_tenGods['偏印']||0);
     var diRoot=0,diYin=0;
     pillars.forEach(function(pp){if(pp&&pp[1]){var h=CANG[pp[1]]||[];for(var i=0;i<h.length;i++){if(BZ_WX[h[i]]===dw)diRoot++;else if(BZ_X_SHENG_INV[dw]===BZ_WX[h[i]])diYin++;}}});
-    var diScore=0;
-    pillars.forEach(function(pp){if(pp&&pp[1]&&CANG[pp[1]]){var h=CANG[pp[1]];if(BZ_WX[h[0]]===dw)diScore+=1.5;else if(BZ_X_SHENG_INV[dw]===BZ_WX[h[0]])diScore+=1;if(h[1]){if(BZ_WX[h[1]]===dw)diScore+=0.8;else if(BZ_X_SHENG_INV[dw]===BZ_WX[h[1]])diScore+=0.5;}if(h[2]){if(BZ_WX[h[2]]===dw)diScore+=0.4;else if(BZ_X_SHENG_INV[dw]===BZ_WX[h[2]])diScore+=0.2;}}});
-    var shiScore=tenBi*1+tenYin*0.8;
-    var score=lingScore+shiScore+diScore;
-    var isStrong=(typeof bzBodyStrength==='function')?bzBodyStrength({pillars:pillars,dayGan:riGan,tenGods:{}}).isStrong:(score>=6);
-    var xi=[];var ji=[];
-    if(isStrong){xi=[BZ_X_KE[dw]||'',BZ_X_SHENG_INV[dw]||'',BZ_X_KE_INV[dw]||''];ji=[BZ_X_SHENG[dw]||'',dw];}else{xi=[BZ_X_SHENG[dw]||'',dw];ji=[BZ_X_KE[dw]||'',BZ_X_SHENG_INV[dw]||'',BZ_X_KE_INV[dw]||''];}
-    xi=uniq(xi.filter(function(x){return x;}));
-    ji=uniq(ji.filter(function(x){return x;}));
+    var bs=(typeof bzBodyStrength==='function')?bzBodyStrength({pillars:pillars,dayGan:riGan,tenGods:_tenGods}):{level:'弱',score:0,ling:0,shi:0,di:0};
+    var isStrong=(bs.level==='强'||bs.level==='旺');
+    var lingScore=bs.ling||0;
+    var shiScore=bs.shi||0;
+    var diScore=bs.di||0;
+    var score=bs.score||0;
+    var ys=(typeof bzYongShen==='function')?bzYongShen({pillars:pillars,dayGan:riGan,tenGods:_tenGods},bs):{xi:[],ji:[]};
+    var xi=uniq((ys.xi||[]).filter(function(x){return x;}));
+    var ji=uniq((ys.ji||[]).filter(function(x){return x;}));
     var html='';
     var gxStr=(gKey===0)?'女命':'男命';
     var pillarStr=(pillars[0]?pillars[0].join(''):'—')+' '+(pillars[1]?pillars[1].join(''):'—')+' '+(pillars[2]?pillars[2].join(''):'—')+' '+(pillars[3]?pillars[3].join(''):'—');
