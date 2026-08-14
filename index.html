@@ -7956,21 +7956,25 @@ function renderBaziAnalysis(){
     var allTen=[];
     pillars.forEach(function(pp){if(pp&&pp[0])allTen.push(tenOf(pp[0]));if(pp&&pp[1]){var bx=(CANG[pp[1]]&&CANG[pp[1]][0])||'';if(bx)allTen.push(tenOf(bx));}});
     allTen=uniq(allTen);
-    var _st=bzBodyStrength(r);
-    var _yong=bzYongShen(r,_st);
-    var _dw=BZ_WX[r.dayGan];
+            var _tenGods={};
+    (allTen||[]).forEach(function(t){if(t)_tenGods[t]=(_tenGods[t]||0)+1;});
+    var _rArg={pillars:pillars,dayGan:riGan,tenGods:_tenGods,gender:(gKey===0?'女':'男')};
+    var _st=bzBodyStrength(_rArg);
+    var _yong=bzYongShen(_rArg,_st);
     var _levelText=_st.level==='强'?'身强，可担财官':'身弱，宜先扶抑';
     var _xiStr=_yong.xi.join('、');
     var _jiStr=_yong.ji.join('、');
-    var _mainUse=_yong.xi[0]||_dw;
-    var _useReason=_st.level==='强'?(_mainUse===BZ_X_KE[_dw]?'食伤泄秀，吐'+_dw+'之精华':'财官耗身，担起家财'):(_mainUse===BZ_X_SHENG_INV[_dw]?'印星生扶日主'+_dw:'比劫助力，担起命局');
+    var _mainUse=_yong.xi[0]||dw;
+    var _useReason=_st.level==='强'?(_mainUse===BZ_X_KE[dw]?'食伤泄秀，吐'+dw+'之精华':'财官耗身，担起家财'):(_mainUse===BZ_X_SHENG_INV[dw]?'印星生扶日主'+dw:'比劫助力，担起命局');
     var html='';
-    var pillarStr=(r.pillars[0]?r.pillars[0].join(''):'—')+' '+(r.pillars[1]?r.pillars[1].join(''):'—')+' '+(r.pillars[2]?r.pillars[2].join(''):'—')+' '+(r.pillars[3]?r.pillars[3].join(''):'—');
+    var pillarStr=(pillars[0]?pillars[0].join(''):'—')+' '+(pillars[1]?pillars[1].join(''):'—')+' '+(pillars[2]?pillars[2].join(''):'—')+' '+(pillars[3]?pillars[3].join(''):'—');
     html+='<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">一、旺衰与喜用</h3>';
-    html+=p('你属'+_dw+'命（'+r.dayGan+'），生于'+(r.gender==='女'?'女命':'男命')+'，四柱为'+pillarStr+'。');
+    html+=p('你属'+dw+'命（'+riGan+'），生于'+(gKey===0?'女命':'男命')+'，四柱为'+pillarStr+'。');
     html+=p('日主强弱：<b>'+_st.level+'</b>（'+_levelText+'）。综合得分 '+_st.score+'（得令'+_st.ling+'、得势'+_st.shi+'、得地'+_st.di+'）。');
     html+=p(b2('喜用神')+'：'+_xiStr+'。'+_useReason+'。'+b2('忌神')+'：'+_jiStr+'。');
     html+='</div>';
+
+
  html+='<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">二、格局</h3>';
     var geJuName=yueGod?(yueGod+'格'):'普通命局';
     var fuN=[];
