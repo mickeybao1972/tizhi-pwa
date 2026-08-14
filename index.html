@@ -2770,7 +2770,7 @@ handleHash();
 
   <div class="pageDISC disc-test" id="disc-page-test" style="display:none">
 
-    <div class="disc-test thdr">
+    <div class="thdr">
 
       <div class="pbar">
 
@@ -7920,7 +7920,7 @@ function renderBaziAnalysis(){
     var allTen=[];
     pillars.forEach(function(pp){if(pp&&pp[0])allTen.push(tenOf(pp[0]));if(pp&&pp[1]){var bx=(CANG[pp[1]]&&CANG[pp[1]][0])||'';if(bx)allTen.push(tenOf(bx));}});
     allTen=uniq(allTen);
-    // V3.2.10a 统一调 bzBodyStrength + bzYongShen（与图2 子女推算同一算法，方案C 保留分数展示）
+    // V3.2.11a 统一调 bzBodyStrength + bzYongShen（与图2 子女推算同一算法，方案C 保留分数展示）
     var _tenGods={};
     allTen.forEach(function(t){if(t){_tenGods[t]=(_tenGods[t]||0)+1;}});
     var tenBi=(_tenGods['比肩']||0)+(_tenGods['劫财']||0);
