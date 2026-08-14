@@ -7623,21 +7623,17 @@ function bzUpdateSelDtInline(){
   var selYueIdx=st.selectedLiuYue;  // 1-12
   var selRi=st.selectedLiuRi;  // 1-30
   // V3.2.21：三选（流年+流月+流日）必须全选才刷新公历日期
+  // V3.2.22：只显示选中日的公历日期（去掉节气起始日）
   var allPicked=(st.selectedLiuNianYear!==null&&st.selectedLiuNianYear!==undefined)&&(selYueIdx!==null&&selYueIdx!==undefined)&&(selRi!==null&&selRi!==undefined);
   if(!allPicked){el.textContent='';return;}
   var jqSolar=null;
   try{var l0=Lunar.fromYmd(yy,1,1);var jqt=l0.getJieQiTable();if(selYueIdx){var jqn=jieName[selYueIdx-1];if(jqt[jqn])jqSolar=jqt[jqn];}}catch(e){}
-  var parts=[];
-  if(jqSolar){
-    var md=jqSolar.getYear()+'-'+(jqSolar.getMonth()<10?'0'+jqSolar.getMonth():jqSolar.getMonth())+'-'+(jqSolar.getDay()<10?'0'+jqSolar.getDay():jqSolar.getDay());
-    parts.push(md);
-    if(selRi!==null&&selRi!==undefined&&selRi>=1){
-      var d=new Date(jqSolar.getYear(),jqSolar.getMonth()-1,jqSolar.getDay()+selRi-1);
-      var rd=d.getFullYear()+'-'+((d.getMonth()+1)<10?'0'+(d.getMonth()+1):(d.getMonth()+1))+'-'+(d.getDate()<10?'0'+d.getDate():d.getDate());
-      parts.push(rd);
-    }
+  var text='';
+  if(jqSolar&&selRi!==null&&selRi!==undefined&&selRi>=1){
+    var d=new Date(jqSolar.getYear(),jqSolar.getMonth()-1,jqSolar.getDay()+selRi-1);
+    text=d.getFullYear()+'-'+((d.getMonth()+1)<10?'0'+(d.getMonth()+1):(d.getMonth()+1))+'-'+(d.getDate()<10?'0'+d.getDate():d.getDate());
   }
-  el.textContent=parts.length?parts.join(' '):'';
+  el.textContent=text||'请选择流年/流月/流日';
 }
 
 
