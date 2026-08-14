@@ -7958,6 +7958,7 @@ function renderBaziAnalysis(){
     var ys=(typeof bzYongShen==='function')?bzYongShen({pillars:pillars,dayGan:riGan,tenGods:_tenGods},bs):{xi:[],ji:[]};
     var xi=uniq((ys.xi||[]).filter(function(x){return x;}));
     var ji=uniq((ys.ji||[]).filter(function(x){return x;}));
+    var LING_DESC={'3':'得令','2':'得相','0':'休囚','-1':'囚死','-2':'死绝'};
     var html='';
     var gxStr=(gKey===0)?'女命':'男命';
     var pillarStr=(pillars[0]?pillars[0].join(''):'—')+' '+(pillars[1]?pillars[1].join(''):'—')+' '+(pillars[2]?pillars[2].join(''):'—')+' '+(pillars[3]?pillars[3].join(''):'—');
