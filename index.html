@@ -7968,10 +7968,19 @@ function renderBaziAnalysis(){
     var _useReason=_st.level==='强'?(_mainUse===BZ_X_KE[dw]?'食伤泄秀，吐'+dw+'之精华':'财官耗身，担起家财'):(_mainUse===BZ_X_SHENG_INV[dw]?'印星生扶日主'+dw:'比劫助力，担起命局');
     var html='';
     var pillarStr=(pillars[0]?pillars[0].join(''):'—')+' '+(pillars[1]?pillars[1].join(''):'—')+' '+(pillars[2]?pillars[2].join(''):'—')+' '+(pillars[3]?pillars[3].join(''):'—');
+    var yueZhi=pillars[1]?pillars[1][1]:'';
+    var yueName=({"寅":"寅月","卯":"卯月","辰":"辰月","巳":"巳月","午":"午月","未":"未月","申":"申月","酉":"酉月","戌":"戌月","亥":"亥月","子":"子月","丑":"丑月"})[yueZhi]||'';
     html+='<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">一、旺衰与喜用</h3>';
     html+=p('你属'+dw+'命（'+riGan+'），生于'+(gKey===0?'女命':'男命')+'，四柱为'+pillarStr+'。');
-    html+=p('日主强弱：<b>'+_st.level+'</b>（'+_levelText+'）。综合得分 '+_st.score+'（得令'+_st.ling+'、得势'+_st.shi+'、得地'+_st.di+'）。');
+    html+=p('<b>【旺衰派】</b>日主强弱：<b>'+_st.level+'</b>（'+_levelText+'）。综合得分 '+_st.score+'（得令'+_st.ling+'、得势'+_st.shi+'、得地'+_st.di+'）。');
+    var _diaoHou=({"寅":"寅月甲木当权，为母旺。调候用甲引丁，庚劈甲，方显丁辉。","卯":"卯月湿乙伤丁，须先庚后甲，庚甲两透科甲定然。","辰":"辰月戊土司令泄丁，先用甲木引丁制土，次看庚金劈甲。","巳":"巳月丁火乘旺，以壬癸制火润金，方显水火既济。","午":"午月丁火极旺，最忌丙夺丁光。需壬癸水制衡，方免过烈。","未":"未月火气渐衰，土晦丁光，用甲木疏土可再放光明。","申":"申月丁火退气，专用甲木，庚劈甲引，丙晒甲。","酉":"酉月甲庚并用，乙木为枯草引灯亦不离丙晒。","戌":"戌月火弱，甲庚并用救应戌中丁火。","亥":"亥月甲木为尊，水旺压火时亥中甲木化水生火，转克为生。","子":"子月水旺丁微，甲木引丁为嫡母，可冬可藏。","丑":"丑月寒湿之土晦光，甲木为主，庚劈甲，方显丁辉。"})[yueZhi]||'';
+    html+=p('<b>【调候派】</b>生于'+yueName+'。'+_diaoHou);
+    var _geju=_st.level==='强'?'身强可任月令所藏之官杀食伤，主格局可成。':'身弱须印比扶身，月令虽美需借年时补救，方许立格。';
+    html+=p('<b>【格局派】</b>'+_geju+'月令'+yueZhi+'为本，藏干透干为用，财官印食顺用则吉，杀伤枭刃逆用方成。');
+    var _zuoGong=(_yong.xi[0]===dw?'命主喜见印比帮扶，做功于得力。':_yong.xi[0]===BZ_X_KE[dw]?'命主以食伤财星为用，做功于泄秀吐气。':'命主以官杀为用，做功于约束激发。');
+    html+=p('<b>【盲派·做功】</b>'+_zuoGong);
     html+=p(b2('喜用神')+'：'+_xiStr+'。'+_useReason+'。'+b2('忌神')+'：'+_jiStr+'。');
+    html+='<div style="background:#f5ecd1;border-left:3px solid #a67c52;padding:8px 10px;margin:8px 0 0 0;border-radius:4px;font-size:11.5px;color:#5c4a2f;line-height:1.7;font-style:normal"><b style="color:#8B4513">古籍云</b><br>《滴天髓·衰旺》：「<i>能知衰旺之真机，其于三命之奥，思过半矣。</i>」白话：若能掌握五行衰旺变化之根本规律，便已通晓命理大半奥妙。<br>《子平真诠·论用神》：「<i>八字用神，专求月令。以日干配月令地支，而生克不同，格局分焉。财官印食，此用神之善而顺用之者也；杀伤枭刃，此用神之不善而逆用之者也。当顺而顺，当逆而逆，配合得宜，皆为贵格。</i>」白话：用神首取月令，顺逆得宜方成格局。<br>《穷通宝鉴·丁火》：「<i>丁火柔中，内性昭融，抱乙而孝，合壬而忠，旺而不烈，衰而不穷，如有嫡母，可秋可冬。</i>」白话：丁为灯烛之火，需甲木为引、壬水为映，方显其光。</div>';
     html+='</div>';
 
 
