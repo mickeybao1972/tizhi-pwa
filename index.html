@@ -149,7 +149,8 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
 
 /* Test header */
 
-.thdr { background:var(--card); width:100%; padding:14px 16px; position:sticky; top:0; z-index:10; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+.thdr { background:transparent; width:100%; padding:24px 16px 12px; position:static; }
+.thdr .pbar-track { background:#E8DCC4; }
 
 .pbar { margin-bottom:8px; }
 
@@ -163,7 +164,8 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
 
 .mtag.wz { background:#5B8DB8; } .mtag.wm { background:#9B7BB8; } .mtag.cx { background:#B87B5B; }
 
-.qa { width:100%; max-width:560px; margin:28px auto; }
+.qa { width:100%; max-width:560px; margin:0 auto 14px; }
+.qcard { background:var(--card); border-radius:14px; padding:22px 20px 18px; box-shadow:0 2px 12px rgba(0,0,0,.06); width:100%; max-width:560px; margin:0 auto 18px; }
 
 .qnum { font-size:12px; color:var(--tl); margin-bottom:6px; }
 
@@ -908,7 +910,7 @@ function rerenderCurrent(){
 
   </div>
 
-  <div class="qa">
+  <div class="qa disc-card">
 
     <div class="qnum" id="qn"></div>
 
@@ -2788,11 +2790,15 @@ handleHash();
 
     </div>
 
-    <div class="qa">
+    <div class="qcard">
 
       <div class="qnum" id="disc-qn"></div>
 
       <div class="qtext" id="disc-qt"></div>
+
+    </div>
+
+    <div class="qa">
 
       <div class="opts" id="disc-qo"></div>
 
@@ -7920,7 +7926,7 @@ function renderBaziAnalysis(){
     var allTen=[];
     pillars.forEach(function(pp){if(pp&&pp[0])allTen.push(tenOf(pp[0]));if(pp&&pp[1]){var bx=(CANG[pp[1]]&&CANG[pp[1]][0])||'';if(bx)allTen.push(tenOf(bx));}});
     allTen=uniq(allTen);
-    // V3.2.11a 统一调 bzBodyStrength + bzYongShen（与图2 子女推算同一算法，方案C 保留分数展示）
+    // V3.2.13a 统一调 bzBodyStrength + bzYongShen（与图2 子女推算同一算法，方案C 保留分数展示）
     var _tenGods={};
     allTen.forEach(function(t){if(t){_tenGods[t]=(_tenGods[t]||0)+1;}});
     var tenBi=(_tenGods['比肩']||0)+(_tenGods['劫财']||0);
