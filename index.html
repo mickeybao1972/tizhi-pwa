@@ -5,19 +5,7 @@
 
 <head>
 
-<script>
 
-if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
-
-  navigator.serviceWorker.getRegistrations().then(function(rgs){
-
-    if(rgs.length){ rgs.forEach(function(sw){ sw.unregister(); }); location.reload(true); }
-
-  });
-
-}
-
-</script>
 
 <meta charset="UTF-8">
 
@@ -891,7 +879,7 @@ function rerenderCurrent(){
 
       ✍️ <span data-i18n="dev_designed">设计开发：</span><span class="ds-name">九燊工作室</span>
 
-      <span class="ds-ver">V3.2.6</span>
+      <span class="ds-ver">V3.2.4</span>
 
     </div>
 
@@ -956,7 +944,7 @@ function rerenderCurrent(){
 
   <div class="devsig" style="margin-top:auto;margin-bottom:0;max-width:480px">
 
-    <span class="ds-name">九燊工作室</span> 作品 · V3.2.6 · 创建 2026.07.23 17:00 · 更新 2026.08.10 20:05 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
+    <span class="ds-name">九燊工作室</span> 作品 · V3.2.4 · 创建 2026.07.23 17:00 · 更新 2026.08.10 20:05 · <a class="ds-mail" href="mailto:13816620500@163.com">13816620500@163.com</a>
 
   </div>
 
@@ -4126,9 +4114,7 @@ function closeHistModal() {
 
 
 
-<script src="lunar.js" onerror="window.__lunarLoadErr='lunar.js 加载失败，请检查网络或硬刷 (Ctrl+Shift+R)'"></script>
 
-<script src="bazi-engine.js"></script>
 
 <script>
 
@@ -7939,6 +7925,8 @@ function renderBaziAnalysis(){
     var gKey=(typeof BZ_GENDER!=='undefined'&&BZ_GENDER===0)?0:1;
     var pillars=(typeof BZ_PILLARS!=='undefined'&&BZ_PILLARS)?BZ_PILLARS:[];
     var CANG={'子':['癸'],'丑':['己','癸','辛'],'寅':['甲','丙','戊'],'卯':['乙'],'辰':['戊','乙','癸'],'巳':['丙','庚','戊'],'午':['丁','己'],'未':['己','丁','乙'],'申':['庚','壬','戊'],'酉':['辛'],'戌':['戊','辛','丁'],'亥':['壬','甲']};
+    var LING_MAP={'木':{寅:'3',卯:'3',亥:'2',子:'-2',午:'-1',巳:'-1',申:'-2',酉:'-2',辰:'0',戌:'0',丑:'0',未:'0'},'火':{寅:'2',卯:'2',巳:'3',午:'3',子:'-2',亥:'-2',申:'-1',酉:'-1',辰:'0',戌:'0',丑:'0',未:'0'},'土':{巳:'2',午:'2',辰:'3',戌:'3',丑:'3',未:'3',寅:'-1',卯:'-1',申:'-2',酉:'-2',子:'0',亥:'0'},'金':{辰:'2',戌:'2',丑:'2',未:'2',申:'3',酉:'3',巳:'-1',午:'-1',寅:'-2',卯:'-2',子:'0',亥:'0'},'水':{申:'2',酉:'2',亥:'3',子:'3',辰:'0',戌:'0',丑:'0',未:'0',寅:'-1',卯:'-1',巳:'-2',午:'-2'}};
+    var LING_DESC={'3':'得令','2':'得相','0':'休囚','-1':'囚死','-2':'死绝'};
     var WX_ZANG={'木':'肝胆','火':'心小肠','土':'脾胃','金':'肺大肠','水':'肾膀胱'};
     // SOC_MAP already defined above
     var ZI_NV=(gKey===0)?{'食神':'女儿','伤官':'儿子'}:{'食神':'孙子','伤官':'孙女'};
@@ -7956,35 +7944,39 @@ function renderBaziAnalysis(){
     var allTen=[];
     pillars.forEach(function(pp){if(pp&&pp[0])allTen.push(tenOf(pp[0]));if(pp&&pp[1]){var bx=(CANG[pp[1]]&&CANG[pp[1]][0])||'';if(bx)allTen.push(tenOf(bx));}});
     allTen=uniq(allTen);
-            var _tenGods={};
-    (allTen||[]).forEach(function(t){if(t)_tenGods[t]=(_tenGods[t]||0)+1;});
-    var _rArg={pillars:pillars,dayGan:riGan,tenGods:_tenGods,gender:(gKey===0?'女':'男')};
-    var _st=bzBodyStrength(_rArg);
-    var _yong=bzYongShen(_rArg,_st);
-    var _levelText=_st.level==='强'?'身强，可担财官':'身弱，宜先扶抑';
-    var _xiStr=_yong.xi.join('、');
-    var _jiStr=_yong.ji.join('、');
-    var _mainUse=_yong.xi[0]||dw;
-    var _useReason=_st.level==='强'?(_mainUse===BZ_X_KE[dw]?'食伤泄秀，吐'+dw+'之精华':'财官耗身，担起家财'):(_mainUse===BZ_X_SHENG_INV[dw]?'印星生扶日主'+dw:'比劫助力，担起命局');
+    var lingMap=LING_MAP[dw];
+    var lingScore=Number((lingMap&&lingMap[yueZhi])||0);
+    var tenYin=0,tenBi=0;
+    pillars.forEach(function(pp){if(pp&&pp[0]){var gw=BZ_WX[pp[0]];if(gw===dw)tenBi++;else if(BZ_X_SHENG[dw]===gw)tenYin++;}});
+    var diRoot=0,diYin=0;
+    pillars.forEach(function(pp){if(pp&&pp[1]){var h=CANG[pp[1]]||[];for(var i=0;i<h.length;i++){if(BZ_WX[h[i]]===dw)diRoot++;else if(BZ_X_SHENG_INV[dw]===BZ_WX[h[i]])diYin++;}}});
+    var diScore=0;
+    pillars.forEach(function(pp){if(pp&&pp[1]&&CANG[pp[1]]){var h=CANG[pp[1]];if(BZ_WX[h[0]]===dw)diScore+=1.5;else if(BZ_X_SHENG_INV[dw]===BZ_WX[h[0]])diScore+=1;if(h[1]){if(BZ_WX[h[1]]===dw)diScore+=0.8;else if(BZ_X_SHENG_INV[dw]===BZ_WX[h[1]])diScore+=0.5;}if(h[2]){if(BZ_WX[h[2]]===dw)diScore+=0.4;else if(BZ_X_SHENG_INV[dw]===BZ_WX[h[2]])diScore+=0.2;}}});
+    var shiScore=tenBi*1+tenYin*0.8;
+    var score=lingScore+shiScore+diScore;
+    var isStrong=(typeof bzBodyStrength==='function')?bzBodyStrength({pillars:pillars,dayGan:riGan,tenGods:{}}).isStrong:(score>=6);
+    var xi=[];var ji=[];
+    if(isStrong){xi=[BZ_X_KE[dw]||'',BZ_X_SHENG_INV[dw]||'',BZ_X_KE_INV[dw]||''];ji=[BZ_X_SHENG[dw]||'',dw];}else{xi=[BZ_X_SHENG[dw]||'',dw];ji=[BZ_X_KE[dw]||'',BZ_X_SHENG_INV[dw]||'',BZ_X_KE_INV[dw]||''];}
+    xi=uniq(xi.filter(function(x){return x;}));
+    ji=uniq(ji.filter(function(x){return x;}));
     var html='';
+    var gxStr=(gKey===0)?'女命':'男命';
     var pillarStr=(pillars[0]?pillars[0].join(''):'—')+' '+(pillars[1]?pillars[1].join(''):'—')+' '+(pillars[2]?pillars[2].join(''):'—')+' '+(pillars[3]?pillars[3].join(''):'—');
-    var yueZhi=pillars[1]?pillars[1][1]:'';
-    var yueName=({"寅":"寅月","卯":"卯月","辰":"辰月","巳":"巳月","午":"午月","未":"未月","申":"申月","酉":"酉月","戌":"戌月","亥":"亥月","子":"子月","丑":"丑月"})[yueZhi]||'';
     html+='<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">一、旺衰与喜用</h3>';
-    html+=p('你属'+dw+'命（'+riGan+'），生于'+(gKey===0?'女命':'男命')+'，四柱为'+pillarStr+'。');
-    html+=p('<b>【旺衰派】</b>日主强弱：<b>'+_st.level+'</b>（'+_levelText+'）。综合得分 '+_st.score+'（得令'+_st.ling+'、得势'+_st.shi+'、得地'+_st.di+'）。');
-    var _diaoHou=({"寅":"寅月甲木当权，为母旺。调候用甲引丁，庚劈甲，方显丁辉。","卯":"卯月湿乙伤丁，须先庚后甲，庚甲两透科甲定然。","辰":"辰月戊土司令泄丁，先用甲木引丁制土，次看庚金劈甲。","巳":"巳月丁火乘旺，以壬癸制火润金，方显水火既济。","午":"午月丁火极旺，最忌丙夺丁光。需壬癸水制衡，方免过烈。","未":"未月火气渐衰，土晦丁光，用甲木疏土可再放光明。","申":"申月丁火退气，专用甲木，庚劈甲引，丙晒甲。","酉":"酉月甲庚并用，乙木为枯草引灯亦不离丙晒。","戌":"戌月火弱，甲庚并用救应戌中丁火。","亥":"亥月甲木为尊，水旺压火时亥中甲木化水生火，转克为生。","子":"子月水旺丁微，甲木引丁为嫡母，可冬可藏。","丑":"丑月寒湿之土晦光，甲木为主，庚劈甲，方显丁辉。"})[yueZhi]||'';
-    html+=p('<b>【调候派】</b>生于'+yueName+'。'+_diaoHou);
-    var _geju=_st.level==='强'?'身强可任月令所藏之官杀食伤，主格局可成。':'身弱须印比扶身，月令虽美需借年时补救，方许立格。';
-    html+=p('<b>【格局派】</b>'+_geju+'月令'+yueZhi+'为本，藏干透干为用，财官印食顺用则吉，杀伤枭刃逆用方成。');
-    var _zuoGong=(_yong.xi[0]===dw?'命主喜见印比帮扶，做功于得力。':_yong.xi[0]===BZ_X_KE[dw]?'命主以食伤财星为用，做功于泄秀吐气。':'命主以官杀为用，做功于约束激发。');
-    html+=p('<b>【盲派·做功】</b>'+_zuoGong);
-    html+=p(b2('喜用神')+'：'+_xiStr+'。'+_useReason+'。'+b2('忌神')+'：'+_jiStr+'。');
-    html+='<div style="background:#f5ecd1;border-left:3px solid #a67c52;padding:8px 10px;margin:8px 0 0 0;border-radius:4px;font-size:11.5px;color:#5c4a2f;line-height:1.7;font-style:normal"><b style="color:#8B4513">古籍云</b><br>《滴天髓·衰旺》：「<i>能知衰旺之真机，其于三命之奥，思过半矣。</i>」白话：若能掌握五行衰旺变化之根本规律，便已通晓命理大半奥妙。<br>《子平真诠·论用神》：「<i>八字用神，专求月令。以日干配月令地支，而生克不同，格局分焉。财官印食，此用神之善而顺用之者也；杀伤枭刃，此用神之不善而逆用之者也。当顺而顺，当逆而逆，配合得宜，皆为贵格。</i>」白话：用神首取月令，顺逆得宜方成格局。<br>《穷通宝鉴·丁火》：「<i>丁火柔中，内性昭融，抱乙而孝，合壬而忠，旺而不烈，衰而不穷，如有嫡母，可秋可冬。</i>」白话：丁为灯烛之火，需甲木为引、壬水为映，方显其光。</div>';
+    var lingName=LING_DESC[lingScore]||'未知';
+    var lingSentence=lingScore>=3?'得月令之气强力帮扶':lingScore>=2?'得月令相生助力，根基较稳':lingScore>=0?'月令休囚无大助力':lingScore>=-1?'月令囚死受克':'月令死绝，根基极弱';
+    html+=p('你属'+dw+'命（'+riGan+'），生于'+gxStr+'，四柱为'+pillarStr+'。');
+    html+=p('月令为'+yueZhi+'（本气'+yueBen+'，月令十神'+(yueGod||'—')+'）。'+riGan+'在'+yueZhi+'月'+lingSentence+'（'+lingName+'）。');
+    var hjS=[];
+    if(tenBi>0)hjS.push('天干见'+tenBi+'颗'+(tenBi>1?'比劫':'比肩')+'帮身');
+    if(tenYin>0)hjS.push('另见'+tenYin+'颗印星生扶');
+    if(diRoot>0||diYin>0)hjS.push('地支藏'+(diRoot+diYin)+'颗根气');
+    html+=p('帮身力量：'+(hjS.length?hjS.join('，'):'天干地支皆无帮扶')+'。综合得令'+lingScore+'分、得势'+shiScore.toFixed(1)+'分、得地'+diScore.toFixed(1)+'分，总分'+score.toFixed(1)+'（以≥6为身强），判为'+(isStrong?'身强，可担财官':'身弱，宜先扶抑')+'。');
+    var mainUse=xi[0]||dw;
+    var useReason=isStrong?(mainUse===BZ_X_KE[dw]?'食伤泄秀，吐'+dw+'之精华':'财星耗身，担起家财'):(mainUse===BZ_X_SHENG[dw]?'印星生扶日主'+dw:'比劫助力，担起命局');
+    html+=p(b2('主用神')+'：'+mainUse+'。'+useReason+'。'+b2('辅用神')+'：'+(xi.slice(1).join('、')||'—')+'。'+b2('忌神')+'：'+ji.join('、')+'。');
     html+='</div>';
-
-
- html+='<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">二、格局</h3>';
+    html+='<div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)"><h3 style="font-size:13px;color:#8B4513;margin:0 0 6px;border-left:3px solid #8B4513;padding-left:8px">二、格局</h3>';
     var geJuName=yueGod?(yueGod+'格'):'普通命局';
     var fuN=[];
     if(yueGod==='七杀'&&allTen.indexOf('正印')>=0)fuN.push('杀印相生——压力化为学识');
@@ -8049,6 +8041,8 @@ function renderBaziAnalysis(){
 }window.renderBaziAnalysis=renderBaziAnalysis;
 
 </script>
+
+  <div style="text-align:center;color:#aaa;font-size:12px;padding:12px 0;">&#20061;&#28771;&#24037;&#20316;&#23460; &middot; V3.2.8 &middot; 2026.8.14</div>
 </body>
 
 </html>
