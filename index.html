@@ -7918,7 +7918,7 @@ function renderBaziAnalysis(){
     var allTen=[];
     pillars.forEach(function(pp){if(pp&&pp[0])allTen.push(tenOf(pp[0]));if(pp&&pp[1]){var bx=(CANG[pp[1]]&&CANG[pp[1]][0])||'';if(bx)allTen.push(tenOf(bx));}});
     allTen=uniq(allTen);
-    // V3.2.9a: 统一调 bzBodyStrength + bzYongShen（与图2 子女推算同一算法，方案C 保留分数展示）
+    // V3.2.10a 统一调 bzBodyStrength + bzYongShen（与图2 子女推算同一算法，方案C 保留分数展示）
     var _tenGods={};
     allTen.forEach(function(t){if(t){_tenGods[t]=(_tenGods[t]||0)+1;}});
     var tenBi=(_tenGods['比肩']||0)+(_tenGods['劫财']||0);
@@ -8017,8 +8017,6 @@ function renderBaziAnalysis(){
 }window.renderBaziAnalysis=renderBaziAnalysis;
 
 </script>
-
-  <div style="text-align:center;color:#aaa;font-size:12px;padding:12px 0;">&#20061;&#28771;&#24037;&#20316;&#23460; &middot; V3.2.9 &middot; 2026.8.14</div>
 </body>
 
 </html>
