@@ -7625,7 +7625,7 @@ function bzUpdateSelDtInline(){
   var jqSolar=null;
   try{var l0=Lunar.fromYmd(yy,1,1);var jqt=l0.getJieQiTable();if(selYueIdx){var jqn=jieName[selYueIdx-1];if(jqt[jqn])jqSolar=jqt[jqn];}}catch(e){}
   var monthDay='';
-  if(jqSolar){monthDay=(jqSolar.getMonth()+1)+'月'+jqSolar.getDate()+'日';}
+  if(jqSolar){monthDay=(jqSolar.getMonth()+1)+'月'+jqSolar.getDay()+'日';}
   // use jqSolar + (selRi-1) days
   var riSolar=null;
   if(jqSolar&&selRi!==null&&selRi!==undefined&&selRi>=1){var d=new Date(jqSolar.getFullYear(),jqSolar.getMonth(),jqSolar.getDate()+selRi-1);riSolar=d;}
@@ -7951,7 +7951,7 @@ function renderBaziAnalysis(){
     var allTen=[];
     pillars.forEach(function(pp){if(pp&&pp[0])allTen.push(tenOf(pp[0]));if(pp&&pp[1]){var bx=(CANG[pp[1]]&&CANG[pp[1]][0])||'';if(bx)allTen.push(tenOf(bx));}});
     allTen=uniq(allTen);
-    // V3.2.18a 统一调 bzBodyStrength + bzYongShen（与图2 子女推算同一算法，方案C 保留分数展示）
+    // V3.2.19a 统一调 bzBodyStrength + bzYongShen（与图2 子女推算同一算法，方案C 保留分数展示）
     var _tenGods={};
     allTen.forEach(function(t){if(t){_tenGods[t]=(_tenGods[t]||0)+1;}});
     var tenBi=(_tenGods['比肩']||0)+(_tenGods['劫财']||0);
