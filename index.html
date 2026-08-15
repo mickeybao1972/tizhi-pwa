@@ -7,7 +7,7 @@
 <head><script>
 (function(){
   // Mark this version on first load
-  try { window.__pwaVer = 'V3.4.9'; } catch(e){}
+  try { window.__pwaVer = 'V3.4.10'; } catch(e){}
 })();
 </script>
 <!-- SW cleanup -->
@@ -37,7 +37,7 @@ if('serviceWorker' in navigator){
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>V3.4.9 四诊体质 DISC 性格自测系统</title>
+<title>V3.4.10 四诊体质 DISC 性格自测系统</title>
 
 <style>
 
@@ -2525,7 +2525,16 @@ function handleHash() {
 
   else if (h === '#pDISC') { document.getElementById('pDISC').classList.add('active'); }
 
-  else { document.getElementById('th-page').classList.add('active'); function i18nPick(k){
+  else { document.getElementById('th-page').classList.add('active'); 
+
+
+}
+
+}
+
+
+
+function i18nPick(k){
 
   if(LANG==='en' && I18N.en[k]!=null) return I18N.en[k];
 
@@ -2608,13 +2617,6 @@ function rerenderCurrent(){
   }catch(e){ console.log('rerenderCurrent',e); }
 
 }
-
-
-
-}
-
-}
-
 refreshLang();
 
 handleHash();
