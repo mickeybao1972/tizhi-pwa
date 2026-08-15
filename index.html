@@ -742,7 +742,7 @@ function rerenderCurrent(){
 
 <div id="th-page" class="page" style="display:none">
 
- <div id="cover-section" style="display:flex;flex-direction:column;align-items:center;width:100%">
+ <button class="rb" onclick="showModule('home')" style="margin-top:20px;font-size:13px;padding:9px 24px">&#8592; Fan Hui Shou Ye </button><div id="cover-section" style="display:flex;flex-direction:column;align-items:center;width:100%">
 
   <div style="width:auto;max-width:480px">
 
@@ -975,28 +975,7 @@ function rerenderCurrent(){
 
 <div 
 <!-- 底部导航栏 V3.3 -->
-<div id="bottom-nav">
-  <button class="nav-btn active" id="nav-th" data-mod="th">
-    <span class="nb-icon">🌿</span>
-    <span class="nb-label">身体</span>
-  </button>
-  <button class="nav-btn" id="nav-di" data-mod="di">
-    <span class="nb-icon">🐯</span>
-    <span class="nb-label">性格</span>
-  </button>
-  <button class="nav-btn" id="nav-bz" data-mod="bz">
-    <span class="nb-icon">🔮</span>
-    <span class="nb-label">命理</span>
-  </button>
-  <button class="nav-btn disabled" id="nav-fs" onclick="">
-    <span class="nb-icon">🏠</span>
-    <span class="nb-label">空间</span>
-  </button>
-  <button class="nav-btn" id="nav-ar" data-mod="ar">
-    <span class="nb-icon">📋</span>
-    <span class="nb-label">档案</span>
-  </button>
-</div>
+
 <div id="p1" class="page test-page">
 
   <div class="thdr">
@@ -2783,7 +2762,7 @@ handleHash();
 
   <!-- DISC封面 -->
 
-  <div class="pageDISC disc-cover" id="disc-page-cover">
+  <div class="page pageDISC disc-cover" id="disc-page-cover">
 
     <div class="badge" data-i18n="disc_badge">DISC行为风格测试</div>
 
@@ -2867,7 +2846,7 @@ handleHash();
 
       开始测试 →
 
-    </button>
+    </button><button class="rb" onclick="showModule('home')" style="margin-top:10px;font-size:13px;padding:9px 24px">&#8592; Fan Hui </button>
 
     <button class="rb" onclick="backToHome()" style="margin-top:10px;font-size:13px;padding:9px 24px" data-i18n="disc_back">← 返回首页</button>
 
@@ -2877,7 +2856,7 @@ handleHash();
 
   <!-- DISC测试区 -->
 
-  <div class="pageDISC disc-test" id="disc-page-test" style="display:none">
+  <div class="page pageDISC disc-test" id="disc-page-test" style="display:none">
 
     <div class="thdr">
 
@@ -2925,7 +2904,7 @@ handleHash();
 
   <!-- DISC报告 -->
 
-  <div class="pageDISC disc-report" id="disc-page-report" style="display:none">
+  <div class="page pageDISC disc-report" id="disc-page-report" style="display:none">
 
     <div class="disc-rhd">
 
