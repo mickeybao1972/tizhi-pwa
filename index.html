@@ -486,38 +486,6 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
 .hm-tag-bz{background:#f3e5f5;color:#6A1B9A}
 .hm-tag-ar{background:#e3f2fd;color:#1565c0}
 
-/* 底部导航 */
-#bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;z-index:900;
-  background:#fff;border-top:1px solid var(--brd);
-  display:flex;box-shadow:0 -2px 12px rgba(0,0,0,.08);
-  max-width:520px;margin:0 auto
-}
-.nav-btn{
-  flex:1;padding:10px 4px 8px;text-align:center;
-  border:none;background:none;cursor:pointer;
-  font-size:11px;color:var(--tl);transition:color .2s;
-  display:flex;flex-direction:column;align-items:center;gap:3px
-}
-.nav-btn .nb-icon{font-size:20px;line-height:1}
-.nav-btn .nb-label{font-size:10px;font-weight:500}
-.nav-btn.active{color:var(--p)}
-.nav-btn.active .nb-icon{transform:scale(1.1)}
-.nav-btn.disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
-
-
-<link rel="manifest" href="manifest.json">
-
-  <meta name="theme-color" content="#4A7C59">
-
-</head>
-
-<body>
-
-
-
-<script>
-
 /* i18n: 中英文切换 (界面与导航，题目保持中文) */
 
 const I18N = {
@@ -8185,7 +8153,7 @@ var _currentModule='home';
 function showModule(mod){
   _currentModule=mod;
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');p.style.display='none'});
-  document.getElementById('bottom-nav').querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active')});
+  var bn=document.getElementById('bottom-nav');if(bn)bn.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active')});
   var pageMap={th:'th-page',di:'disc-page-cover',bz:'p-bazi',ar:'p-history'};
   var navMap={th:'nav-th',di:'nav-di',bz:'nav-bz',ar:'nav-ar'};
   if(mod==='home'){
@@ -8195,7 +8163,7 @@ function showModule(mod){
     var pg=document.getElementById(pageMap[mod]);
     if(pg){pg.classList.add('active');pg.style.display='block'}
   }
-  if(navMap[mod]){var nb=document.getElementById(navMap[mod]);if(nb)nb.classList.add('active')}
+  if(navMap[mod]){var nb=document.getElementById(navMap[mod]);if(nb&&document.getElementById('bottom-nav'))nb.classList.add('active')}
 }
 
 
