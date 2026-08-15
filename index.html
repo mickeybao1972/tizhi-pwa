@@ -6,26 +6,8 @@
 
 <head><script>
 (function(){
-  var VER = 'V3.4.5';
-  try {
-    if (window.__pwaVer === VER) return;
-    // Old poisoned cache detected: kill SW and reload
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(rs){
-        rs.forEach(function(r){ try { r.unregister(); } catch(e){} });
-      });
-    }
-    if (window.caches && caches.keys) {
-      caches.keys().then(function(keys){ keys.forEach(function(k){ caches.delete(k); }); });
-    }
-    // Mark this version
-    try { window.__pwaVer = VER; } catch(e){}
-    // Force a one-time hard reload to get fresh content
-    if (!window.__reloading) {
-      window.__reloading = true;
-      location.reload(true);
-    }
-  } catch(e){}
+  // Mark this version on first load
+  try { window.__pwaVer = 'V3.4.6'; } catch(e){}
 })();
 </script>
 <!-- SW cleanup -->
