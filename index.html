@@ -1,60 +1,9 @@
 <!DOCTYPE html>
-<!-- cache-bust: 2026-08-15 15:20 UTC+8 V3.4.12 -->
-<!-- V3.3: New home page + bottom nav + module skeleton (身体/思维/能量/空间) -->
+<!-- cache-bust: 2026-08-10 17:00 UTC+8 -->
 
 <html lang="zh-CN">
 
-<head><script>
-// V3.4.12 cache-bust: force fresh load (prevent stuck old HTML)
-(function(){
-  if(location.search.indexOf('v=3412')===-1){
-    // no marker -> force a fresh URL with cache-buster
-    var u=location.href.split('#')[0];
-    var sep = u.indexOf('?')>=0 ? '&' : '?';
-    var nb = u + sep + 'v=3412&_t=' + Date.now();
-    location.replace(nb);
-  }
-  // Also unregister any leftover SW from earlier versions
-  if(navigator.serviceWorker){
-    navigator.serviceWorker.getRegistrations().then(function(rs){
-      rs.forEach(function(r){ try{ r.unregister(); }catch(e){} });
-    });
-    if(window.caches){
-      caches.keys().then(function(ks){
-        ks.forEach(function(k){ caches.delete(k); });
-      });
-    }
-  }
-})();
-</script>
-<script>
-(function(){
-  // Mark this version on first load
-  try { window.__pwaVer = 'V3.4.12'; } catch(e){}
-})();
-</script>
-<!-- SW cleanup -->
-<script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.getRegistrations().then(function(regs){
-    regs.forEach(function(r){ r.unregister(); });
-  });
-  caches.keys().then(function(names){
-    names.forEach(function(n){ caches.delete(n); });
-  });
-}
-// Force fresh load if URL has stale marker
-(function(){
-  try{
-    var u=new URL(location.href);
-    if(u.searchParams.get('v')!=='3411'){
-      u.searchParams.set('v','3411');
-      location.replace(u.toString());
-    }
-  }catch(e){}
-})();
-</script>
-
+<head>
 
 
 
@@ -70,7 +19,7 @@ if('serviceWorker' in navigator){
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>V3.4.12 四诊体质 DISC 性格自测系统</title>
+<title>四诊体质·DISC性格自测系统</title>
 
 <style>
 
@@ -492,38 +441,19 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
 
 
 
+</style>
 
-/* === 首页 + 底部导航 V3.3 === */
-#home-page{background:var(--bg);min-height:100vh;padding:16px 16px 80px;max-width:520px;margin:0 auto;display:none}
-#home-page.active{display:block}
-.home-logo{text-align:center;padding:24px 0 20px}
-.home-logo .hl-title{font-size:20px;font-weight:700;color:var(--txt);letter-spacing:2px}
-.home-logo .hl-sub{font-size:12px;color:var(--tl);margin-top:4px}
-.home-cards{display:flex;flex-direction:column;gap:12px;padding:0 4px}
-.hm-card{
-  background:var(--card);border-radius:var(--r);padding:18px 20px;
-  box-shadow:var(--shd);border:1px solid var(--brd);cursor:pointer;
-  transition:transform .15s,box-shadow .15s;display:flex;align-items:center;gap:14px;
-  text-decoration:none;color:inherit
-}
-.hm-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(74,124,89,.18)}
-.hm-card:active{transform:translateY(0)}
-.hm-icon{font-size:28px;flex-shrink:0;width:44px;height:44px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center}
-.hm-body{flex:1}
-.hm-title{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:3px}
-.hm-sub{font-size:12px;color:var(--tl);line-height:1.4}
-.hm-arrow{font-size:16px;color:var(--brd);flex-shrink:0}
-.hm-disabled{opacity:.55;cursor:not-allowed;pointer-events:none}
-.hm-disabled .hm-sub{color:#aaa}
-.hm-tag{
-  display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;
-  font-weight:600;margin-bottom:4px
-}
-.hm-tag-th{background:#e8f5e9;color:#2e7d32}
-.hm-tag-di{background:#fff8e1;color:#8B6914}
-.hm-tag-bz{background:#f3e5f5;color:#6A1B9A}
-.hm-tag-ar{background:#e3f2fd;color:#1565c0}
+<link rel="manifest" href="manifest.json">
+
+  <meta name="theme-color" content="#4A7C59">
+
+</head>
+
+<body>
+
+
+
+<script>
 
 /* i18n: 中英文切换 (界面与导航，题目保持中文) */
 
@@ -633,11 +563,92 @@ const MODULE_EN = {'问诊':'Inquiry','望诊':'Observation','闻诊':'Smell and
 
 let LANG = localStorage.getItem('lang') || 'zh';
 
+function i18nPick(k){
+
+  if(LANG==='en' && I18N.en[k]!=null) return I18N.en[k];
+
+  if(I18N_ZH[k]!=null) return I18N_ZH[k];
+
+  return k;
+
+}
+
+var _i18nInited=false;
+
+function initI18n(){
+
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+
+    if(!el.getAttribute('data-i18n-zh')) el.setAttribute('data-i18n-zh', el.textContent);
+
+  });
+
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+
+    if(!el.getAttribute('data-i18n-ph-zh')) el.setAttribute('data-i18n-ph-zh', el.placeholder||'');
+
+  });
+
+  _i18nInited=true;
+
+}
+
+function refreshLang(){
+
+  if(!_i18nInited) initI18n();
+
+  document.documentElement.lang = (LANG==='en')?'en':'zh-CN';
+
+  document.title = (LANG==='en') ? 'Constitution & DISC Self-Assessment' : '四诊体质·DISC性格自测系统';
+
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+
+    var k=el.getAttribute('data-i18n');
+
+    el.textContent = (LANG==='en') ? i18nPick(k) : el.getAttribute('data-i18n-zh');
+
+  });
+
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+
+    var k=el.getAttribute('data-i18n-ph');
+
+    el.placeholder = (LANG==='en') ? i18nPick(k) : el.getAttribute('data-i18n-ph-zh');
+
+  });
+
+  var lbl=document.getElementById('lang-btn');
+
+  if(lbl) lbl.textContent = (LANG==='zh')?'EN':'中';
+
+  rerenderCurrent();
+
+}
+
+function rerenderCurrent(){
+
+  try{
+
+    if(document.getElementById('p1') && document.getElementById('p1').classList.contains('active')) renderQ();
+
+    if(document.getElementById('pDISC') && document.getElementById('pDISC').classList.contains('active')){
+
+      var t=document.getElementById('disc-page-test'), r=document.getElementById('disc-page-report');
+
+      if(t && t.style.display==='flex') discRenderQ();
+
+      else if(r && r.style.display==='flex') discRenderReport();
+
+    }
+
+    if(document.getElementById('p-history') && document.getElementById('p-history').classList.contains('active')) renderHistoryPage();
+
+  }catch(e){ console.log('rerenderCurrent',e); }
+
+}
 
 
 
-
-</style>
 </script>
 
 
@@ -646,59 +657,9 @@ let LANG = localStorage.getItem('lang') || 'zh';
 
 <!-- ═══ 封面 ═══ -->
 
-<div <div id="home-page" class="page active">
+<div id="p0" class="page active">
 
-  <div class="home-logo">
-    <div class="hl-title">三 生 系 统</div>
-    <div class="hl-sub">身体 · 性格 · 命理</div>
-  </div>
-
-  <div class="home-cards">
-
-    <!-- 模块一：身体状况 -->
-    <div class="hm-card" data-mod="th" onclick="showModule('th')">
-      <div class="hm-icon" style="background:#e8f5e9">&#127807;</div>
-      <div class="hm-body">
-        <div class="hm-tag hm-tag-th">中医体质</div>
-        <div class="hm-title">你的身体状况</div>
-        <div class="hm-sub">基于国标《中医体质分类与判定》<br>望闻问切四诊合参，评估九种体质</div>
-      </div>
-      <div class="hm-arrow">&#8250;</div>
-    </div>
-
-    <!-- 模块二：思维模式 -->
-    <div class="hm-card" data-mod="di" onclick="showModule('di')">
-      <div class="hm-icon" style="background:#fff8e1">&#128047;</div>
-      <div class="hm-body">
-        <div class="hm-tag hm-tag-di">行为风格</div>
-        <div class="hm-title">你的思维模式</div>
-        <div class="hm-sub">DISC行为风格理论 · 30题约3分钟<br>五种动物读懂你的行为风格</div>
-      </div>
-      <div class="hm-arrow">&#8250;</div>
-    </div>
-
-    <!-- 模块三：能量流态 -->
-    <div class="hm-card" data-mod="bz" onclick="showModule('bz')">
-      <div class="hm-icon" style="background:#f3e5f5">&#128302;</div>
-      <div class="hm-body">
-        <div class="hm-tag hm-tag-bz">命理国学</div>
-        <div class="hm-title">你的能量流态</div>
-        <div class="hm-sub">八字命理 · 大运流年 · 子女推算<br>五行旺衰与喜用分析</div>
-      </div>
-      <div class="hm-arrow">&#8250;</div>
-    </div>
-
-  </div>
-</div>
-        
-    </div>
-
-  </div>
-</div>
-
-<div id="th-page" class="page" style="display:none">
-
- <button class="rb" onclick="showModule('home')" style="margin-top:20px;font-size:13px;padding:9px 24px">&#8592; Fan Hui Shou Ye </button><div id="cover-section" style="display:flex;flex-direction:column;align-items:center;width:100%">
+ <div id="cover-section" style="display:flex;flex-direction:column;align-items:center;width:100%">
 
   <div style="width:auto;max-width:480px">
 
@@ -928,9 +889,6 @@ let LANG = localStorage.getItem('lang') || 'zh';
 
 
 <!-- ═══ 测试 ═══ -->
-
-<div 
-<!-- 底部导航栏 V3.3 -->
 
 <div id="p1" class="page test-page">
 
@@ -1398,9 +1356,9 @@ function showReport(){
 
   document.getElementById('report-section').style.display='block';
 
-  document.getElementById('th-page').classList.add('showing-report');
+  document.getElementById('p0').classList.add('showing-report');
 
-  show('th-page');
+  show('p0');
 
   renderReportHistory();
 
@@ -1434,9 +1392,9 @@ function restart(){
 
   document.getElementById('report-section').style.display='none';
 
-  document.getElementById('th-page').classList.remove('showing-report');
+  document.getElementById('p0').classList.remove('showing-report');
 
-  show('th-page');
+  show('p0');
 
   renderReportHistory();
 
@@ -2076,9 +2034,9 @@ function showReportFromRecord(record){
 
   document.getElementById('report-section').style.display='block';
 
-  document.getElementById('th-page').classList.add('showing-report');
+  document.getElementById('p0').classList.add('showing-report');
 
-  show('th-page');
+  show('p0');
 
   window.scrollTo({top:0,behavior:'smooth'});
 
@@ -2514,7 +2472,7 @@ renderReportHistory();
 
 
 
-// Hash routing (V3.4.12: refreshLang at top-level)：支持直接访问子页面
+// Hash 路由：支持直接访问子页面
 
 window.addEventListener('hashchange', handleHash);
 
@@ -2558,98 +2516,10 @@ function handleHash() {
 
   else if (h === '#pDISC') { document.getElementById('pDISC').classList.add('active'); }
 
-  else { document.getElementById('th-page').classList.add('active'); 
-
-
-}
+  else { document.getElementById('p0').classList.add('active'); }
 
 }
 
-
-
-function i18nPick(k){
-
-  if(LANG==='en' && I18N.en[k]!=null) return I18N.en[k];
-
-  if(I18N_ZH[k]!=null) return I18N_ZH[k];
-
-  return k;
-
-}
-
-var _i18nInited=false;
-
-function initI18n(){
-
-  document.querySelectorAll('[data-i18n]').forEach(function(el){
-
-    if(!el.getAttribute('data-i18n-zh')) el.setAttribute('data-i18n-zh', el.textContent);
-
-  });
-
-  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
-
-    if(!el.getAttribute('data-i18n-ph-zh')) el.setAttribute('data-i18n-ph-zh', el.placeholder||'');
-
-  });
-
-  _i18nInited=true;
-
-}
-
-function refreshLang(){
-
-  if(!_i18nInited) initI18n();
-
-  document.documentElement.lang = (LANG==='en')?'en':'zh-CN';
-
-  document.title = (LANG==='en') ? 'Constitution & DISC Self-Assessment' : '四诊体质·DISC性格自测系统';
-
-  document.querySelectorAll('[data-i18n]').forEach(function(el){
-
-    var k=el.getAttribute('data-i18n');
-
-    el.textContent = (LANG==='en') ? i18nPick(k) : el.getAttribute('data-i18n-zh');
-
-  });
-
-  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
-
-    var k=el.getAttribute('data-i18n-ph');
-
-    el.placeholder = (LANG==='en') ? i18nPick(k) : el.getAttribute('data-i18n-ph-zh');
-
-  });
-
-  var lbl=document.getElementById('lang-btn');
-
-  if(lbl) lbl.textContent = (LANG==='zh')?'EN':'中';
-
-  rerenderCurrent();
-
-}
-
-function rerenderCurrent(){
-
-  try{
-
-    if(document.getElementById('p1') && document.getElementById('p1').classList.contains('active')) renderQ();
-
-    if(document.getElementById('pDISC') && document.getElementById('pDISC').classList.contains('active')){
-
-      var t=document.getElementById('disc-page-test'), r=document.getElementById('disc-page-report');
-
-      if(t && t.style.display==='flex') discRenderQ();
-
-      else if(r && r.style.display==='flex') discRenderReport();
-
-    }
-
-    if(document.getElementById('p-history') && document.getElementById('p-history').classList.contains('active')) renderHistoryPage();
-
-  }catch(e){ console.log('rerenderCurrent',e); }
-
-}
 refreshLang();
 
 handleHash();
@@ -2806,7 +2676,7 @@ handleHash();
 
   <!-- DISC封面 -->
 
-  <div class="page pageDISC disc-cover" id="disc-page-cover">
+  <div class="pageDISC disc-cover" id="disc-page-cover">
 
     <div class="badge" data-i18n="disc_badge">DISC行为风格测试</div>
 
@@ -2890,9 +2760,9 @@ handleHash();
 
       开始测试 →
 
-    </button><button class="rb" onclick="showModule('home')" style="margin-top:10px;font-size:13px;padding:9px 24px">&#8592; Fan Hui </button>
+    </button>
 
-    <button class="rb" onclick="backToHome()" style="margin-top:10px;font-size:13px;padding:9px 24px" data-i18n="disc_back">← 返回首页</button>
+    <button class="rb" onclick="backToHome()" style="margin-top:10px;font-size:13px;padding:9px 24px" data-i18n="disc_back">← 返回体质测试</button>
 
   </div>
 
@@ -2900,7 +2770,7 @@ handleHash();
 
   <!-- DISC测试区 -->
 
-  <div class="page pageDISC disc-test" id="disc-page-test" style="display:none">
+  <div class="pageDISC disc-test" id="disc-page-test" style="display:none">
 
     <div class="thdr">
 
@@ -2948,7 +2818,7 @@ handleHash();
 
   <!-- DISC报告 -->
 
-  <div class="page pageDISC disc-report" id="disc-page-report" style="display:none">
+  <div class="pageDISC disc-report" id="disc-page-report" style="display:none">
 
     <div class="disc-rhd">
 
@@ -3188,7 +3058,7 @@ function startDISC(){
 
     document.getElementById('pDISC').classList.add('active');
 
-  document.getElementById('th-page').classList.remove('active');
+  document.getElementById('p0').classList.remove('active');
 
   document.getElementById('p1').classList.remove('active');
 
@@ -3200,7 +3070,15 @@ function startDISC(){
 
 function backToHome(){
 
-  showModule('home');
+  document.getElementById('pDISC').classList.remove('active');
+
+  document.getElementById('p0').classList.add('active');
+
+  document.getElementById('disc-page-cover').style.display = 'none';
+
+  document.getElementById('disc-page-test').style.display = 'none';
+
+  document.getElementById('disc-page-report').style.display = 'none';
 
   window.scrollTo({top:0,behavior:'smooth'});
 
@@ -3892,7 +3770,7 @@ function closeHistModal() {
 
     <div class="hist-page-hd">
 
-      <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('th-page').classList.add('active');" style="float:right;background:none;border:none;cursor:pointer;font-size:20px;color:var(--tl);padding:4px 8px;margin-right:56px">✕</button>
+      <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p0').classList.add('active');" style="float:right;background:none;border:none;cursor:pointer;font-size:20px;color:var(--tl);padding:4px 8px;margin-right:56px">✕</button>
 
       <h2 data-i18n="hist_title">📋 测试历史记录</h2>
 
@@ -3932,8 +3810,7 @@ function closeHistModal() {
 
     </div>
 
-    <button onclick="showModule('ar');" style="position:fixed;top:12px;right:120px;background:#8B4513;color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;z-index:100">历史档案</button>
-    <button onclick="showModule('home');" style="position:fixed;top:12px;right:12px;background:#8B4513;color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;z-index:100">✕ 返回</button>
+    <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p0').classList.add('active');" style="position:fixed;top:12px;right:12px;background:#8B4513;color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;z-index:100">✕ 返回</button>
 
     
 
@@ -8171,36 +8048,6 @@ function renderBaziAnalysis(){
   }
 }window.renderBaziAnalysis=renderBaziAnalysis;
 
-
-// V3.3: 模块导航函数
-var _currentModule='home';
-function showModule(mod){
-  _currentModule=mod;
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');p.style.display='none'});
-  var bn=document.getElementById('bottom-nav');if(bn)bn.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active')});
-  var pageMap={th:'th-page',di:'disc-page-cover',bz:'p-bazi',ar:'p-history'};
-  var navMap={th:'nav-th',di:'nav-di',bz:'nav-bz',ar:'nav-ar'};
-  if(mod==='home'){
-    document.getElementById('home-page').classList.add('active');
-    document.getElementById('home-page').style.display='block';
-  } else if(pageMap[mod]){
-    var pg=document.getElementById(pageMap[mod]);
-    if(pg){pg.classList.add('active');pg.style.display='block'}
-  }
-  if(navMap[mod]){var nb=document.getElementById(navMap[mod]);if(nb&&document.getElementById('bottom-nav'))nb.classList.add('active')}
-}
-
-
-// 将 discStartTest 入口改为切到 DISC 模块
-
-
-
-
-// Home page card click handler
-document.getElementById('home-page').addEventListener('click', function(e){
-  var card = e.target.closest('.hm-card');
-  if(card && card.dataset.mod){ showModule(card.dataset.mod); }
-});
 </script>
 </body>
 

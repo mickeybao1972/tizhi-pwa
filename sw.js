@@ -1,23 +1,29 @@
-// V3.4.11 sw.js: pass-through + clean install
-// On install: clear all caches + unregister self (so SW won't interfere on next page load)
+// Service Worker for 四诊体质顾问 PWA
+const CACHE_NAME='sizheng-pwa-v82';
+const ASSETS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon.svg',
+  './favicon.ico',
+  './lunar.js'
+];
 self.addEventListener('install', e => {
   self.skipWaiting();
-  e.waitUntil((async () => {
-    try {
-      const keys = await caches.keys();
-      await Promise.all(keys.map(k => caches.delete(k)));
-      await self.registration.unregister();
-    } catch(e){}
-  })());
 });
 self.addEventListener('activate', e => {
-  e.waitUntil((async () => {
-    try {
-      await self.registration.unregister();
-      const keys = await caches.keys();
-      await Promise.all(keys.map(k => caches.delete(k)));
-      await self.clients.claim();
-    } catch(e){}
-  })());
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))));
+  self.clients.claim();
 });
-// NO fetch handler — all requests go straight to network (no SW interception)
+self.addEventListener('fetch', e => {
+  // network-first, fallback to cache
+  e.respondWith(
+    fetch(e.request).then(r => {
+      if (r.ok && e.request.method === 'GET') {
+        const clone = r.clone();
+        caches.open(CACHE_NAME).then(c => c.put(e.request, clone)).catch(() => {});
+      }
+      return r;
+    }).catch(() => caches.match(e.request))
+  );
+});
