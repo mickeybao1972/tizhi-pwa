@@ -1,13 +1,36 @@
 <!DOCTYPE html>
-<!-- cache-bust: 2026-08-15 15:20 UTC+8 V3.4.11 -->
+<!-- cache-bust: 2026-08-15 15:20 UTC+8 V3.4.12 -->
 <!-- V3.3: New home page + bottom nav + module skeleton (身体/思维/能量/空间) -->
 
 <html lang="zh-CN">
 
 <head><script>
+// V3.4.12 cache-bust: force fresh load (prevent stuck old HTML)
+(function(){
+  if(location.search.indexOf('v=3412')===-1){
+    // no marker -> force a fresh URL with cache-buster
+    var u=location.href.split('#')[0];
+    var sep = u.indexOf('?')>=0 ? '&' : '?';
+    var nb = u + sep + 'v=3412&_t=' + Date.now();
+    location.replace(nb);
+  }
+  // Also unregister any leftover SW from earlier versions
+  if(navigator.serviceWorker){
+    navigator.serviceWorker.getRegistrations().then(function(rs){
+      rs.forEach(function(r){ try{ r.unregister(); }catch(e){} });
+    });
+    if(window.caches){
+      caches.keys().then(function(ks){
+        ks.forEach(function(k){ caches.delete(k); });
+      });
+    }
+  }
+})();
+</script>
+<script>
 (function(){
   // Mark this version on first load
-  try { window.__pwaVer = 'V3.4.11'; } catch(e){}
+  try { window.__pwaVer = 'V3.4.12'; } catch(e){}
 })();
 </script>
 <!-- SW cleanup -->
@@ -47,7 +70,7 @@ if('serviceWorker' in navigator){
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>V3.4.11 四诊体质 DISC 性格自测系统</title>
+<title>V3.4.12 四诊体质 DISC 性格自测系统</title>
 
 <style>
 
@@ -2491,7 +2514,7 @@ renderReportHistory();
 
 
 
-// Hash routing (V3.4.11: refreshLang at top-level)：支持直接访问子页面
+// Hash routing (V3.4.12: refreshLang at top-level)：支持直接访问子页面
 
 window.addEventListener('hashchange', handleHash);
 
