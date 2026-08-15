@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- cache-bust: 2026-08-10 17:00 UTC+8 -->
+<!-- cache-bust: 2026-08-15 09:00 UTC+8 -->
+<!-- V3.3: New home page + bottom nav + module skeleton (身体/思维/能量/空间) -->
 
 <html lang="zh-CN">
 
@@ -19,7 +20,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>四诊体质·DISC性格自测系统</title>
+<title>三生系统·身体·性格·命理·空间</title>
 
 <style>
 
@@ -442,6 +443,57 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
 
 
 </style>
+/* === 首页 + 底部导航 V3.3 === */
+#home-page{background:var(--bg);min-height:100vh;padding:16px 16px 80px;max-width:520px;margin:0 auto;display:none}
+#home-page.active{display:block}
+.home-logo{text-align:center;padding:24px 0 20px}
+.home-logo .hl-title{font-size:20px;font-weight:700;color:var(--txt);letter-spacing:2px}
+.home-logo .hl-sub{font-size:12px;color:var(--tl);margin-top:4px}
+.home-cards{display:flex;flex-direction:column;gap:12px;padding:0 4px}
+.hm-card{
+  background:var(--card);border-radius:var(--r);padding:18px 20px;
+  box-shadow:var(--shd);border:1px solid var(--brd);cursor:pointer;
+  transition:transform .15s,box-shadow .15s;display:flex;align-items:center;gap:14px;
+  text-decoration:none;color:inherit
+}
+.hm-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(74,124,89,.18)}
+.hm-card:active{transform:translateY(0)}
+.hm-icon{font-size:28px;flex-shrink:0;width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center}
+.hm-body{flex:1}
+.hm-title{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:3px}
+.hm-sub{font-size:12px;color:var(--tl);line-height:1.4}
+.hm-arrow{font-size:16px;color:var(--brd);flex-shrink:0}
+.hm-disabled{opacity:.55;cursor:not-allowed;pointer-events:none}
+.hm-disabled .hm-sub{color:#aaa}
+.hm-tag{
+  display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;
+  font-weight:600;margin-bottom:4px
+}
+.hm-tag-th{background:#e8f5e9;color:#2e7d32}
+.hm-tag-di{background:#fff8e1;color:#8B6914}
+.hm-tag-bz{background:#f3e5f5;color:#6A1B9A}
+.hm-tag-ar{background:#e3f2fd;color:#1565c0}
+
+/* 底部导航 */
+#bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:900;
+  background:#fff;border-top:1px solid var(--brd);
+  display:flex;box-shadow:0 -2px 12px rgba(0,0,0,.08);
+  max-width:520px;margin:0 auto
+}
+.nav-btn{
+  flex:1;padding:10px 4px 8px;text-align:center;
+  border:none;background:none;cursor:pointer;
+  font-size:11px;color:var(--tl);transition:color .2s;
+  display:flex;flex-direction:column;align-items:center;gap:3px
+}
+.nav-btn .nb-icon{font-size:20px;line-height:1}
+.nav-btn .nb-label{font-size:10px;font-weight:500}
+.nav-btn.active{color:var(--p)}
+.nav-btn.active .nb-icon{transform:scale(1.1)}
+.nav-btn.disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+
 
 <link rel="manifest" href="manifest.json">
 
@@ -657,7 +709,74 @@ function rerenderCurrent(){
 
 <!-- ═══ 封面 ═══ -->
 
-<div id="p0" class="page active">
+<div <div id="home-page" class="page active">
+
+  <div class="home-logo">
+    <div class="hl-title">三 生 系 统</div>
+    <div class="hl-sub">身体 · 性格 · 命理 · 空间</div>
+  </div>
+
+  <div class="home-cards">
+
+    <!-- 模块一：身体状况 -->
+    <div class="hm-card" onclick="showModule('th')">
+      <div class="hm-icon" style="background:#e8f5e9">🌿</div>
+      <div class="hm-body">
+        <div class="hm-tag hm-tag-th">中医体质</div>
+        <div class="hm-title">你的身体状况</div>
+        <div class="hm-sub">基于国标《中医体质分类与判定》<br>望闻问切四诊合参，评估九种体质</div>
+      </div>
+      <div class="hm-arrow">›</div>
+    </div>
+
+    <!-- 模块二：思维模式 -->
+    <div class="hm-card" onclick="showModule('di')">
+      <div class="hm-icon" style="background:#fff8e1">🐯</div>
+      <div class="hm-body">
+        <div class="hm-tag hm-tag-di">行为风格</div>
+        <div class="hm-title">你的思维模式</div>
+        <div class="hm-sub">DISC行为风格理论 · 30题约3分钟<br>五种动物读懂你的行为风格</div>
+      </div>
+      <div class="hm-arrow">›</div>
+    </div>
+
+    <!-- 模块三：能量流态 -->
+    <div class="hm-card" onclick="showModule('bz')">
+      <div class="hm-icon" style="background:#f3e5f5">🔮</div>
+      <div class="hm-body">
+        <div class="hm-tag hm-tag-bz">命理国学</div>
+        <div class="hm-title">你的能量流态</div>
+        <div class="hm-sub">八字命理 · 大运流年 · 子女推算<br>五行旺衰与喜用分析</div>
+      </div>
+      <div class="hm-arrow">›</div>
+    </div>
+
+    <!-- 模块四：空间环境（敬请期待） -->
+    <div class="hm-card hm-disabled">
+      <div class="hm-icon" style="background:#f5f5f5">🏠</div>
+      <div class="hm-body">
+        <div class="hm-tag hm-tag-ar">环境风水</div>
+        <div class="hm-title">你的空间环境</div>
+        <div class="hm-sub">风水布局（敬请期待）</div>
+      </div>
+      <div class="hm-arrow" style="color:#ccc">›</div>
+    </div>
+
+    <!-- 档案管理 -->
+    <div class="hm-card" onclick="showModule('ar')">
+      <div class="hm-icon" style="background:#e3f2fd">📋</div>
+      <div class="hm-body">
+        <div class="hm-tag hm-tag-ar">档案管理</div>
+        <div class="hm-title">全部历史记录</div>
+        <div class="hm-sub">查看体质、性格、命理全部历史档案</div>
+      </div>
+      <div class="hm-arrow">›</div>
+    </div>
+
+  </div>
+</div>
+
+id="th-page" class="page" style="display:none">
 
  <div id="cover-section" style="display:flex;flex-direction:column;align-items:center;width:100%">
 
@@ -890,7 +1009,31 @@ function rerenderCurrent(){
 
 <!-- ═══ 测试 ═══ -->
 
-<div id="p1" class="page test-page">
+<div 
+<!-- 底部导航栏 V3.3 -->
+<div id="bottom-nav">
+  <button class="nav-btn active" id="nav-th" onclick="showModule('th')">
+    <span class="nb-icon">🌿</span>
+    <span class="nb-label">身体</span>
+  </button>
+  <button class="nav-btn" id="nav-di" onclick="showModule('di')">
+    <span class="nb-icon">🐯</span>
+    <span class="nb-label">性格</span>
+  </button>
+  <button class="nav-btn" id="nav-bz" onclick="showModule('bz')">
+    <span class="nb-icon">🔮</span>
+    <span class="nb-label">命理</span>
+  </button>
+  <button class="nav-btn disabled" id="nav-fs" onclick="">
+    <span class="nb-icon">🏠</span>
+    <span class="nb-label">空间</span>
+  </button>
+  <button class="nav-btn" id="nav-ar" onclick="showModule('ar')">
+    <span class="nb-icon">📋</span>
+    <span class="nb-label">档案</span>
+  </button>
+</div>
+id="p1" class="page test-page">
 
   <div class="thdr">
 
@@ -2762,7 +2905,7 @@ handleHash();
 
     </button>
 
-    <button class="rb" onclick="backToHome()" style="margin-top:10px;font-size:13px;padding:9px 24px" data-i18n="disc_back">← 返回体质测试</button>
+    <button class="rb" onclick="backToHome()" style="margin-top:10px;font-size:13px;padding:9px 24px" data-i18n="disc_back">← 返回首页</button>
 
   </div>
 
@@ -3070,15 +3213,7 @@ function startDISC(){
 
 function backToHome(){
 
-  document.getElementById('pDISC').classList.remove('active');
-
-  document.getElementById('p0').classList.add('active');
-
-  document.getElementById('disc-page-cover').style.display = 'none';
-
-  document.getElementById('disc-page-test').style.display = 'none';
-
-  document.getElementById('disc-page-report').style.display = 'none';
+  showModule('home');
 
   window.scrollTo({top:0,behavior:'smooth'});
 
@@ -8047,6 +8182,28 @@ function renderBaziAnalysis(){
     box.style.display='block';
   }
 }window.renderBaziAnalysis=renderBaziAnalysis;
+
+
+// V3.3: 模块导航函数
+var _currentModule='home';
+function showModule(mod){
+  _currentModule=mod;
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');p.style.display='none'});
+  document.getElementById('bottom-nav').querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active')});
+  var pageMap={th:'th-page',di:'disc-page-cover',bz:'p-bazi',ar:'p-history'};
+  var navMap={th:'nav-th',di:'nav-di',bz:'nav-bz',ar:'nav-ar'};
+  if(mod==='home'){
+    document.getElementById('home-page').classList.add('active');
+    document.getElementById('home-page').style.display='block';
+  } else if(pageMap[mod]){
+    var pg=document.getElementById(pageMap[mod]);
+    if(pg){pg.classList.add('active');pg.style.display='block'}
+  }
+  if(navMap[mod]){var nb=document.getElementById(navMap[mod]);if(nb)nb.classList.add('active')}
+}
+
+
+// 将 discStartTest 入口改为切到 DISC 模块
 
 </script>
 </body>
