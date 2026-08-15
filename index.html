@@ -4,7 +4,31 @@
 
 <html lang="zh-CN">
 
-<head><!-- SW cleanup -->
+<head><script>
+(function(){
+  var VER = 'V3.4.5';
+  try {
+    if (window.__pwaVer === VER) return;
+    // Old poisoned cache detected: kill SW and reload
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(rs){
+        rs.forEach(function(r){ try { r.unregister(); } catch(e){} });
+      });
+    }
+    if (window.caches && caches.keys) {
+      caches.keys().then(function(keys){ keys.forEach(function(k){ caches.delete(k); }); });
+    }
+    // Mark this version
+    try { window.__pwaVer = VER; } catch(e){}
+    // Force a one-time hard reload to get fresh content
+    if (!window.__reloading) {
+      window.__reloading = true;
+      location.reload(true);
+    }
+  } catch(e){}
+})();
+</script>
+<!-- SW cleanup -->
 <script>
 if('serviceWorker' in navigator){
   navigator.serviceWorker.getRegistrations().then(function(regs){
@@ -31,7 +55,7 @@ if('serviceWorker' in navigator){
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>三生系统·身体·性格·命理·空间</title>
+<title>V3.4.5 四诊体质 DISC 性格自测系统</title>
 
 <style>
 
