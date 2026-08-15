@@ -600,89 +600,6 @@ const MODULE_EN = {'问诊':'Inquiry','望诊':'Observation','闻诊':'Smell and
 
 let LANG = localStorage.getItem('lang') || 'zh';
 
-function i18nPick(k){
-
-  if(LANG==='en' && I18N.en[k]!=null) return I18N.en[k];
-
-  if(I18N_ZH[k]!=null) return I18N_ZH[k];
-
-  return k;
-
-}
-
-var _i18nInited=false;
-
-function initI18n(){
-
-  document.querySelectorAll('[data-i18n]').forEach(function(el){
-
-    if(!el.getAttribute('data-i18n-zh')) el.setAttribute('data-i18n-zh', el.textContent);
-
-  });
-
-  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
-
-    if(!el.getAttribute('data-i18n-ph-zh')) el.setAttribute('data-i18n-ph-zh', el.placeholder||'');
-
-  });
-
-  _i18nInited=true;
-
-}
-
-function refreshLang(){
-
-  if(!_i18nInited) initI18n();
-
-  document.documentElement.lang = (LANG==='en')?'en':'zh-CN';
-
-  document.title = (LANG==='en') ? 'Constitution & DISC Self-Assessment' : '四诊体质·DISC性格自测系统';
-
-  document.querySelectorAll('[data-i18n]').forEach(function(el){
-
-    var k=el.getAttribute('data-i18n');
-
-    el.textContent = (LANG==='en') ? i18nPick(k) : el.getAttribute('data-i18n-zh');
-
-  });
-
-  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
-
-    var k=el.getAttribute('data-i18n-ph');
-
-    el.placeholder = (LANG==='en') ? i18nPick(k) : el.getAttribute('data-i18n-ph-zh');
-
-  });
-
-  var lbl=document.getElementById('lang-btn');
-
-  if(lbl) lbl.textContent = (LANG==='zh')?'EN':'中';
-
-  rerenderCurrent();
-
-}
-
-function rerenderCurrent(){
-
-  try{
-
-    if(document.getElementById('p1') && document.getElementById('p1').classList.contains('active')) renderQ();
-
-    if(document.getElementById('pDISC') && document.getElementById('pDISC').classList.contains('active')){
-
-      var t=document.getElementById('disc-page-test'), r=document.getElementById('disc-page-report');
-
-      if(t && t.style.display==='flex') discRenderQ();
-
-      else if(r && r.style.display==='flex') discRenderReport();
-
-    }
-
-    if(document.getElementById('p-history') && document.getElementById('p-history').classList.contains('active')) renderHistoryPage();
-
-  }catch(e){ console.log('rerenderCurrent',e); }
-
-}
 
 
 
@@ -2608,7 +2525,93 @@ function handleHash() {
 
   else if (h === '#pDISC') { document.getElementById('pDISC').classList.add('active'); }
 
-  else { document.getElementById('th-page').classList.add('active'); }
+  else { document.getElementById('th-page').classList.add('active'); function i18nPick(k){
+
+  if(LANG==='en' && I18N.en[k]!=null) return I18N.en[k];
+
+  if(I18N_ZH[k]!=null) return I18N_ZH[k];
+
+  return k;
+
+}
+
+var _i18nInited=false;
+
+function initI18n(){
+
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+
+    if(!el.getAttribute('data-i18n-zh')) el.setAttribute('data-i18n-zh', el.textContent);
+
+  });
+
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+
+    if(!el.getAttribute('data-i18n-ph-zh')) el.setAttribute('data-i18n-ph-zh', el.placeholder||'');
+
+  });
+
+  _i18nInited=true;
+
+}
+
+function refreshLang(){
+
+  if(!_i18nInited) initI18n();
+
+  document.documentElement.lang = (LANG==='en')?'en':'zh-CN';
+
+  document.title = (LANG==='en') ? 'Constitution & DISC Self-Assessment' : '四诊体质·DISC性格自测系统';
+
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+
+    var k=el.getAttribute('data-i18n');
+
+    el.textContent = (LANG==='en') ? i18nPick(k) : el.getAttribute('data-i18n-zh');
+
+  });
+
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+
+    var k=el.getAttribute('data-i18n-ph');
+
+    el.placeholder = (LANG==='en') ? i18nPick(k) : el.getAttribute('data-i18n-ph-zh');
+
+  });
+
+  var lbl=document.getElementById('lang-btn');
+
+  if(lbl) lbl.textContent = (LANG==='zh')?'EN':'中';
+
+  rerenderCurrent();
+
+}
+
+function rerenderCurrent(){
+
+  try{
+
+    if(document.getElementById('p1') && document.getElementById('p1').classList.contains('active')) renderQ();
+
+    if(document.getElementById('pDISC') && document.getElementById('pDISC').classList.contains('active')){
+
+      var t=document.getElementById('disc-page-test'), r=document.getElementById('disc-page-report');
+
+      if(t && t.style.display==='flex') discRenderQ();
+
+      else if(r && r.style.display==='flex') discRenderReport();
+
+    }
+
+    if(document.getElementById('p-history') && document.getElementById('p-history').classList.contains('active')) renderHistoryPage();
+
+  }catch(e){ console.log('rerenderCurrent',e); }
+
+}
+
+
+
+}
 
 }
 
