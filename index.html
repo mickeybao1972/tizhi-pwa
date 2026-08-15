@@ -8219,6 +8219,12 @@ document.getElementById('bottom-nav').addEventListener('click', function(e){
   if(btn&&btn.dataset.mod){showModule(btn.dataset.mod)}
 });
 
+
+// Home page card click handler
+document.getElementById('home-page').addEventListener('click', function(e){
+  var card = e.target.closest('.home-card');
+  if(card && card.dataset.mod){ showModule(card.dataset.mod); }
+});
 </script>
 </body>
 
