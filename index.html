@@ -1,3 +1,8 @@
+
+document.getElementById('bottom-nav').addEventListener('click', function(e){
+  var btn = e.target.closest('.nav-btn');
+  if(btn && btn.dataset.mod){ showModule(btn.dataset.mod); }
+});
 <!DOCTYPE html>
 <!-- cache-bust: 2026-08-15 09:00 UTC+8 -->
 <!-- V3.3: New home page + bottom nav + module skeleton (身体/思维/能量/空间) -->
@@ -442,7 +447,7 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
 
 
 
-</style>
+
 /* === 首页 + 底部导航 V3.3 === */
 #home-page{background:var(--bg);min-height:100vh;padding:16px 16px 80px;max-width:520px;margin:0 auto;display:none}
 #home-page.active{display:block}
@@ -701,6 +706,8 @@ function rerenderCurrent(){
 
 
 
+
+</style>
 </script>
 
 
@@ -719,7 +726,7 @@ function rerenderCurrent(){
   <div class="home-cards">
 
     <!-- 模块一：身体状况 -->
-    <div class="hm-card" onclick="showModule('th')">
+    <div class="hm-card" data-mod="th">
       <div class="hm-icon" style="background:#e8f5e9">🌿</div>
       <div class="hm-body">
         <div class="hm-tag hm-tag-th">中医体质</div>
@@ -730,7 +737,7 @@ function rerenderCurrent(){
     </div>
 
     <!-- 模块二：思维模式 -->
-    <div class="hm-card" onclick="showModule('di')">
+    <div class="hm-card" data-mod="di">
       <div class="hm-icon" style="background:#fff8e1">🐯</div>
       <div class="hm-body">
         <div class="hm-tag hm-tag-di">行为风格</div>
@@ -741,7 +748,7 @@ function rerenderCurrent(){
     </div>
 
     <!-- 模块三：能量流态 -->
-    <div class="hm-card" onclick="showModule('bz')">
+    <div class="hm-card" data-mod="bz">
       <div class="hm-icon" style="background:#f3e5f5">🔮</div>
       <div class="hm-body">
         <div class="hm-tag hm-tag-bz">命理国学</div>
@@ -763,7 +770,7 @@ function rerenderCurrent(){
     </div>
 
     <!-- 档案管理 -->
-    <div class="hm-card" onclick="showModule('ar')">
+    <div class="hm-card" data-mod="ar">
       <div class="hm-icon" style="background:#e3f2fd">📋</div>
       <div class="hm-body">
         <div class="hm-tag hm-tag-ar">档案管理</div>
@@ -1012,15 +1019,15 @@ id="th-page" class="page" style="display:none">
 <div 
 <!-- 底部导航栏 V3.3 -->
 <div id="bottom-nav">
-  <button class="nav-btn active" id="nav-th" onclick="showModule('th')">
+  <button class="nav-btn active" id="nav-th" data-mod="th">
     <span class="nb-icon">🌿</span>
     <span class="nb-label">身体</span>
   </button>
-  <button class="nav-btn" id="nav-di" onclick="showModule('di')">
+  <button class="nav-btn" id="nav-di" data-mod="di">
     <span class="nb-icon">🐯</span>
     <span class="nb-label">性格</span>
   </button>
-  <button class="nav-btn" id="nav-bz" onclick="showModule('bz')">
+  <button class="nav-btn" id="nav-bz" data-mod="bz">
     <span class="nb-icon">🔮</span>
     <span class="nb-label">命理</span>
   </button>
@@ -1028,7 +1035,7 @@ id="th-page" class="page" style="display:none">
     <span class="nb-icon">🏠</span>
     <span class="nb-label">空间</span>
   </button>
-  <button class="nav-btn" id="nav-ar" onclick="showModule('ar')">
+  <button class="nav-btn" id="nav-ar" data-mod="ar">
     <span class="nb-icon">📋</span>
     <span class="nb-label">档案</span>
   </button>
@@ -1499,9 +1506,9 @@ function showReport(){
 
   document.getElementById('report-section').style.display='block';
 
-  document.getElementById('p0').classList.add('showing-report');
+  document.getElementById('th-page').classList.add('showing-report');
 
-  show('p0');
+  show('th-page');
 
   renderReportHistory();
 
@@ -1535,9 +1542,9 @@ function restart(){
 
   document.getElementById('report-section').style.display='none';
 
-  document.getElementById('p0').classList.remove('showing-report');
+  document.getElementById('th-page').classList.remove('showing-report');
 
-  show('p0');
+  show('th-page');
 
   renderReportHistory();
 
@@ -2177,9 +2184,9 @@ function showReportFromRecord(record){
 
   document.getElementById('report-section').style.display='block';
 
-  document.getElementById('p0').classList.add('showing-report');
+  document.getElementById('th-page').classList.add('showing-report');
 
-  show('p0');
+  show('th-page');
 
   window.scrollTo({top:0,behavior:'smooth'});
 
@@ -2659,7 +2666,7 @@ function handleHash() {
 
   else if (h === '#pDISC') { document.getElementById('pDISC').classList.add('active'); }
 
-  else { document.getElementById('p0').classList.add('active'); }
+  else { document.getElementById('th-page').classList.add('active'); }
 
 }
 
@@ -3201,7 +3208,7 @@ function startDISC(){
 
     document.getElementById('pDISC').classList.add('active');
 
-  document.getElementById('p0').classList.remove('active');
+  document.getElementById('th-page').classList.remove('active');
 
   document.getElementById('p1').classList.remove('active');
 
@@ -3905,7 +3912,7 @@ function closeHistModal() {
 
     <div class="hist-page-hd">
 
-      <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p0').classList.add('active');" style="float:right;background:none;border:none;cursor:pointer;font-size:20px;color:var(--tl);padding:4px 8px;margin-right:56px">✕</button>
+      <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('th-page').classList.add('active');" style="float:right;background:none;border:none;cursor:pointer;font-size:20px;color:var(--tl);padding:4px 8px;margin-right:56px">✕</button>
 
       <h2 data-i18n="hist_title">📋 测试历史记录</h2>
 
@@ -3945,7 +3952,7 @@ function closeHistModal() {
 
     </div>
 
-    <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p0').classList.add('active');" style="position:fixed;top:12px;right:12px;background:#8B4513;color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;z-index:100">✕ 返回</button>
+    <button onclick="showModule('home');" style="position:fixed;top:12px;right:12px;background:#8B4513;color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;z-index:100">✕ 返回</button>
 
     
 
@@ -8204,6 +8211,13 @@ function showModule(mod){
 
 
 // 将 discStartTest 入口改为切到 DISC 模块
+
+
+
+document.getElementById('bottom-nav').addEventListener('click', function(e){
+  var btn=e.target.closest('.nav-btn');
+  if(btn&&btn.dataset.mod){showModule(btn.dataset.mod)}
+});
 
 </script>
 </body>
