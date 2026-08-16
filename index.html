@@ -1,5 +1,8 @@
 <!DOCTYPE html>
+<!-- cache-bust: 2026-08-10 17:00 UTC+8 -->
+
 <html lang="zh-CN">
+
 <head>
 
 
@@ -16,7 +19,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>子女应期推算 - 四诊体质</title>
+<title>四诊体质·DISC性格自测系统</title>
 
 <style>
 
@@ -446,21 +449,3368 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
 
 </head>
 
-
 <body>
-<div id="p-bazi" class="page active" style="background:#f5f5f0;padding:16px 12px">
+
+
+
+<script>
+
+/* i18n: 中英文切换 (界面与导航，题目保持中文) */
+
+const I18N = {
+
+  zh: {},
+
+  en: {
+
+    app_badge:'TCM Constitution Assessment',
+
+    cover_title:'Four-Examination Self-Test System',
+
+    cover_sub:'Based on the national standard Classification and Determination of TCM Constitution (ZY/T 001.1-1994)',
+
+    flow_title:'Test Flow',
+
+    flow_wz:'Observation', flow_wz_s:'Tongue and complexion - 4 questions - about 1 min',
+
+    flow_wm:'Smell and Sound', flow_wm_s:'Breath, phlegm, odor - 4 questions - about 1 min',
+
+    flow_wq:'Inquiry', flow_wq_s:'61 questions - about 8 min (full standard version)',
+
+    flow_cx:'Pulse', flow_cx_s:'Subjective pulse typing - 1 question - about 30 sec',
+
+    flow_rp:'Report', flow_rp_s:'Constitution determination, organ tendency, wellness advice',
+
+    cover_note:'This assessment is for TCM constitution reference only and is not a basis for disease diagnosis or treatment.',
+
+    form_title:'Subject Information',
+
+    lbl_name:'Name', lbl_gender:'Gender', lbl_age:'Age', lbl_phone:'Phone', lbl_address:'Address',
+
+    ph_name:'Enter name', ph_age:'years', ph_phone:'Mobile number', ph_address:'City or street',
+
+    opt_select:'Please select', opt_male:'Male', opt_female:'Female',
+
+    btn_start:'Start Assessment ->',
+
+    other_tools:'Other Tools',
+
+    btn_disc:'DISC Personality Test - 5 Animal Types',
+
+    btn_history:'Test History',
+
+    report_title:'Constitution Assessment Report',
+
+    report_sub:'Computed per the national standard for TCM Constitution Classification',
+
+    r_badge:'Constitution Determination',
+
+    r_organ_title:'Zang-Fu (Organ) Tendency',
+
+    r_grid_title:'Nine Constitution Comparison',
+
+    r_grid_sub:'? marks your result; numbers show the main constitution ranking',
+
+    btn_retake:'Retake',
+
+    hist_mine:'My Records',
+
+    dev_designed:'Designed by: ', dev_contact:'Contact: ', dev_meta:'TCM Constitution Assessment',
+
+    disclaimer:'This assessment is for TCM constitution reference only and is not a basis for disease diagnosis or treatment. The constitution classification, organ tendency, and wellness advice are for reference only and cannot replace professional TCM diagnosis and treatment. If you have obvious discomfort, please consult a TCM practitioner or visit a medical institution.',
+
+    hist_title:'Test History', hist_keep:'Keeps the latest 20 records', hist_empty:'No test records yet',
+
+    btn_prev:'<- Previous', btn_next:'Next ->', btn_result:'View Result ->',
+
+    disc_badge:'DISC Behavior Style Test', disc_title:'Personality Self-Test', disc_sub:'Understand your style through 5 animals',
+
+    disc_note:'Based on DISC behavior style theory - 30 questions - about 3 min\nFor workplace communication, team building, and interpersonal understanding',
+
+    disc_start:'Start Test ->', disc_back:'<- Back to Constitution Test',
+
+    disc_mtag:'DISC Personality Test', disc_prev:'<- Previous', disc_next:'Next ->', disc_view:'View Result ->',
+
+    disc_rpt_title:'DISC Personality Report', disc_rpt_sub:'Based on DISC Behavior Style Test - 2026.7.25',
+
+    disc_bar_title:'DISC Four-Quadrant Distribution', disc_retake:'Retake', disc_view_hist:'View History',
+
+    disc_disclaimer:'DISC is a behavior style reference tool and does not indicate ability or character. Each type has unique value; effective communication requires understanding and respecting different styles.',
+
+    disc_credit:'DISC Personality Test',
+
+    th_type:'Constitution', th_score:'Conversion Score', th_dist:'Distribution', th_judge:'Determination',
+
+    sync_syncing:'Syncing...', sync_success:'Synced to cloud', sync_offline:'Saved locally'
+
+  }
+
+};
+
+const I18N_ZH = {
+
+  hist_empty:'暂无测试记录',
+
+  btn_prev:'← 上一题', btn_next:'下一题 →', btn_result:'查看结果 →',
+
+  disc_next:'下一题 →', disc_view:'查看结果 →', disc_prev:'← 上一题',
+
+  sync_syncing:'同步中...', sync_success:'已同步到云端', sync_offline:'已保存到本地'
+
+};
+
+const MODULE_EN = {'问诊':'Inquiry','望诊':'Observation','闻诊':'Smell and Sound','切诊':'Pulse'};
+
+let LANG = localStorage.getItem('lang') || 'zh';
+
+function i18nPick(k){
+
+  if(LANG==='en' && I18N.en[k]!=null) return I18N.en[k];
+
+  if(I18N_ZH[k]!=null) return I18N_ZH[k];
+
+  return k;
+
+}
+
+var _i18nInited=false;
+
+function initI18n(){
+
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+
+    if(!el.getAttribute('data-i18n-zh')) el.setAttribute('data-i18n-zh', el.textContent);
+
+  });
+
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+
+    if(!el.getAttribute('data-i18n-ph-zh')) el.setAttribute('data-i18n-ph-zh', el.placeholder||'');
+
+  });
+
+  _i18nInited=true;
+
+}
+
+function refreshLang(){
+
+  if(!_i18nInited) initI18n();
+
+  document.documentElement.lang = (LANG==='en')?'en':'zh-CN';
+
+  document.title = (LANG==='en') ? 'Constitution & DISC Self-Assessment' : '四诊体质·DISC性格自测系统';
+
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+
+    var k=el.getAttribute('data-i18n');
+
+    el.textContent = (LANG==='en') ? i18nPick(k) : el.getAttribute('data-i18n-zh');
+
+  });
+
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+
+    var k=el.getAttribute('data-i18n-ph');
+
+    el.placeholder = (LANG==='en') ? i18nPick(k) : el.getAttribute('data-i18n-ph-zh');
+
+  });
+
+  var lbl=document.getElementById('lang-btn');
+
+  if(lbl) lbl.textContent = (LANG==='zh')?'EN':'中';
+
+  rerenderCurrent();
+
+}
+
+function rerenderCurrent(){
+
+  try{
+
+    if(document.getElementById('p1') && document.getElementById('p1').classList.contains('active')) renderQ();
+
+    if(document.getElementById('pDISC') && document.getElementById('pDISC').classList.contains('active')){
+
+      var t=document.getElementById('disc-page-test'), r=document.getElementById('disc-page-report');
+
+      if(t && t.style.display==='flex') discRenderQ();
+
+      else if(r && r.style.display==='flex') discRenderReport();
+
+    }
+
+    if(document.getElementById('p-history') && document.getElementById('p-history').classList.contains('active')) renderHistoryPage();
+
+  }catch(e){ console.log('rerenderCurrent',e); }
+
+}
+
+
+
+</script>
+
+
+
+
+
+<!-- ═══ 封面 ═══ -->
+
+<div id="p0" class="page active">
+
+ <div id="cover-section" style="display:flex;flex-direction:column;align-items:center;width:100%">
+
+  <div style="width:auto;max-width:480px">
+
+    <div class="badge">中医体质评估</div>
+
+    <div class="ctitle" data-i18n="cover_title">四诊体质自测系统</div>
+
+    <div class="csub" data-i18n="cover_sub">基于国标《中医体质分类与判定》(ZY/T 001.1-1994)</div>
+
+  </div>
+
+  <div class="cbox" style="max-width:480px;width:auto">
+
+    <h3 data-i18n="flow_title">📋 测试流程</h3>
+
+    <ul class="steps">
+
+      <li><div class="sn wz">1</div><div class="step-text"><span data-i18n="flow_wz">望诊模块</span> <small style="color:var(--tl)" data-i18n="flow_wz_s">舌象·面色 共4题·约1分钟</small></div></li>
+
+      <li><div class="sn wm">2</div><div class="step-text"><span data-i18n="flow_wm">闻诊模块</span> <small style="color:var(--tl)" data-i18n="flow_wm_s">口气·痰音·气息·体味 共4题·约1分钟</small></div></li>
+
+      <li><div class="sn">3</div><div class="step-text"><span data-i18n="flow_wq">问诊模块</span> <small style="color:var(--tl)" data-i18n="flow_wq_s">61道题·约8分钟（国标完整版）</small></div></li>
+
+      <li><div class="sn cx">4</div><div class="step-text"><span data-i18n="flow_cx">切诊模块</span> <small style="color:var(--tl)" data-i18n="flow_cx_s">脉象主观分类 共1题·约30秒</small></div></li>
+
+      <li><div class="sn rp">5</div><div class="step-text"><span data-i18n="flow_rp">报告生成</span> <small style="color:var(--tl)" data-i18n="flow_rp_s">体质判定·脏腑倾向·养生建议</small></div></li>
+
+    </ul>
+
+    <div class="disc" data-i18n="cover_note">⚠ 本测评为中医体质参考，不作为疾病诊断与治疗依据。</div>
+
+  </div>
+
+
+
+  <!-- 用户信息表单 -->
+
+  <div class="userform" style="max-width:480px;width:auto">
+
+    <h4 data-i18n="form_title">📝 受测者信息</h4>
+
+    <div class="uf-row">
+
+      <div class="ufg" style="flex:2">
+
+        <label data-i18n="lbl_name">姓名</label>
+
+        <input type="text" id="uf-name" placeholder="请输入姓名" data-i18n-ph="ph_name">
+
+      </div>
+
+      <div class="ufg">
+
+        <label data-i18n="lbl_gender">性别</label>
+
+        <select id="uf-gender">
+
+          <option value="" data-i18n="opt_select">请选择</option>
+
+          <option value="男" data-i18n="opt_male">男</option>
+
+          <option value="女" data-i18n="opt_female">女</option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+    <div class="uf-row">
+
+      <div class="ufg">
+
+        <label data-i18n="lbl_age">年龄</label>
+
+        <input type="number" id="uf-age" placeholder="岁" data-i18n-ph="ph_age" min="1" max="120">
+
+      </div>
+
+      <div class="ufg" style="flex:2">
+
+        <label data-i18n="lbl_phone">联系电话</label>
+
+        <input type="tel" id="uf-phone" placeholder="手机号" data-i18n-ph="ph_phone">
+
+      </div>
+
+    </div>
+
+    <div class="uf-row">
+
+      <div class="ufg" style="flex:1">
+
+        <label data-i18n="lbl_address">地址</label>
+
+        <input type="text" id="uf-address" placeholder="省市区/街道" data-i18n-ph="ph_address">
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <button class="btn" onclick="start()" style="max-width:480px;justify-content:center;width:auto;margin:0 auto 10px" data-i18n="btn_start">开始测评 →</button>
+
+
+
+  <!-- DISC入口 -->
+
+  <div style="width:auto;max-width:480px;margin:10px auto 0">
+
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+
+      <div style="flex:1;height:1px;background:var(--brd)"></div>
+
+      <span style="font-size:11px;color:var(--tl);letter-spacing:1px" data-i18n="other_tools">其它工具</span>
+
+      <div style="flex:1;height:1px;background:var(--brd)"></div>
+
+    </div>
+
+    <button class="btn btn-disc" onclick="startDISC()" style="max-width:480px;justify-content:center;width:100%;font-size:14px;padding:11px 24px" data-i18n="btn_disc">
+
+      🐯 DISC性格测试 · 5种动物类型
+
+    </button>
+
+    <button class="btn btn-history" onclick="showHistoryPage()" style="max-width:480px;justify-content:center;width:100%;font-size:14px;padding:10px 24px;margin-top:8px;background:linear-gradient(135deg,#6B5B95,#8B7FB5);box-shadow:0 4px 16px rgba(107,91,149,0.2);color:#fff" data-i18n="btn_history">
+
+      📋 测试历史记录
+
+    </button>
+
+    <button class="btn" onclick="startBazi()" style="max-width:480px;justify-content:center;width:100%;font-size:14px;padding:11px 24px;margin-top:8px;background:linear-gradient(135deg,#8B4513,#CD853F);box-shadow:0 4px 16px rgba(139,69,19,0.25);color:#fff">
+
+      🔮 国学推理
+
+    </button>
+
+  </div>
+
+ </div>
+
+
+
+  <div id="report-section" style="display:none;width:100%;max-width:760px">
+
+    <div class="rhd"><h1 data-i18n="report_title">🧘 体质评估报告</h1><p data-i18n="report_sub">依据《中医体质分类与判定》国标运算</p><div id="sync-status" style="font-size:12px;color:var(--tl);margin-top:8px;opacity:0;transition:opacity 0.3s"></div></div>
+
+
+
+    <div class="rc">
+
+      <div class="rbadge" data-i18n="r_badge">🏷 体质判定</div>
+
+      <div class="rname" id="rn"></div>
+
+      <div class="rtype" id="rrt"></div>
+
+      <div class="rdesc" id="rd"></div>
+
+      <table class="st"><thead><tr><th data-i18n="th_type">体质类型</th><th data-i18n="th_score">转化分</th><th data-i18n="th_dist">分布</th><th data-i18n="th_judge">判定</th></tr></thead><tbody id="stb"></tbody></table>
+
+    </div>
+
+
+
+    <div class="zc">
+
+      <div class="zt" data-i18n="r_organ_title">脏腑功能倾向参考</div>
+
+      <div class="ztags" id="ztags"></div>
+
+      <div class="zd" id="zd"></div>
+
+    </div>
+
+
+
+    <div class="sg" id="sg"></div>
+
+
+
+    <div class="ncgrid-wrap">
+
+      <div class="ncgrid-title" data-i18n="r_grid_title">🌿 中医九大体质对照图</div>
+
+      <div class="ncgrid-sub" data-i18n="r_grid_sub">标有 <span style="color:var(--p);font-weight:700">✓</span> 为您的判定结果；数字标签代表主体质排名</div>
+
+      <div class="ncgrid" id="ncgrid"></div>
+
+    </div>
+
+
+
+    <div class="dbox" data-i18n="disclaimer">⚠ 本测评为中医体质参考，不作为疾病诊断与治疗依据。报告中的体质分类、脏腑倾向及养生建议仅供参考，不能替代专业中医诊疗。如有明显不适，请咨询中医师或前往医疗机构就诊。</div>
+
+
+
+    <button class="rb" onclick="restart()" data-i18n="btn_retake">🔄 重新测试</button>
+
+  </div>
+
+
+
+  <div class="hist-section" style="max-width:480px;width:auto">
+
+    <div class="hist-title" data-i18n="hist_mine">📋 我的记录</div>
+
+    <div class="hist-scroll" id="rh-list"></div>
+
+  </div><div class="ds-meta">
+
+      <span>📅 创建 2026.07.23 17:00</span>
+
+      <span>🛠️ 更新 2026.08.14 20:05</span>
+      <span data-i18n="dev_meta">🌿 中医体质评估</span>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- ═══ 测试 ═══ -->
+
+<div id="p1" class="page test-page">
+
+  <div class="thdr">
+
+    <div class="pbar">
+
+      <div class="plabel">
+
+        <span id="mt" class="mtag">问诊模块</span>
+
+        <span id="pt">1 / 69</span>
+
+      </div>
+
+      <div class="pbar-track"><div id="pf" class="pbar-fill" style="width:0%"></div></div>
+
+    </div>
+
+  </div>
+
+  <div class="qa disc-card">
+
+    <div class="qnum" id="qn"></div>
+
+    <div class="qtext" id="qt"></div>
+
+    <div class="qsub" id="qs"></div>
+
+    <div class="opts" id="qo"></div>
+
+  </div>
+
+  <div class="nav">
+
+    <button class="np" id="bp" onclick="prev()" disabled data-i18n="btn_prev">← 上一题</button>
+
+    <button class="nn" id="bn" onclick="next()">下一题 →</button>
+
+  </div></div>
+
+
+
+<script>
+
+// ═══════════════════════════════════════════════════════════
+
+// 题库：69题（问诊 60 + 望诊 4 + 闻诊 4 + 切诊 1）
+
+// ═══════════════════════════════════════════════════════════
+
+const Q = [
+
+  // ════════════════════════════════════
+
+  // 望诊（自评版 4题）
+
+  // ════════════════════════════════════
+
+  { m:'望诊', id:'WZ_TC_01', t:'您舌头的颜色接近哪种？', s:'对着镜子观察自然光下的舌色', rev:false, g:'望诊', o:[
+
+    {v:1,l:'淡红（正常）'},{v:2,l:'淡白（偏白色）'},{v:3,l:'红（偏红色）'},{v:4,l:'绛红（深红色）'},{v:5,l:'紫暗（偏紫偏暗）'}
+
+  ] },
+
+  { m:'望诊', id:'WZ_TC_02', t:'您舌苔的厚薄程度？', s:'对着镜子伸出舌头观察苔层', rev:false, g:'望诊', o:[
+
+    {v:1,l:'薄白苔（正常薄苔）'},{v:2,l:'白厚腻（厚而发白）'},{v:3,l:'黄腻（厚而发黄）'},{v:4,l:'少苔/无苔（光滑无苔）'},{v:5,l:'剥苔（有缺损区域）'}
+
+  ] },
+
+  { m:'望诊', id:'WZ_TS_01', t:'您舌体的大小和齿痕？', s:'伸出舌头看舌边缘是否有牙齿印', rev:false, g:'望诊', o:[
+
+    {v:1,l:'大小适中、无齿痕'},{v:2,l:'偏胖大、有轻微齿痕'},{v:3,l:'胖大明显、齿痕深'},{v:4,l:'偏瘦小'},{v:5,l:'瘦小有裂纹'}
+
+  ] },
+
+  { m:'望诊', id:'WZ_FC_01', t:'您的面色（脸部肤色）？', s:'自然光下观察整个脸颊颜色', rev:false, g:'望诊', o:[
+
+    {v:1,l:'红黄隐隐/明润（正常）'},{v:2,l:'萎黄/苍白'},{v:3,l:'潮红（两颧尤明显）'},{v:4,l:'晦暗/黧黑'},{v:5,l:'油光/满面通红'}
+
+  ] },
+
+
+
+  // ════════════════════════════════════
+
+  // 闻诊（自评版 4题）
+
+  // ════════════════════════════════════
+
+  { m:'闻诊', id:'WM_OH_01', t:'您觉得自己的口气（口腔气味）怎么样？', s:'可呼口气到手掌闻一下', rev:false, g:'闻诊', o:[
+
+    {v:1,l:'无明显气味（正常）'},{v:2,l:'轻微气味'},{v:3,l:'有口臭/异味'},{v:4,l:'有明显酸腐味'},{v:5,l:'腐臭味明显'}
+
+  ] },
+
+  { m:'闻诊', id:'WM_PH_01', t:'您感觉自己的呼吸声音？', s:'安静状态下感受', rev:false, g:'闻诊', o:[
+
+    {v:1,l:'均匀调畅（正常）'},{v:2,l:'稍微气粗或气短'},{v:3,l:'呼吸急促/气粗有力'},{v:4,l:'呼吸微弱/气短声低'},{v:5,l:'喘促/气不得续'}
+
+  ] },
+
+  { m:'闻诊', id:'WM_SB_01', t:'您说话的声音？', s:'回忆自己日常说话音量', rev:false, g:'闻诊', o:[
+
+    {v:1,l:'声音洪亮清晰（正常）'},{v:2,l:'声音偏低/中气不足'},{v:3,l:'声音低弱/说话费力'},{v:4,l:'声低断续/有气无力'},{v:5,l:'声音嘶哑/难出声'}
+
+  ] },
+
+  { m:'闻诊', id:'WM_BO_01', t:'您身体的气味（体味）？', s:'沐浴后或一天结束时感受', rev:false, g:'闻诊', o:[
+
+    {v:1,l:'无明显体味（正常）'},{v:2,l:'有轻微体味'},{v:3,l:'体味偏重/有汗臭味'},{v:4,l:'有明显异味'},{v:5,l:'腥臭味/异味很重'}
+
+  ] },
+
+
+
+  // ════════════════════════════════════
+
+  // 问诊（国标完整版60题 + 附加1题）
+
+  // ════════════════════════════════════
+
+  // — 平和质(8题, 6题*为平和质逆向计分) —
+
+  { m:'问诊', id:'WQ_001', t:'您精力充沛吗？', s:'运动、进食、工作不易疲劳', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_002', t:'您容易疲乏吗？', s:'日常活动后感觉疲劳', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_003', t:'您说话声音低弱无力吗？', s:'感觉说话费劲', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_004', t:'您感到闷闷不乐、情绪低沉吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_005', t:'您比一般人耐受不了寒冷吗？', s:'冬天的寒冷、夏天的冷空调、电扇等', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_006', t:'您能适应外界自然和社会环境的变化吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_007', t:'您容易失眠吗？', s:'入睡困难、易醒、多梦', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_008', t:'您容易忘事（健忘）吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  // — 气虚质(8题, 含疲乏WQ_002、声音WQ_003、感冒WQ_012、虚汗WQ_014) —
+
+  { m:'问诊', id:'WQ_009', t:'您容易气短（呼吸短促，接不上气）吗？', s:'稍微活动就感觉气不够用', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_010', t:'您容易心慌吗？', s:'心跳不规律或感觉心跳很快', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_011', t:'您容易头晕或站起时眩晕吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_012', t:'您比别人容易感冒吗？', s:'一年内反复感冒多次', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_013', t:'您喜欢安静、懒得说话吗？', s:'感觉说话费劲', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_014', t:'您活动量稍大就容易出虚汗吗？', s:'比常人出汗多，或不动也出汗', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  // — 阳虚质(7题, 含怕冷WQ_005、感冒WQ_012) —
+
+  { m:'问诊', id:'WQ_015', t:'您手脚发凉吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_016', t:'您胃脘部、背部或腰膝部感觉怕冷吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_017', t:'您感到怕冷、衣服比别人穿得多吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_018', t:'您吃（喝）凉的东西会感到不舒服或者怕吃（喝）凉的吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_019', t:'您受凉或吃（喝）凉的东西后，容易腹泻、拉肚子吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  // — 阴虚质(8题, 含虚汗WQ_014) —
+
+  { m:'问诊', id:'WQ_020', t:'您感到手脚心发热吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_021', t:'您感觉身体、脸上发热吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_022', t:'您皮肤或口唇干吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_023', t:'您口唇的颜色比一般人红吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_024', t:'您容易便秘或大便干燥吗？', s:'羊屎状、排便费力', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_025', t:'您面部两颧潮红或偏红吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_026', t:'您感到眼睛干涩吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  // — 痰湿质(8题) —
+
+  { m:'问诊', id:'WQ_027', t:'您感到胸闷或腹部胀满吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_028', t:'您感到身体沉重不轻松或不爽快吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_029', t:'您腹部胀满松软吗？', s:'腹部脂肪厚、软塌', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_030', t:'您有额部油脂分泌多的现象吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_031', t:'您上眼睑比别人肿吗？', s:'上眼睑有轻微隆起现象', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_032', t:'您嘴里有黏黏的感觉吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_033', t:'您平时痰多，特别是感到咽喉部总有痰堵着吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_034', t:'您舌苔厚腻或有舌苔厚厚的感觉吗？', s:'自己可观察到', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  // — 湿热质(7题, 分性别) —
+
+  { m:'问诊', id:'WQ_035', t:'您面部或鼻部有油腻感或者油光发亮吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_036', t:'您脸上容易生痤疮或皮肤容易生疮疖吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_037', t:'您感到口苦或嘴里有异味吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_038', t:'您大便黏滞不爽、有解不尽的感觉吗？', s:'马桶冲不干净', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_039', t:'您小便时尿道有发热感、尿色浓（深）吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_040', t:'您带下色黄（白带颜色发黄）吗？（限女性回答）', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_041', t:'您的阴囊潮湿吗？（限男性回答）', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  // — 血瘀质(7题, 含健忘WQ_008) —
+
+  { m:'问诊', id:'WQ_042', t:'您的皮肤在不知不觉中会出现青紫瘀斑（皮下出血）吗？', s:'无外伤情况下', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_043', t:'您的两颧部有细微红丝（毛细血管扩张）吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_044', t:'您身体上有疼痛吗？', s:'刺痛或固定位置的疼痛', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_045', t:'您面色晦黯或容易出现褐斑吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_046', t:'您容易出现黑眼圈吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_047', t:'您口唇颜色偏黯吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  // — 气郁质(7题, 含闷闷不乐WQ_004) —
+
+  { m:'问诊', id:'WQ_048', t:'您精神紧张、焦虑不安吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_049', t:'您多愁善感、感情脆弱吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_050', t:'您容易感到害怕或受到惊吓吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_051', t:'您胁肋部或乳房胀痛吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_052', t:'您无缘无故叹气吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_053', t:'您咽喉部有异物感，且吐之不出、咽之不下吗？', s:'梅核气', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  // — 特禀质(7题+附加) —
+
+  { m:'问诊', id:'WQ_054', t:'您没有感冒也会打喷嚏吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_055', t:'您没有感冒也会鼻塞、流鼻涕吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_056', t:'您有因季节变化、温度变化或异味等原因而咳喘的现象吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_057', t:'您容易过敏吗？', s:'药物、食物、气味、花粉、季节交替时等', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_058', t:'您的皮肤起荨麻疹（风团、风疹块、风疙瘩）吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_059', t:'您的皮肤因过敏出现过紫癜（紫红色瘀点、瘀斑）吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_060', t:'您的皮肤一抓就红，并出现抓痕吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'没有'},{v:2,l:'很少'},{v:3,l:'有时'},{v:4,l:'经常'},{v:5,l:'总是'}] },
+
+  { m:'问诊', id:'WQ_061', t:'您的家人（父母/兄弟姐妹）有过敏性疾病史吗？', s:'', rev:false, g:'问诊', o:[{v:1,l:'无'},{v:2,l:'有1人'},{v:3,l:'有2人'},{v:4,l:'有3人'},{v:5,l:'3人以上'}] },
+
+
+
+  // ════════════════════════════════════
+
+  // 切诊（自评版 1题）
+
+  // ════════════════════════════════════
+
+  { m:'切诊', id:'CX_PULSE', t:'请选择最符合您自身脉象的选项（如有不确定，请选\u201c跳过\u201d）', s:'若您无法自行判断脉象，建议跳过此模块，仅依靠前三大模块（问/望/闻）即可获得参考报告。', rev:false, g:'切诊', o:[
+
+    {v:1, l:'浮脉', pulse:'WQ_P_01', desc:'轻触即得，跳动有力但位置偏浅，重按减弱'},
+
+    {v:2, l:'沉脉', pulse:'WQ_P_02', desc:'需用力按压至骨节上方才能触及脉搏'},
+
+    {v:3, l:'迟脉', pulse:'WQ_P_03', desc:'脉搏跳动缓慢，每分钟少于60次'},
+
+    {v:4, l:'数脉', pulse:'WQ_P_04', desc:'脉搏跳动快速，每分钟超过90次'},
+
+    {v:5, l:'细脉', pulse:'WQ_P_05', desc:'脉搏细如丝线，指下感觉细小虚弱'},
+
+    {v:6, l:'滑脉', pulse:'WQ_P_06', desc:'脉搏如珠滚动，圆滑流利，节律均匀'},
+
+    {v:7, l:'涩脉', pulse:'WQ_P_07', desc:'脉搏往来艰涩，不流利，时有一止'},
+
+    {v:0, l:'不确定/跳过', pulse:'WQ_P_00', desc:'您没有脉诊基础，跳过此项'},
+
+  ] }
+
+];
+
+
+
+// ═══════════════════════════════════════════════════════════
+
+// 配置
+
+// ═══════════════════════════════════════════════════════════
+
+const GC = { // Group Config
+
+  '平和质':{ids:['WQ_001','WQ_002','WQ_003','WQ_004','WQ_005','WQ_006','WQ_007','WQ_008'],type:'ph',n:8,
+
+    rev:['WQ_002','WQ_003','WQ_004','WQ_005','WQ_007','WQ_008']},
+
+  '气虚质':{ids:['WQ_002','WQ_003','WQ_009','WQ_010','WQ_011','WQ_012','WQ_013','WQ_014'],type:'pp',n:8},
+
+  '阳虚质':{ids:['WQ_005','WQ_012','WQ_015','WQ_016','WQ_017','WQ_018','WQ_019'],type:'pp',n:7},
+
+  '阴虚质':{ids:['WQ_014','WQ_020','WQ_021','WQ_022','WQ_023','WQ_024','WQ_025','WQ_026'],type:'pp',n:8},
+
+  '痰湿质':{ids:['WQ_027','WQ_028','WQ_029','WQ_030','WQ_031','WQ_032','WQ_033','WQ_034'],type:'pp',n:8},
+
+  '湿热质':{ids:['WQ_035','WQ_036','WQ_037','WQ_038','WQ_039','WQ_040','WQ_041'],type:'pp',n:7},
+
+  '血瘀质':{ids:['WQ_008','WQ_042','WQ_043','WQ_044','WQ_045','WQ_046','WQ_047'],type:'pp',n:7},
+
+  '气郁质':{ids:['WQ_004','WQ_048','WQ_049','WQ_050','WQ_051','WQ_052','WQ_053'],type:'pp',n:7},
+
+  '特禀质':{ids:['WQ_054','WQ_055','WQ_056','WQ_057','WQ_058','WQ_059','WQ_060','WQ_061'],type:'pp',n:8},
+
+};
+
+
+
+// 望闻切修正规则
+
+const MOD = {
+
+  'WZ_TC_01': {2:{'气虚质':2,'阳虚质':2}, 3:{'阴虚质':1}, 4:{'阴虚质':2}, 5:{'血瘀质':2}},
+
+  'WZ_TC_02': {2:{'痰湿质':2}, 3:{'湿热质':2}, 4:{'湿热质':3,'痰湿质':1}, 5:{'阴虚质':2}},
+
+  'WZ_TS_01': {2:{'气虚质':2,'痰湿质':1}, 3:{'阴虚质':2}, 4:{'阴虚质':1}, 5:{'血瘀质':2}},
+
+  'WZ_FC_01': {2:{'气虚质':1}, 3:{'阴虚质':1}, 4:{'血瘀质':1}, 5:{'湿热质':2}},
+
+  'WM_OH_01': {3:{'湿热质':1}, 4:{'痰湿质':1}, 5:{'湿热质':2}},
+
+  'WM_PH_01': {3:{'痰湿质':1}, 4:{'阴虚质':1}, 5:{'阴虚质':1}},
+
+  'WM_SB_01': {2:{'气虚质':1}, 3:{'气虚质':1,'阳虚质':1}, 5:{'气郁质':1}},
+
+  'WM_BO_01': {3:{'痰湿质':1,'湿热质':1}, 4:{'湿热质':1}, 5:{'湿热质':2}},
+
+  'WQ_P_01':  {1:{'气虚质':1}},
+
+  'WQ_P_02':  {1:{'阳虚质':1}},
+
+  'WQ_P_03':  {1:{'阳虚质':1,'气虚质':1}},
+
+  'WQ_P_04':  {1:{'阴虚质':1,'湿热质':1}},
+
+  'WQ_P_05':  {1:{'气虚质':1,'阴虚质':1}},
+
+  'WQ_P_06':  {1:{'痰湿质':1}},
+
+  'WQ_P_07':  {1:{'血瘀质':1,'气郁质':1}},
+
+};
+
+
+
+// 五脏映射
+
+const ZF = {
+
+  '气虚质':{organs:['脾','肺'],desc:'脾主运化偏弱（消化吸收差、腹胀、食少）；肺主卫外偏弱（易感冒、自汗）'},
+
+  '阳虚质':{organs:['肾','脾'],desc:'肾阳温煦偏弱（畏寒、腰膝酸冷、夜尿多）；脾阳温煦偏弱（完谷不化、腹泻）'},
+
+  '阴虚质':{organs:['肾','肺','心'],desc:'肾阴涵养偏弱（腰酸、耳鸣、失眠）；肺阴滋燥偏弱（干咳、咽干）；心阴涵养偏弱（心烦、盗汗）'},
+
+  '痰湿质':{organs:['脾','肺'],desc:'脾失健运偏弱（水湿内停、肥胖、倦怠）；肺宣降失常偏弱（痰多、胸闷、咳嗽）'},
+
+  '湿热质':{organs:['肝','胆','脾'],desc:'肝胆湿热偏盛（口苦、胁痛、烦躁）；脾胃湿热偏盛（腹胀、便黏、口臭）'},
+
+  '血瘀质':{organs:['心','肝'],desc:'心脉瘀阻偏盛（心悸、胸痛）；肝血瘀阻偏盛（胁痛、面色晦暗、情志抑郁）'},
+
+  '气郁质':{organs:['肝','脾'],desc:'肝气郁结偏盛（胁胀、情绪抑郁、梅核气）；肝脾不和偏盛（腹胀、纳差、叹息）'},
+
+  '特禀质':{organs:['肺','脾','肾'],desc:'肺卫不固偏盛（过敏性鼻炎、哮喘、皮疹）；脾肾不固偏盛（先天禀赋不足、免疫低下）'},
+
+  '平和质':{organs:[],desc:'脏腑功能协调，未见明显偏颇倾向。继续保持均衡生活方式。'},
+
+};
+
+
+
+const CD = {
+
+  '气虚质':'元气不足，以疲乏、气短、自汗为主要特征。表现为体力不足、容易疲劳、说话声音低弱，容易感冒。',
+
+  '阳虚质':'阳气不足，以畏寒怕冷、手足不温为主要特征。表现为怕冷喜暖、精神不振，容易腹泻，夜尿偏多。',
+
+  '阴虚质':'阴液亏虚，以口燥咽干、手足心热为主要特征。表现为口干舌燥、喜冷饮、失眠多梦，大便偏干。',
+
+  '痰湿质':'水湿内停，以体形肥胖、腹部肥满为主要特征。表现为身体沉重、痰多胸闷、舌苔厚腻，大便黏滞。',
+
+  '湿热质':'湿热内蕴，以面垢长痘、口苦苔黄为主要特征。表现为面部油腻、口苦异味、大便黏滞、小便黄赤。',
+
+  '血瘀质':'气血瘀滞，以肤色晦暗、固定位置刺痛为主要特征。表现为面色暗沉、身体固定位置刺痛、舌下静脉曲张。',
+
+  '气郁质':'气机郁结，以情绪抑郁、胸胁胀闷为主要特征。表现为情绪低落、焦虑易怒、胁肋胀痛、咽部异物感。',
+
+  '特禀质':'先天禀赋不足，以过敏易感为主要特征。容易患过敏性疾病，如鼻炎、哮喘、皮疹等。',
+
+  '平和质':'气血阴阳平衡，脏腑功能协调，是健康理想的体质状态。继续保持良好的生活方式。',
+
+};
+
+
+
+const SG = { // 养生建议
+
+  '气虚质':{icon:'🥗',di:'山药、黄芪、党参、红枣、鸡肉、牛肉',li:'早睡早起，避免过度劳累，午间小憩',ex:'太极拳、八段锦、散步等温和运动'},
+
+  '阳虚质':{icon:'🔥',di:'羊肉、桂圆、生姜、红糖、核桃、板栗',li:'早睡晚起，避寒保暖，腰腹和足部保暖',ex:'上午运动，晒背驱寒，艾灸关元、命门穴'},
+
+  '阴虚质':{icon:'💧',di:'银耳、百合、莲子、梨、蜂蜜、枸杞',li:'早睡早起，戒熬夜，午间养阴',ex:'太极拳、静坐冥想、游泳等舒缓运动'},
+
+  '痰湿质':{icon:'🌊',di:'薏仁、赤小豆、冬瓜、白萝卜、芹菜、绿茶',li:'规律作息，适量运动出汗，忌久坐',ex:'快走、跑步、八段锦、爬山等有氧运动'},
+
+  '湿热质':{icon:'☀️',di:'苦瓜、绿豆、莲子心、菊花茶、芹菜、冬瓜',li:'早睡早起，戒辛辣油腻，戒酒',ex:'快走、游泳、骑行，适度出汗排湿'},
+
+  '血瘀质':{icon:'💜',di:'黑木耳、山楂、洋葱、玫瑰花茶、红葡萄酒',li:'规律作息，心情舒畅，避寒凉',ex:'太极拳、瑜伽、舞蹈，促进气血运行'},
+
+  '气郁质':{icon:'🌸',di:'玫瑰花茶、陈皮、茉莉花茶、柑橘类、萝卜',li:'规律作息，睡前泡脚，听舒缓音乐',ex:'户外运动、太极拳、舞蹈，疏解肝气'},
+
+  '特禀质':{icon:'🛡️',di:'避免已知过敏原，山药、薏仁、红枣',li:'保持环境清洁，规律作息，增强免疫力',ex:'适度运动，循序渐进，避免过度疲劳'},
+
+  '平和质':{icon:'✨',di:'均衡饮食，五谷为主，多蔬果',li:'顺应自然，起居有常，饮食有节',ex:'坚持运动，保持身心愉悦'},
+
+};
+
+
+
+// ═══════════════════════════════════════════════════════════
+
+// 状态
+
+// ═══════════════════════════════════════════════════════════
+
+let idx = 0;
+
+let ans = {}; // id -> selected value
+
+
+
+// ═══ 页面切换 ═══
+
+function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+
+
+function start(){idx=0;ans={};show('p1');renderQ();}
+
+function showReport(){
+
+  genReport();
+
+  document.getElementById('cover-section').style.display='none';
+
+  document.getElementById('report-section').style.display='block';
+
+  document.getElementById('p0').classList.add('showing-report');
+
+  show('p0');
+
+  renderReportHistory();
+
+  window.scrollTo({top:0,behavior:'smooth'});
+
+}
+
+function restart(){
+
+  if (currentUser) {
+
+    ['uf-name','uf-age','uf-phone','uf-address'].forEach(id => {
+
+      const el = document.getElementById(id);
+
+      if (el) el.value = currentUser[id.replace('uf-','')] || '';
+
+    });
+
+    const sel = document.getElementById('uf-gender');
+
+    if (sel && currentUser.gender && currentUser.gender !== '-') {
+
+      sel.value = currentUser.gender;
+
+    }
+
+  }
+
+  document.getElementById('cover-section').style.display='flex';
+
+  document.getElementById('report-section').style.display='none';
+
+  document.getElementById('p0').classList.remove('showing-report');
+
+  show('p0');
+
+  renderReportHistory();
+
+  window.scrollTo({top:0,behavior:'smooth'});
+
+}
+
+
+
+// ═══ 渲染题目 ═══
+
+function renderQ(){
+
+  const q=Q[idx], total=Q.length;
+
+  // 性别相关题目自动跳过：女性跳过阴囊潮湿，男性跳过带下
+
+  const user=getUserInfo();
+
+  if(q.id==='WQ_040'||q.id==='WQ_041'){
+
+    const g=(user&&user.gender)?user.gender:(document.getElementById('uf-gender')?.value||'');
+
+    if((q.id==='WQ_040'&&g!=='女')||(q.id==='WQ_041'&&g!=='男')){
+
+      ans[q.id]=1; idx++; renderQ(); return;
+
+    }
+
+  }
+
+  const mt=document.getElementById('mt');
+
+  const mc={
+
+    '问诊':'', '望诊':'wz', '闻诊':'wm', '切诊':'cx'
+
+  };
+
+  const modLabel=(LANG==='en')?(MODULE_EN[q.m]||q.m):q.m; mt.textContent=modLabel+(LANG==='en'?'':'模块');
+
+  mt.className='mtag'+(mc[q.m]?' '+mc[q.m]:'');
+
+  document.getElementById('pt').textContent=(idx+1)+' / '+total;
+
+  document.getElementById('pf').style.width=((idx+1)/total*100)+'%';
+
+  let qnExtra=''; if(q.g==='平和质') qnExtra=' · '+'平和质 · '+q.o[0].l+'→'+q.o[4].l; else if(q.g && q.g!=='切诊') qnExtra=' · '+q.g; document.getElementById('qn').innerHTML='<b>'+modLabel+'</b> '+(LANG==='en'?('Q '+(idx+1)):('第 '+(idx+1)+' 题'))+qnExtra;
+
+  document.getElementById('qt').textContent=q.t;
+
+  document.getElementById('qs').textContent=q.s||'';
+
+  const el=document.getElementById('qo');el.innerHTML='';
+
+
+
+  if(q.m==='切诊'){
+
+    // 单题多选：7脉+跳过
+
+    q.o.forEach(o=>{
+
+      const sel=ans[q.id]===o.v;
+
+      const d=document.createElement('div');
+
+      d.className='opt'+(sel?' selected':'');
+
+      d.onclick=()=>select(q.id,o.v);
+
+      d.innerHTML=`<div class="oc"></div><div class="olbl"><div style="font-weight:600;color:var(--pd)">${o.l}</div><div style="font-size:11px;color:var(--tl);margin-top:2px">${o.desc||''}</div></div>`;
+
+      el.appendChild(d);
+
+    });
+
+  }else{
+
+    q.o.forEach(o=>{
+
+      const sel=ans[q.id]===o.v;
+
+      const d=document.createElement('div');
+
+      d.className='opt'+(sel?' selected':'');
+
+      d.onclick=()=>select(q.id,o.v);
+
+      d.innerHTML=`<div class="oc"></div><div class="olbl">${o.l}</div>`;
+
+      el.appendChild(d);
+
+    });
+
+  }
+
+
+
+  document.getElementById('bp').disabled=idx===0;
+
+  const isLast=idx===total-1;
+
+  const bn=document.getElementById('bn');
+
+  bn.textContent=isLast?(LANG==='en'?'View Result ->':'查看结果 →'):(LANG==='en'?'Next ->':'下一题 →');
+
+  bn.disabled=ans[q.id]===undefined;
+
+}
+
+
+
+function select(id,v){ans[id]=v;renderQ();}
+
+function prev(){if(idx>0){idx--;renderQ();}}
+
+function next(){
+
+  if(idx<Q.length-1){idx++;renderQ();}
+
+  else {showReport();}
+
+}
+
+
+
+// ═══════════════════════════════════════════════════════════
+
+// 评分算法
+
+// ═══════════════════════════════════════════════════════════
+
+
+
+// 阶段1：原始分
+
+function rawScore(g){
+
+  const c=GC[g]; if(!c) return 0;
+
+  let sum=0;
+
+  c.ids.forEach(id=>{
+
+    const v=ans[id]; if(v===undefined) return;
+
+    if(c.rev && c.rev.includes(id)) sum+=(6-v); // 逆向计分：1→5,5→1
+
+    else sum+=v;
+
+  });
+
+  return sum;
+
+}
+
+
+
+// 阶段1：转化分（国标公式）
+
+// 平和质: 转化分 = (逆向后原始分-8) / 32 * 100
+
+// 偏颇体质: 转化分 = (原始分-条目数) / (条目数×4) * 100
+
+function convScore(g){
+
+  const c=GC[g]; if(!c) return 0;
+
+  const raw=rawScore(g);
+
+  if(g==='平和质') return Math.round((raw-c.n)/(c.n*4)*100); // 国标: (raw-8)/32*100
+
+  return Math.round((raw-c.n)/(c.n*4)*100);
+
+}
+
+
+
+// 阶段2：修正分
+
+function calcMod(){
+
+  const mods={};
+
+  Object.keys(GC).forEach(k=>mods[k]=0);
+
+
+
+  // 望诊修正
+
+  ['WZ_TC_01','WZ_TC_02','WZ_TS_01','WZ_FC_01'].forEach(qid=>{
+
+    const v=ans[qid]; if(!v) return;
+
+    const r=MOD[qid]; if(!r||!r[v]) return;
+
+    Object.entries(r[v]).forEach(([g,d])=>{mods[g]=(mods[g]||0)+d;});
+
+  });
+
+
+
+  // 闻诊
+
+  ['WM_OH_01','WM_PH_01','WM_SB_01','WM_BO_01'].forEach(qid=>{
+
+    const v=ans[qid]; if(!v) return;
+
+    const r=MOD[qid]; if(!r||!r[v]) return;
+
+    Object.entries(r[v]).forEach(([g,d])=>{mods[g]=(mods[g]||0)+d;});
+
+  });
+
+
+
+  // 切诊（从选中的脉象中查找修正映射）
+
+  if(ans['CX_PULSE']){
+
+    const pulseQ=Q.find(qq=>qq.id==='CX_PULSE');
+
+    const sel=pulseQ && pulseQ.o.find(o=>o.v===ans['CX_PULSE']);
+
+    if(sel && sel.pulse && sel.pulse!=='WQ_P_00'){
+
+      const r=MOD[sel.pulse]; if(r&&r[1]) Object.entries(r[1]).forEach(([g,d])=>{mods[g]=(mods[g]||0)+d;});
+
+    }
+
+  }
+
+
+
+  // 上限±8
+
+  Object.keys(mods).forEach(k=>{mods[k]=Math.max(-8,Math.min(8,mods[k]));});
+
+  return mods;
+
+}
+
+
+
+// 最终得分
+
+function finalScores(){
+
+  const s={};
+
+  Object.keys(GC).forEach(k=>s[k]=convScore(k));
+
+  const mods=calcMod();
+
+  Object.keys(s).forEach(k=>{
+
+    s[k]=Math.max(0,Math.min(100,Math.round(s[k]+(mods[k]||0))));
+
+  });
+
+  return s;
+
+}
+
+
+
+// 阶段3：体质判定
+
+function judge(s){
+
+  const ph=s['平和质']||0;
+
+  const pp={}; Object.keys(GC).forEach(k=>{if(k!=='平和质')pp[k]=s[k];});
+
+  const maxPP=Math.max(...Object.values(pp));
+
+  const topPP=Object.keys(pp).find(k=>pp[k]===maxPP);
+
+
+
+  // === 国标判定 ===
+
+  // 平和质判定
+
+  let phJudge = '否';
+
+  if(ph>=60 && Object.values(pp).every(v=>v<30)) phJudge = '是';
+
+  else if(ph>=60 && Object.values(pp).every(v=>v<40)) phJudge = '基本是';
+
+
+
+  // 偏颇质判定
+
+  const ppJudges = {};
+
+  Object.keys(pp).forEach(k=>{
+
+    if(pp[k]>=40) ppJudges[k]='是';
+
+    else if(pp[k]>=30) ppJudges[k]='倾向是';
+
+    else ppJudges[k]='否';
+
+  });
+
+
+
+  // 最终体质结论
+
+  const yesOnes = Object.keys(pp).filter(k=>ppJudges[k]==='是').sort((a,b)=>pp[b]-pp[a]);
+
+  const倾向 = Object.keys(pp).filter(k=>ppJudges[k]==='倾向是');
+
+
+
+  let name='平和质', type='平和体质', desc='';
+
+
+
+  if(phJudge==='是' && yesOnes.length===0){
+
+    name='平和质'; type='是'; desc='气血阴阳平衡，脏腑功能协调。继续保持良好生活方式。';
+
+  }else if(phJudge==='基本是' && yesOnes.length===0){
+
+    name='平和质（倾向偏颇）'; type='基本是'; desc='基本处于平衡状态，部分偏颇倾向，注意观察。';
+
+  }else if(yesOnes.length>=2 && (pp[yesOnes[0]]-pp[yesOnes[1]])<15){
+
+    name=yesOnes[0]+'+'+yesOnes[1]; type='复合体质'; desc=CD[yesOnes[0]]+' 同时伴有'+CD[yesOnes[1]];
+
+  }else if(yesOnes.length>0){
+
+    name=yesOnes[0]; type='偏颇体质'; desc=CD[yesOnes[0]];
+
+  }else if(倾向.length>0){
+
+    name=倾向[0]; type='倾向偏颇'; desc='转化分在30-39分之间，有'+倾向[0]+'倾向，建议适当调养。';
+
+  }else{
+
+    name='平和质'; type='否（偏颇转化分均<30）'; desc='虽未达平和质标准，但各偏颇体质倾向不明显。';
+
+  }
+
+
+
+  return {name,type,desc,ppJudges,phJudge,s,topPP};
+
+}
+
+
+
+// ═══ 生成报告 ═══
+
+// 九宫格布局 + 修正后的五行归属（参考用户红色标注）
+
+// 左列=气郁木／血瘀土 │ 上中=阳虚火 │ 右中=特禀金 │ 下中=阴虚水
+
+const GRID=[
+
+  {k:'气郁质', w:'木', icon:'🌧', tags:['神情抑郁','胸闷叹气','咽部异物','敏感多虑','优柔寡断']},
+
+  {k:'阳虚质', w:'火', icon:'❄', tags:['手足不温','怕冷喜暖','喜热饮食','小便清长','大便溏薄']},
+
+  {k:'湿热质', w:'土', icon:'🔥', tags:['面油生痤','口苦口干','小便短黄','大便黏滞','舌苔黄腻']},
+
+  {k:'气虚质', w:'木', icon:'⛰', tags:['容易疲乏','声音低弱','易出汗','容易感冒','舌淡有齿痕']},
+
+  {k:'平和质', w:'土', icon:'☯', tags:['体形匀称','面色润泽','精力充沛','耐受寒热','二便调畅']},
+
+  {k:'特禀质', w:'金', icon:'🌸', tags:['过敏体质','易哮喘','易荨麻疹','易过敏','先天异常']},
+
+  {k:'血瘀质', w:'土', icon:'🩸', tags:['面色晦暗','易生瘀斑','唇色紫暗','舌质紫暗','肤色暗沉']},
+
+  {k:'阴虚质', w:'水', icon:'🌙', tags:['手足心热','口燥咽干','喜冷饮','大便干燥','舌红少津']},
+
+  {k:'痰湿质', w:'金', icon:'💧', tags:['腹部肥满','口黏腻','痰多胸闷','面油多汗','舌苔白腻']},
+
+];
+
+
+
+async function genReport(){
+
+  const S=finalScores();
+
+  const j=judge(S);
+
+  renderReportUI(S, j);
+
+  
+
+  // 保存到本地并同步到云端
+
+  const record = saveRecord(j, S);
+
+  renderReportHistory();
+
+  
+
+  // 显示同步状态
+
+  showSyncStatus('syncing');
+
+  const syncResult = await syncToCloud(record);
+
+  showSyncStatus(syncResult.success ? 'success' : 'offline');
+
+}
+
+
+
+// 显示同步状态
+
+function showSyncStatus(status) {
+
+  const statusEl = document.getElementById('sync-status');
+
+  if (!statusEl) return;
+
+  
+
+  const icons = {
+
+    syncing: '⏳',
+
+    success: '✅',
+
+    offline: '💾'
+
+  };
+
+  const texts = {
+
+    syncing: i18nPick('sync_syncing'),
+
+    success: i18nPick('sync_success'),
+
+    offline: i18nPick('sync_offline')
+
+  };
+
+  
+
+  statusEl.innerHTML = `${icons[status]} ${texts[status]}`;
+
+  statusEl.style.opacity = '1';
+
+  
+
+  if (status === 'success' || status === 'offline') {
+
+    setTimeout(() => {
+
+      statusEl.style.opacity = '0.6';
+
+    }, 2000);
+
+  }
+
+}
+
+
+
+function renderReportUI(S, j){
+
+  // 排序显示
+
+  const sorted=Object.entries(S).sort((a,b)=>b[1]-a[1]);
+
+
+
+  document.getElementById('rn').textContent=j.name;
+
+  document.getElementById('rrt').textContent=j.type+' · 转化分最高：'+sorted[0][0]+'（'+sorted[0][1]+'分）';
+
+  document.getElementById('rd').textContent=j.desc;
+
+
+
+  const tbody=document.getElementById('stb'); tbody.innerHTML='';
+
+  sorted.forEach(([name,score])=>{
+
+    const isTop=name===j.name||(j.name.includes('+')&&j.name.includes(name));
+
+    const tr=document.createElement('tr'); if(isTop)tr.className='hr';
+
+    let judgeLabel='';
+
+    if(name==='平和质') judgeLabel=j.phJudge;
+
+    else judgeLabel=j.ppJudges[name]||'';
+
+    const barColor=score>=60?'#4A7C59':score>=40?'#C49A6C':'#ccc';
+
+    tr.innerHTML=`<td>${name}</td><td>${score}</td><td><div class="sbw"><div class="sb"><div class="sbf" style="width:${score}%;background:${barColor}"></div></div><span class="sv">${score}</span></div></td><td style="font-size:11px">${judgeLabel}</td>`;
+
+    tbody.appendChild(tr);
+
+  });
+
+
+
+  let mainName=j.name;
+
+  if(mainName.includes('+')) mainName=j.name.split('+')[0];
+
+  const zfInfo=ZF[mainName]||ZF['平和质'];
+
+  const tagsEl=document.getElementById('ztags');
+
+  tagsEl.innerHTML=zfInfo.organs.length>0
+
+    ? zfInfo.organs.map(o=>`<span class="ztag">🫁 ${o}</span>`).join('')
+
+    : '<span class="ztag" style="background:#EFF7F1;border-color:#4A7C59;color:#4A7C59">✓ 脏腑协调</span>';
+
+  document.getElementById('zd').textContent=zfInfo.desc;
+
+
+
+  const sug=SG[mainName]||SG['平和质'];
+
+  const grid=document.getElementById('sg');
+
+  grid.innerHTML=[
+
+    {icon:'🥗',title:'饮食·药膳',items:sug.di},
+
+    {icon:'🌙',title:'作息·调摄',items:sug.li},
+
+    {icon:'🏃',title:'运动·导引',items:sug.ex},
+
+  ].map(c=>`<div class="sc"><div class="si">${c.icon}</div><div class="stl">${c.title}</div><ul class="sitems">${c.items.split('、').map(i=>`<li>${i.trim()}</li>`).join('')}</ul></div>`).join('');
+
+
+
+  const matched=[];
+
+  if(j.name && j.name!=='无') j.name.split('+').forEach(n=>{if(n.trim()) matched.push(n.trim());});
+
+  Object.entries(S).forEach(([n,s])=>{if(n!=='平和质' && s>=40 && !matched.includes(n)) matched.push(n);});
+
+  if(!matched.length) matched.push('平和质');
+
+
+
+  const rankMap={};
+
+  sorted.forEach(([n],i)=>{ rankMap[n]=i+1; });
+
+
+
+  const ncgrid=document.getElementById('ncgrid');
+
+  ncgrid.innerHTML=GRID.map(g=>{
+
+    const isMatch=matched.includes(g.k);
+
+    const rank=rankMap[g.k];
+
+    const hasRank=rank<=3 && S[g.k]>=40;
+
+    const cls=isMatch?'match':(S[g.k]<30?'weak':'');
+
+    const wm=g.w==='木'?'rgba(76,175,80,0.18)':
+
+              g.w==='火'?'rgba(244,67,54,0.14)':
+
+              g.w==='土'?'rgba(255,193,7,0.16)':
+
+              g.w==='金'?'rgba(210,210,210,0.35)':
+
+              'rgba(0,0,0,0.10)';
+
+    const wbd=g.w==='木'?'#4CAF50':
+
+               g.w==='火'?'#F44336':
+
+               g.w==='土'?'#FFC107':
+
+               g.w==='金'?'#C0C0C0':
+
+               '#333333';
+
+    const wtx=g.w==='木'?'#2E7D32':
+
+              g.w==='火'?'#C62828':
+
+              g.w==='土'?'#E65100':
+
+              g.w==='金'?'#424242':
+
+              '#000000';
+
+    const cardStyle=`background:${wm};border-color:${wbd};color:${wtx}`;
+
+    return `<div class="nccard ${cls}" style="${cardStyle}">
+
+      ${hasRank?`<span class="nc-rank">${rank}</span>`:''}
+
+      <div class="nc-icon">${g.icon}</div>
+
+      <div class="nc-name">${g.k}</div>
+
+      <div class="nc-w">${g.w}行</div>
+
+      ${isMatch?`<div class="nc-match">✔</div>`:''}
+
+      <div class="nc-tags">${g.tags.map(t=>`<span class="nc-tag">${t}</span>`).join('')}</div>
+
+    </div>`;
+
+  }).join('');
+
+}
+
+
+
+function showReportFromRecord(record){
+
+  const j={name:record.result,type:record.resultType,desc:record.description};
+
+  // 重建平和质/偏颇体质判定标签
+
+  j.phJudge='';
+
+  j.ppJudges={};
+
+  renderReportUI(record.scores, j);
+
+  document.getElementById('cover-section').style.display='none';
+
+  document.getElementById('report-section').style.display='block';
+
+  document.getElementById('p0').classList.add('showing-report');
+
+  show('p0');
+
+  window.scrollTo({top:0,behavior:'smooth'});
+
+}
+
+
+
+// ═══ 本地数据库功能 ═══
+
+const DB_KEY = 'tcm_records';
+
+let currentUser = null;
+
+let currentUserId = null; // 当前用户唯一标识
+
+
+
+// 生成用户唯一标识（基于姓名+电话的简单哈希）
+
+function genUserId(user) {
+
+  const str = (user.name || '') + (user.phone || '') + (user.gender || '');
+
+  let hash = 0;
+
+  for (let i = 0; i < str.length; i++) {
+
+    const char = str.charCodeAt(i);
+
+    hash = ((hash << 5) - hash) + char;
+
+    hash = hash & hash;
+
+  }
+
+  return 'user_' + Math.abs(hash).toString(36);
+
+}
+
+
+
+function restoreLastUser() {
+
+  const records = getRecords();
+
+  if (records.length === 0) return;
+
+  const last = records[0].user;
+
+  const lastUserId = records[0].userId;
+
+  currentUser = last;
+
+  currentUserId = lastUserId;
+
+  ['name','gender','age','phone','address'].forEach(f => {
+
+    const el = document.getElementById('uf-' + f);
+
+    if (!el) return;
+
+    if (f === 'gender') {
+
+      if (last[f] && last[f] !== '-') el.value = last[f];
+
+    } else {
+
+      el.value = last[f] && last[f] !== '-' ? last[f] : '';
+
+    }
+
+  });
+
+}
+
+
+
+function getUserInfo() {
+
+  return {
+
+    name: document.getElementById('uf-name')?.value?.trim() || '匿名',
+
+    gender: document.getElementById('uf-gender')?.value || '-',
+
+    age: document.getElementById('uf-age')?.value || '-',
+
+    phone: document.getElementById('uf-phone')?.value?.trim() || '-',
+
+    address: document.getElementById('uf-address')?.value?.trim() || '-'
+
+  };
+
+}
+
+
+
+// ═══ 云端同步配置 ═══
+
+const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzIFWFSSBsii5EfkzmV9U-niBwKAu8BmunDxDx9qOF6jRdKdubKTvsj_aoc0zGycTRjaw/exec';
+
+
+
+async function syncToCloud(record) {
+
+  try {
+
+    const response = await fetch(GAS_API_URL, {
+
+      method: 'POST',
+
+      headers: { 'Content-Type': 'application/json' },
+
+      body: JSON.stringify(record)
+
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+
+      console.log('✅ 云端同步成功');
+
+      return { success: true };
+
+    } else {
+
+      console.warn('⚠️ 云端同步失败:', result.error);
+
+      return { success: false, error: result.error };
+
+    }
+
+  } catch (err) {
+
+    console.warn('⚠️ 网络错误，云端同步失败:', err.message);
+
+    return { success: false, error: err.message };
+
+  }
+
+}
+
+
+
+function saveRecord(judgeResult, scores) {
+
+  const user = getUserInfo();
+
+  currentUser = user;
+
+  currentUserId = genUserId(user); // 更新当前用户标识
+
+  
+
+  const record = {
+
+    id: Date.now(),
+
+    date: new Date().toLocaleString('zh-CN'),
+
+    userId: currentUserId, // 用户唯一标识
+
+    user: user,
+
+    result: judgeResult.name,
+
+    resultType: judgeResult.type,
+
+    description: judgeResult.desc,
+
+    scores: scores
+
+  };
+
+  
+
+  let records = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+
+  records.unshift(record);
+
+  // 最多保留100条
+
+  if (records.length > 100) records = records.slice(0, 100);
+
+  localStorage.setItem(DB_KEY, JSON.stringify(records));
+
+  
+
+  // 返回 record 供调用者使用
+
+  return record;
+
+}
+
+
+
+// DISC 记录
+
+const DISC_DB_KEY = 'disc_records';
+
+function saveDiscRecord(judge, scores, chameleonScore) {
+
+  const mainType = DISC_TYPES[judge.typeIdx];
+
+  const record = {
+
+    id: Date.now(),
+
+    date: new Date().toLocaleString('zh-CN'),
+
+    kind: 'disc',
+
+    discType: mainType.short,
+
+    discEmoji: mainType.name.split(' ')[0],
+
+    discColor: mainType.color,
+
+    discSubLabel: judge.subLabel,
+
+    discDesc: mainType.desc,
+
+    discScores: { D: scores[0], I: scores[1], S: scores[2], C: scores[3] },
+
+    chameleonScore: chameleonScore,
+
+    discRange: judge.range
+
+  };
+
+  let records = JSON.parse(localStorage.getItem(DISC_DB_KEY) || '[]');
+
+  records.unshift(record);
+
+  if (records.length > 50) records = records.slice(0, 50);
+
+  localStorage.setItem(DISC_DB_KEY, JSON.stringify(records));
+
+  return record;
+
+}
+
+function getDiscRecords() {
+
+  return JSON.parse(localStorage.getItem(DISC_DB_KEY) || '[]');
+
+}
+
+function deleteDiscRecord(id) {
+
+  let records = getDiscRecords();
+
+  records = records.filter(r => r.id !== id);
+
+  localStorage.setItem(DISC_DB_KEY, JSON.stringify(records));
+
+  renderHistoryPage();
+
+}
+
+
+
+// 获取当前用户的记录（仅返回匹配 userId 的记录）
+
+function getRecords() {
+
+  const allRecords = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+
+  // 如果有当前用户标识，只返回该用户的记录
+
+  if (currentUserId) {
+
+    return allRecords.filter(r => r.userId === currentUserId);
+
+  }
+
+  return allRecords;
+
+}
+
+
+
+// 获取所有记录（用于管理功能）
+
+function getAllRecords() {
+
+  return JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+
+}
+
+
+
+function deleteRecord(id) {
+
+  let records = getRecords();
+
+  records = records.filter(r => r.id !== id);
+
+  localStorage.setItem(DB_KEY, JSON.stringify(records));
+
+  renderHistory();
+
+}
+
+
+
+function clearAllRecords() {
+
+  if (confirm('确定要清空所有历史记录吗？此操作不可恢复。')) {
+
+    localStorage.removeItem(DB_KEY);
+
+    renderHistory();
+
+  }
+
+}
+
+
+
+function _download(url, filename) {
+
+  const a = document.createElement('a');
+
+  a.style.display = 'none';
+
+  document.body.appendChild(a);
+
+  a.href = url;
+
+  a.download = filename;
+
+  a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+
+  document.body.removeChild(a);
+
+}
+
+
+
+function exportJSON() {
+
+  const records = getRecords();
+
+  if (records.length === 0) { alert('暂无记录可导出'); return; }
+
+  const blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' });
+
+  _download(URL.createObjectURL(blob), '体质记录_' + new Date().toISOString().slice(0,10) + '.json');
+
+}
+
+
+
+function exportCSV() {
+
+  const records = getRecords();
+
+  if (records.length === 0) { alert('暂无记录可导出'); return; }
+
+  const headers = ['日期','姓名','性别','年龄','电话','地址','体质结果','结果类型','平和质','气虚质','阳虚质','阴虚质','痰湿质','湿热质','血瘀质','气郁质','特禀质'];
+
+  const rows = records.map(r => [
+
+    r.date, r.user.name, r.user.gender, r.user.age,
+
+    r.user.phone, r.user.address, r.result, r.resultType,
+
+    r.scores['平和质']||0, r.scores['气虚质']||0, r.scores['阳虚质']||0,
+
+    r.scores['阴虚质']||0, r.scores['痰湿质']||0, r.scores['湿热质']||0,
+
+    r.scores['血瘀质']||0, r.scores['气郁质']||0, r.scores['特禀质']||0
+
+  ]);
+
+  const csv = [headers.join(','), ...rows.map(r => r.map(v => '"'+v+'"').join(',')).join('')].join('\n');
+
+  const blob = new Blob(["\uFEFF"+csv], { type: 'text/csv;charset=utf-8' });
+
+  _download(URL.createObjectURL(blob), '体质记录_' + new Date().toISOString().slice(0,10) + '.csv');
+
+}
+
+function renderReportHistory() {
+
+  const container = document.getElementById('rh-list');
+
+  if (!container) return;
+
+  const records = getRecords().slice(0, 10);
+
+  if (records.length === 0) {
+
+    container.innerHTML = '<div class="hist-empty-row">暂无历史记录</div>';
+
+    return;
+
+  }
+
+  container.innerHTML = records.map((r, i) => `
+
+    <div class="hist-row" onclick="showReportFromRecord(getRecords()[${i}])" style="cursor:pointer">
+
+      <div>
+
+        <div class="hr-name">${r.user.name}</div>
+
+        <div class="hr-date">${r.date.split(' ')[0]}</div>
+
+      </div>
+
+      <div>
+
+        <div class="hr-result">🌿 ${r.result}</div>
+
+        <div class="hr-tip">${r.description || ''}</div>
+
+      </div>
+
+    </div>
+
+  `).join('');
+
+}
+
+
+
+restoreLastUser();
+
+renderReportHistory();
+
+
+
+// Hash 路由：支持直接访问子页面
+
+window.addEventListener('hashchange', handleHash);
+
+function handleHash() {
+
+  const h = location.hash;
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+  if (h === '#p-history') {
+
+    document.getElementById('p-history').classList.add('active');
+
+    // Demo模式注入数据
+
+    if (location.search.includes('seed=1')) {
+
+      const DB_KEY = 'tcm_records';
+
+      const records = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+
+      const now = new Date().toISOString();
+
+      if (!records.find(r => r.id && r.id.startsWith('demo_'))) {
+
+        records.push({ id:'demo_d1', kind:'disc', discType:'老虎型 (D)', discSubLabel:'老虎型 (D)', discEmoji:'🐯', discColor:'#E8A020', discScores:{D:28,I:14,S:18,C:10}, chameleonScore:12, judge:'D', timestamp:now, description:'主导型人格，善于掌控全局，决策果断，勇于承担领导责任。' });
+
+        records.push({ id:'demo_d2', kind:'disc', discType:'孔雀型 (I)', discSubLabel:'孔雀型 (I)', discEmoji:'🦚', discColor:'#27AE60', discScores:{D:10,I:26,S:16,C:8}, chameleonScore:10, judge:'I', timestamp:new Date(now.getTime()-86400000).toISOString(), description:'社交达人，热情洋溢，善于表达，乐于激励和鼓舞他人。' });
+
+        records.push({ id:'demo_t1', kind:'tcm', type:'气虚质', emoji:'😮‍💨', timestamp:new Date(now.getTime()-172800000).toISOString(), description:'元气不足，易疲劳。' });
+
+        localStorage.setItem(DB_KEY, JSON.stringify(records));
+
+      }
+
+    }
+
+    renderHistoryPage();
+
+  }
+
+  else if (h === '#pDISC') { document.getElementById('pDISC').classList.add('active'); }
+
+  else { document.getElementById('p0').classList.add('active'); }
+
+}
+
+refreshLang();
+
+handleHash();
+
+</script>
+
+
+
+<!-- ═══════════════════════════════════════════════════════════
+
+     DISC性格测试页面
+
+═══════════════════════════════════════════════════════════ -->
+
+<style>
+
+/* DISC测试页 */
+
+#pDISC .pageDISC { display:none; min-height:100vh; }
+
+#pDISC.page.active { display:flex; flex-direction:column; }
+
+#pDISC.page.active .pageDISC { display:flex; flex-direction:column; min-height:100vh; }
+
+.disc-cover { align-items:center; justify-content:center; padding:24px 16px; flex:1; }
+
+.disc-cover .badge { background:linear-gradient(135deg,#8B6914,#C49A6C); }
+
+.disc-types { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; max-width:480px; width:100%; margin:0 auto 20px; }
+
+.disc-types .dtype { flex:0 1 calc((100% - 20px) / 3); }
+
+.disc-blank { visibility:hidden; pointer-events:none; flex:0 1 calc((100% - 20px) / 3); }
+
+.dtype { background:var(--card); border-radius:var(--r); padding:16px 12px; text-align:center; box-shadow:var(--shd); cursor:pointer; transition:all .2s; }
+
+.dtype:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.15); }
+
+.dtype .di { font-size:32px; line-height:1; margin-bottom:4px; }
+
+.dtype .dn { font-size:13px; font-weight:700; color:var(--pd); margin-bottom:4px; }
+
+.dtype .dd { font-size:11px; color:var(--tl); line-height:1.5; }
+
+.disc-note { max-width:480px; width:100%; font-size:11px; color:var(--tl); text-align:center; line-height:1.7; margin-bottom:20px; }
+
+.disc-test { flex:1; padding:24px 16px; }
+
+.disc-test .thdr { background:var(--card); width:100%; padding:14px 16px; position:sticky; top:0; z-index:10; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+
+.disc-report { padding:24px 16px; }
+
+.disc-rhd { text-align:center; margin-bottom:20px; }
+
+.disc-rhd h1 { font-size:clamp(22px,5vw,32px); color:var(--pd); margin-bottom:4px; }
+
+.disc-rhd p { font-size:12px; color:var(--tl); }
+
+.disc-result-card { background:var(--card); border-radius:var(--r); padding:20px 18px; max-width:500px; margin:0 auto 14px; box-shadow:var(--shd); text-align:center; }
+
+.disc-scores, .disc-bar-wrap, .disc-char-cards, .disc-advice { max-width:600px; }
+
+.disc-main-icon { font-size:48px; line-height:1; margin-bottom:8px; }
+
+.disc-main-label { font-size:clamp(28px,7vw,38px); font-weight:800; color:#8B6914; margin-bottom:2px; }
+
+.disc-sub-label { font-size:14px; color:var(--a); font-weight:600; margin-bottom:10px; }
+
+.disc-main-desc { font-size:13px; color:var(--tl); line-height:1.7; }
+
+.disc-scores { background:var(--card); border-radius:var(--r); padding:18px; max-width:500px; margin:0 auto 14px; box-shadow:var(--shd); }
+
+.disc-scores-title { font-size:13px; font-weight:700; color:#8B6914; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+
+.disc-score-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+
+.disc-score-row:last-child { margin-bottom:0; }
+
+.disc-slabel { font-size:13px; font-weight:600; color:var(--pd); width:60px; flex-shrink:0; white-space:nowrap; }
+
+.disc-sbar { flex:1; height:8px; background:#eee; border-radius:4px; overflow:hidden; }
+
+.disc-sbf { height:100%; border-radius:4px; transition:width .6s; }
+
+.disc-sval { font-size:12px; color:var(--tl); min-width:28px; text-align:right; }
+
+.disc-char-cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(80px, 1fr)); gap:10px; max-width:600px; margin:0 auto 14px; }
+
+.disc-char { background:var(--card); border-radius:var(--r); padding:10px 6px 12px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.05); position:relative; overflow:hidden; }
+
+.disc-char .dc-bar { position:absolute; top:0; left:0; right:0; height:6px; background:#eee; }
+
+.disc-char .dc-barf { height:100%; border-radius:0 0 4px 4px; transition:width .6s; }
+
+.disc-char .dci { font-size:26px; margin:6px 0 2px; }
+
+.disc-char .dcn { font-size:12px; font-weight:700; color:var(--pd); margin-bottom:2px; white-space:nowrap; }
+
+.disc-char .dcv { font-size:11px; color:var(--tl); }
+
+.disc-bar-wrap { max-width:500px; margin:0 auto 14px; }
+
+.disc-bar-title { font-size:12px; font-weight:600; color:#8B6914; margin-bottom:10px; }
+
+.disc-bar-row { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+
+.disc-bar-label { font-size:12px; color:var(--pd); font-weight:600; width:50px; flex-shrink:0; }
+
+.disc-bar-track { flex:1; height:6px; background:#eee; border-radius:3px; overflow:hidden; display:flex; }
+
+.disc-bar-seg { height:100%; }
+
+.disc-bar-legend { max-width:500px; margin:8px auto 0; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+
+.disc-quad { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; max-width:600px; margin:0 auto 8px; }
+
+.disc-quad-card { border-radius:10px; padding:10px 6px 12px; text-align:center; border:1px solid; position:relative; overflow:hidden; }
+
+.disc-quad-bar { position:absolute; top:0; left:0; height:5px; border-radius:0 0 4px 4px; transition:width .6s; }
+
+.disc-quad-emoji { font-size:24px; margin:4px 0 2px; }
+
+.disc-quad-label { font-size:11px; font-weight:700; }
+
+.disc-quad-val { font-size:13px; color:var(--pd); font-weight:700; margin-top:2px; }
+
+.disc-legend-item { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--tl); }
+
+.disc-legend-dot { width:10px; height:10px; border-radius:50%; }
+
+.disc-advice { background:var(--card); border-radius:var(--r); padding:18px; max-width:500px; margin:0 auto 14px; box-shadow:var(--shd); }
+
+.disc-advice-title { font-size:13px; font-weight:700; color:#8B6914; margin-bottom:10px; }
+
+.disc-advice-item { display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; }
+
+.disc-advice-item:last-child { margin-bottom:0; }
+
+.disc-advice-icon { font-size:18px; flex-shrink:0; }
+
+.disc-advice-text { font-size:12px; color:var(--tl); line-height:1.6; }
+
+.disc-advice-text strong { color:var(--pd); }
+
+
+
+
+
+</style>
+
+
+
+<div id="pDISC" class="page">
+
+  <!-- DISC封面 -->
+
+  <div class="pageDISC disc-cover" id="disc-page-cover">
+
+    <div class="badge" data-i18n="disc_badge">DISC行为风格测试</div>
+
+    <div class="ctitle" style="margin-bottom:10px" data-i18n="disc_title">性格自测系统</div>
+
+    <div class="csub" style="margin-bottom:24px" data-i18n="disc_sub">用5种动物读懂你的行为风格</div>
+
+    <div class="disc-types">
+
+      <div class="dtype">
+
+        <div class="di">🐯</div>
+
+        <div class="dn">老虎</div>
+
+        <div class="dd">支配型<br>果断、目标导向</div>
+
+      </div>
+
+      <div class="dtype">
+
+        <div class="di">🦚</div>
+
+        <div class="dn">孔雀</div>
+
+        <div class="dd">表达型<br>热情、善于交际</div>
+
+      </div>
+
+      <div class="dtype">
+
+        <div class="di">🐨</div>
+
+        <div class="dn">考拉</div>
+
+        <div class="dd">稳健型<br>温和、善于配合</div>
+
+      </div>
+
+      <div class="dtype">
+
+        <div class="di">🦉</div>
+
+        <div class="dn">猫头鹰</div>
+
+        <div class="dd">严谨型<br>精确、注重细节</div>
+
+      </div>
+
+      <div class="dtype">
+
+        <div class="di">🦎</div>
+
+        <div class="dn">变色龙</div>
+
+        <div class="dd">综合型<br>适应力强、多面融合</div>
+
+      </div>
+
+      <div class="dtype disc-blank" aria-hidden="true">
+
+        <div class="di">&nbsp;</div>
+
+        <div class="dn">&nbsp;</div>
+
+        <div class="dd">&nbsp;</div>
+
+      </div>
+
+    </div>
+
+    <div class="disc-note" data-i18n="disc_note">
+
+      本测试基于DISC行为风格理论，共30题，约3分钟完成<br>
+
+      适合职场沟通、团队建设、人际了解参考使用
+
+    </div>
+
+    <button class="btn btn-disc" onclick="discStartTest()" style="max-width:300px;justify-content:center;width:100%" data-i18n="disc_start">
+
+      开始测试 →
+
+    </button>
+
+    <button class="rb" onclick="backToHome()" style="margin-top:10px;font-size:13px;padding:9px 24px" data-i18n="disc_back">← 返回体质测试</button>
+
+  </div>
+
+
+
+  <!-- DISC测试区 -->
+
+  <div class="pageDISC disc-test" id="disc-page-test" style="display:none">
+
+    <div class="thdr">
+
+      <div class="pbar">
+
+        <div class="plabel">
+
+          <span class="mtag" style="background:#8B6914" data-i18n="disc_mtag">DISC性格测试</span>
+
+          <span id="disc-pt">1 / 30</span>
+
+        </div>
+
+        <div class="pbar-track"><div id="disc-pf" style="height:5px;background:#8B6914;border-radius:3px;transition:width .4s;width:0%"></div></div>
+
+      </div>
+
+    </div>
+
+    <div class="qcard">
+
+      <div class="qnum" id="disc-qn"></div>
+
+      <div class="qtext" id="disc-qt"></div>
+
+    </div>
+
+    <div class="qa">
+
+      <div class="opts" id="disc-qo"></div>
+
+    </div>
+
+    <div class="nav">
+
+      <button class="np" id="disc-bp" onclick="discPrev()" disabled data-i18n="disc_prev">← 上一题</button>
+
+      <button class="nn" id="disc-bn" onclick="discNext()">下一题 →</button>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- DISC报告 -->
+
+  <div class="pageDISC disc-report" id="disc-page-report" style="display:none">
+
+    <div class="disc-rhd">
+
+      <h1 data-i18n="disc_rpt_title">🐯 DISC性格报告</h1>
+
+      <p data-i18n="disc_rpt_sub">基于DISC行为风格测试 · 2026.7.25</p>
+
+    </div>
+
+    <div class="disc-result-card" id="disc-result-card"></div>
+
+    <div class="disc-char-cards" id="disc-char-cards"></div>
+
+    <div class="disc-bar-wrap">
+
+      <div class="disc-bar-title" data-i18n="disc_bar_title">🔬 DISC四象限分布图</div>
+
+      <div id="disc-bar-chart"></div>
+
+      <div class="disc-bar-legend">
+
+        <div class="disc-legend-item"><div class="disc-legend-dot" style="background:#E67E22"></div>支配(D)</div>
+
+        <div class="disc-legend-item"><div class="disc-legend-dot" style="background:#27AE60"></div>影响(I)</div>
+
+        <div class="disc-legend-item"><div class="disc-legend-dot" style="background:#2980B9"></div>稳健(S)</div>
+
+        <div class="disc-legend-item"><div class="disc-legend-dot" style="background:#8E44AD"></div>严谨(C)</div>
+
+      </div>
+
+    </div>
+
+    <div class="disc-advice" id="disc-advice"></div>
+
+    <button class="rb" onclick="discRestart()" style="margin:0 auto 30px;font-size:13px;padding:9px 24px" data-i18n="disc_retake">🔄 重新测试</button>
+
+    <button class="rb btn-history" onclick="showHistoryPage()" style="margin:0 auto 30px;font-size:13px;padding:9px 24px" data-i18n="disc_view_hist">📋 查看历史记录</button>
+
+    <button class="rb" onclick="backToHome()" style="margin:0 auto 30px;font-size:13px;padding:9px 24px" data-i18n="disc_back">← 返回体质测试</button>
+
+    <div class="dbox" style="max-width:500px;margin:0 auto" data-i18n="disc_disclaimer">
+
+      ⚠ DISC是行为风格参考工具，不对应能力高低或人品优劣。每种类型都有独特价值，有效沟通需要理解并尊重彼此的风格差异。
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<script>
+
+// ═══════════════════════════════════════════════════════════
+
+// DISC测试数据
+
+// ═══════════════════════════════════════════════════════════
+
+const DISC_Q = [
+
+  {q:'1.你做事是一个值得信赖的人吗？', d:[5,10,14,18,24,30]},
+
+  {q:'2.你个性温和吗？', d:[2,8,15,17,25,28]},
+
+  {q:'3.你有活力吗？', d:[3,6,13,20,22,29]},
+
+  {q:'4.你善解人意吗？', d:[4,9,12,19,23,27]},
+
+  {q:'5.你独立吗？', d:[5,10,14,18,24,30]},
+
+  {q:'6.你受人爱戴吗？', d:[3,6,13,20,22,29]},
+
+  {q:'7.做事认真且正直吗？', d:[1,7,11,16,21,26]},
+
+  {q:'8.你富有同情心吗？', d:[2,8,15,17,25,28]},
+
+  {q:'9.你有说服力吗？', d:[4,9,12,19,23,27]},
+
+  {q:'10.你大胆吗？', d:[5,10,14,18,24,30]},
+
+  {q:'11.你精确吗？', d:[1,7,11,16,21,26]},
+
+  {q:'12.你适应能力强吗？', d:[4,9,12,19,23,27]},
+
+  {q:'13.你组织能力好吗？', d:[3,6,13,20,22,29]},
+
+  {q:'14.你是否积极主动？', d:[5,10,14,18,24,30]},
+
+  {q:'15.你害羞吗？', d:[2,8,15,17,25,28]},
+
+  {q:'16.你强势吗？', d:[1,7,11,16,21,26]},
+
+  {q:'17.你镇定吗？', d:[2,8,15,17,25,28]},
+
+  {q:'18.你勇于学习吗？', d:[5,10,14,18,24,30]},
+
+  {q:'19.你反应快吗？', d:[4,9,12,19,23,27]},
+
+  {q:'20.你外向吗？', d:[3,6,13,20,22,29]},
+
+  {q:'21.你注意细节吗？', d:[1,7,11,16,21,26]},
+
+  {q:'22.你爱说话吗？', d:[3,6,13,20,22,29]},
+
+  {q:'23.你的协调能力好吗？', d:[4,9,12,19,23,27]},
+
+  {q:'24.你勤劳吗？', d:[5,10,14,18,24,30]},
+
+  {q:'25.你慷慨吗？', d:[2,8,15,17,25,28]},
+
+  {q:'26.你小心翼翼吗？', d:[1,7,11,16,21,26]},
+
+  {q:'27.你令人愉快吗？', d:[4,9,12,19,23,27]},
+
+  {q:'28.你传统吗？', d:[2,8,15,17,25,28]},
+
+  {q:'29.你亲切吗？', d:[3,6,13,20,22,29]},
+
+  {q:'30.你工作足够有效率吗？', d:[5,10,14,18,24,30]},
+
+];
+
+
+
+// 维度映射：题目索引(0-29) → 哪个动物维度
+
+// DISC_MAP: 每道题(索引) → 对应的维度
+
+// 老虎(D/老虎)=索引4,9,13,17,23,29
+
+// 孔雀(I/孔雀)=索引2,5,12,19,21,28
+
+// 考拉(S/考拉)=索引1,7,14,16,24,27
+
+// 猫头鹰(C/猫头鹰)=索引0,6,10,15,20,25
+
+// 变色龙根据四维均匀程度自动计算，不单独计分
+
+const DISC_MAP = {
+
+  0:0, 1:2, 2:1, 3:null, 4:0,
+
+  5:1, 6:3, 7:2, 8:null, 9:0,
+
+  10:3, 11:null, 12:1, 13:0, 14:2,
+
+  15:3, 16:2, 17:0, 18:null, 19:1,
+
+  20:3, 21:1, 22:null, 23:0, 24:2,
+
+  25:3, 26:null, 27:2, 28:1, 29:0,
+
+};
+
+
+
+const DISC_TYPES = [
+
+  {idx:0, name:'🐯 老虎', short:'老虎', color:'#E67E22', bg:'#FEF3E2',
+
+    desc:'支配型（Dominance）。你是一个有决断力、目标感强的人，喜欢掌控局面，敢于冒险，行动迅速。你有强烈的竞争意识，渴望成功，在团队中往往扮演领导者的角色。',
+
+    traits:['有自信、有权威','决断力高','竞争性强','喜欢冒险','积极主动'],
+
+    advice:'你的优势是决策果断、执行力强。建议注意倾听他人意见，给团队成员表达的机会，避免过于强硬而造成沟通障碍。在与稳健型（考拉）相处时，多一些耐心；在与严谨型（猫头鹰）合作时，提供足够的细节和数据支撑。'},
+
+  {idx:1, name:'🦚 孔雀', short:'孔雀', color:'#27AE60', bg:'#E8F8F0',
+
+    desc:'表达型（Influence）。你热情外向，善于表达，人际沟通能力很强，容易感染周围的人。你是天生的社交高手，喜欢成为焦点，在团队中往往是活跃气氛的那个人。',
+
+    traits:['热情洋溢','善于表达','人际高手','乐观开朗','有感染力'],
+
+    advice:'你的优势是人际影响力强、善于激励团队。建议发挥创意和表达能力的同时，学会专注完成任务，避免过度追求认可而忽视细节。在与严谨型（猫头鹰）合作时，注意提供数据和事实支撑；在与支配型（老虎）沟通时，直接切入重点。'},
+
+  {idx:2, name:'🐨 考拉', short:'考拉', color:'#2980B9', bg:'#EBF5FB',
+
+    desc:'稳健型（Steadiness）。你性格温和，善于配合，极具耐心，喜欢稳定的节奏。你是团队中的稳定力量，重视和谐，善于倾听，在人际交往中给人安全感。',
+
+    traits:['温和耐心','善于配合','重视和谐','倾听者','稳定可靠'],
+
+    advice:'你的优势是建立信任、促进团队协作。建议在保持温和特质的同时，适度表达自己的想法和需求，勇于在必要时发声。在与支配型（老虎）相处时，理解对方对速度和结果的追求；在与表达型（孔雀）合作时，享受活跃氛围的同时保持专注。'},
+
+  {idx:3, name:'🦉 猫头鹰', short:'猫头鹰', color:'#8E44AD', bg:'#F5EEF8',
+
+    desc:'严谨型（Conscientiousness）。你注重细节，追求精确，做事严谨，思维缜密。你喜欢在行动前充分分析和规划，重视规则和质量，在团队中是可靠的分析者。',
+
+    traits:['注重细节','追求精确','思维缜密','严谨负责','善于分析'],
+
+    advice:'你的优势是质量意识强、分析深入。建议在保持高标准的同时，给自己和他人一些弹性空间，接受不完美的存在。在与表达型（孔雀）相处时，理解对方对快速迭代的偏好；在与支配型（老虎）合作时，适时提供决策所需的关键细节。'},
+
+  {idx:4, name:'🦎 变色龙', short:'变色龙', color:'#16A085', bg:'#E8F6F3',
+
+    desc:'综合型（Versatile）。你兼具多种特质，适应能力强，能够根据环境和对象灵活调整自己的行为方式。你是天然的协调者，能够在不同风格的人之间搭建桥梁。',
+
+    traits:['适应力强','灵活多变','善于协调','面面俱到','包容性强'],
+
+    advice:'你的优势是弹性高、适应力强，能够融入各种团队。建议在发挥多面性的同时，找到自己相对更倾向的主导风格，避免为了取悦所有人而失去自我核心。找到最让你感到自然和舒适的角色，是变色龙修炼的关键。'},
+
+];
+
+
+
+const DISC_OPTS = [
+
+  {v:1,l:'不同意'},{v:2,l:'有一点同意'},{v:3,l:'差不多'},
+
+  {v:4,l:'比较同意'},{v:5,l:'非常同意'}
+
+];
+
+
+
+// ═══════════════════════════════════════════════════════════
+
+// DISC状态
+
+// ═══════════════════════════════════════════════════════════
+
+let discIdx = 0;
+
+let discAns = {}; // idx → value (1-5)
+
+
+
+function startDISC(){
+
+    discIdx = 0; discAns = {};
+
+    document.getElementById('disc-page-cover').style.display = 'flex';
+
+    document.getElementById('disc-page-test').style.display = 'none';
+
+    document.getElementById('disc-page-report').style.display = 'none';
+
+    document.getElementById('pDISC').classList.add('active');
+
+  document.getElementById('p0').classList.remove('active');
+
+  document.getElementById('p1').classList.remove('active');
+
+  discRenderQ();
+
+}
+
+
+
+function backToHome(){
+
+  document.getElementById('pDISC').classList.remove('active');
+
+  document.getElementById('p0').classList.add('active');
+
+  document.getElementById('disc-page-cover').style.display = 'none';
+
+  document.getElementById('disc-page-test').style.display = 'none';
+
+  document.getElementById('disc-page-report').style.display = 'none';
+
+  window.scrollTo({top:0,behavior:'smooth'});
+
+}
+
+
+
+function discStartTest(){
+
+  discIdx = 0; discAns = {};
+
+  document.getElementById('disc-page-cover').style.display = 'none';
+
+  document.getElementById('disc-page-test').style.display = 'flex';
+
+  document.getElementById('disc-page-report').style.display = 'none';
+
+  discRenderQ();
+
+}
+
+
+
+function discRenderQ(){
+
+  const total = DISC_Q.length;
+
+  const idx = discIdx;
+
+  const q = DISC_Q[idx];
+
+  document.getElementById('disc-pt').textContent = (idx+1)+' / '+total;
+
+  document.getElementById('disc-pf').style.width = ((idx+1)/total*100)+'%';
+
+  document.getElementById('disc-qn').innerHTML = '<b>DISC</b> 第 '+(idx+1)+' 题 · '+total+'题中';
+
+  document.getElementById('disc-qt').textContent = q.q;
+
+  const el = document.getElementById('disc-qo');
+
+  el.innerHTML = '';
+
+  DISC_OPTS.forEach(o => {
+
+    const sel = discAns[idx] === o.v;
+
+    const d = document.createElement('div');
+
+    d.className = 'opt' + (sel ? ' selected' : '');
+
+    d.onclick = () => { discAns[idx] = o.v; discRenderQ(); };
+
+    d.innerHTML = '<div class="oc"></div><div class="olbl">'+o.l+'</div>';
+
+    el.appendChild(d);
+
+  });
+
+  document.getElementById('disc-bp').disabled = idx === 0;
+
+  const isLast = idx === total - 1;
+
+  const bn = document.getElementById('disc-bn');
+
+  bn.textContent = isLast ? (LANG==='en'?'View Result ->':'查看结果 →') : (LANG==='en'?'Next ->':'下一题 →');
+
+  bn.disabled = discAns[idx] === undefined;
+
+}
+
+
+
+function discPrev(){ if(discIdx > 0){ discIdx--; discRenderQ(); } }
+
+function discNext(){
+
+  if(discIdx < DISC_Q.length - 1){ discIdx++; discRenderQ(); }
+
+  else { discShowReport(); }
+
+}
+
+
+
+// ═══════════════════════════════════════════════════════════
+
+// DISC计分算法
+
+// 老虎(D)=题5,10,14,18,24,30 → 索引4,9,13,17,23,29
+
+// 孔雀(I)=题3,6,13,20,22,29 → 索引2,5,12,19,21,28
+
+// 考拉(S)=题2,8,15,17,25,28 → 索引1,7,14,16,24,27
+
+// 猫头鹰(C)=题1,7,11,16,21,26 → 索引0,6,10,15,20,25
+
+// 变色龙=各项均匀程度（自动计算）
+
+// 每维度6题，每题1-5分，满分30分
+
+// ═══════════════════════════════════════════════════════════
+
+function discCalcScores(){
+
+  // raw[0]=老虎D, raw[1]=孔雀I, raw[2]=考拉S, raw[3]=猫头鹰C
+
+  const raw = [0, 0, 0, 0];
+
+  DISC_Q.forEach((_, qi) => {
+
+    const v = discAns[qi];
+
+    if(v === undefined) return;
+
+    const dim = DISC_MAP[qi]; // 0=老虎,1=孔雀,2=考拉,3=猫头鹰, null=无效题
+
+    if(dim !== null && dim < 4) raw[dim] += v;
+
+  });
+
+  // 原始分即0-30分（每维度6题×5分=30）
+
+  const scores = raw.map(r => Math.round(r));
+
+  // 变色龙：四项分数越接近，得分越高（差异越小→越像变色龙）
+
+  const maxScore = Math.max(...scores);
+
+  const minScore = Math.min(...scores);
+
+  const range = maxScore - minScore;
+
+  // range=0→30分(最均匀)，range=24→0分(最悬殊)
+
+  const chameleonScore = Math.max(0, Math.round(30 - range * 1.2));
+
+  return { scores, chameleonScore };
+
+}
+
+
+
+// DISC判定逻辑
+
+function discJudge(scores, chameleonScore){
+
+  const sc = scores;
+
+  const max = Math.max(...sc);
+
+  const second = [...sc].sort((a,b)=>b-a)[1];
+
+  const range = Math.max(...sc) - Math.min(...sc);
+
+
+
+  let typeIdx = 4; // 默认变色龙
+
+  let label = '🦎 变色龙';
+
+  let subLabel = '综合型 · 面面俱到';
+
+
+
+  // 变色龙判定：四项分数差异小（任意两项差≤4）
+
+  if(range <= 4){
+
+    typeIdx = 4;
+
+    label = '🦎 变色龙';
+
+    subLabel = '综合型 · 面面俱到';
+
+  } else if(max - second > 4){
+
+    // 单项明显突出
+
+    typeIdx = sc.indexOf(max);
+
+    const type = DISC_TYPES[typeIdx];
+
+    label = type.name;
+
+    subLabel = type.short + '型';
+
+  } else {
+
+    // 两项或多维度综合：以最高项为主类型
+
+    const topTwoIdx = sc.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]).slice(0,2).map(x=>x[1]);
+
+    const names = topTwoIdx.map(i=>DISC_TYPES[i].short).join('+');
+
+    label = '🦎 变色龙';
+
+    subLabel = names + '综合型';
+
+    typeIdx = topTwoIdx[0]; // 以第一高分为主类型展示
+
+  }
+
+
+
+  return { typeIdx, label, subLabel, max, second, range };
+
+}
+
+
+
+function discShowReport(){
+
+  document.getElementById('disc-page-test').style.display = 'none';
+
+  document.getElementById('disc-page-report').style.display = 'flex';
+
+    discRenderReport();
+
+}
+
+
+
+// Demo 模式（仅供截图调试使用，URL 加 ?demo=1 直接渲染报告）
+
+if (location.search.includes('demo=1')) {
+
+  window.addEventListener('DOMContentLoaded', () => {
+
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+    document.getElementById('pDISC').classList.add('active');
+
+    document.getElementById('disc-page-cover').style.display = 'none';
+
+    document.getElementById('disc-page-test').style.display = 'none';
+
+    document.getElementById('disc-page-report').style.display = 'flex';
+
+    // 伪造 30 题答案：老虎型偏高分
+
+    for (let i = 0; i < 30; i++) {
+
+      const map = DISC_MAP[i] || 0;
+
+      discAns[i] = (map === 0 ? 5 : map === 1 ? 2 : map === 2 ? 3 : map === 3 ? 2 : 3);
+
+    }
+
+    discShowReport();
+
+  });
+
+}
+
+
+
+function discRenderReport(){
+
+  const {scores, chameleonScore} = discCalcScores();
+
+  const judge = discJudge(scores, chameleonScore);
+
+  const mainType = DISC_TYPES[judge.typeIdx];
+
+
+
+  // 结果卡片
+
+  document.getElementById('disc-result-card').innerHTML = `
+
+    <div class="disc-main-icon">${mainType.name.split(' ')[0]}</div>
+
+    <div class="disc-main-label">${mainType.name.split(' ')[1]}</div>
+
+    <div class="disc-sub-label">${judge.subLabel}</div>
+
+    <div class="disc-main-desc">${mainType.desc}</div>
+
+  `;
+
+
+
+  // 得分条
+
+  const scoreColors = ['#E67E22','#27AE60','#2980B9','#8E44AD'];
+
+  const scoreLabels = ['🐯 老虎(D)','🦚 孔雀(I)','🐨 考拉(S)','🦉 猫头鹰(C)'];
+
+  const scoreMax = 30;
+
+  ((document.getElementById('disc-scores-rows'))||{innerHTML:''}).innerHTML = scores.map((s,i) => `
+
+    <div class="disc-score-row">
+
+      <div class="disc-slabel" style="color:${scoreColors[i]}">${scoreLabels[i].split('(')[0]}</div>
+
+      <div class="disc-sbar"><div class="disc-sbf" style="width:${(s/scoreMax)*100}%;background:${scoreColors[i]}"></div></div>
+
+      <div class="disc-sval">${s}分</div>
+
+    </div>
+
+  `).join('') + `
+
+    <div class="disc-score-row" style="margin-top:8px;padding-top:8px;border-top:1px dashed #eee">
+
+      <div class="disc-slabel" style="color:#16A085">🦎 变色龙</div>
+
+      <div class="disc-sbar"><div class="disc-sbf" style="width:${(chameleonScore/scoreMax)*100}%;background:#16A085"></div></div>
+
+      <div class="disc-sval">${chameleonScore}分</div>
+
+    </div>
+
+  `;
+
+
+
+  // 四象限分布图 + 各类型得分（一体化）
+
+  const [d,i,s,c] = scores;
+
+  const dimData = [
+
+    {label:'支配(D)', emoji:'🐯', color:'#E67E22', val:d, idx:0},
+
+    {label:'影响(I)', emoji:'🦚', color:'#27AE60', val:i, idx:1},
+
+    {label:'稳健(S)', emoji:'🐨', color:'#2980B9', val:s, idx:2},
+
+    {label:'严谨(C)', emoji:'🦉', color:'#8E44AD', val:c, idx:3}
+
+  ];
+
+  document.getElementById('disc-bar-chart').innerHTML = `
+
+    <div class="disc-quad">
+
+      ${dimData.map(d => `
+
+        <div class="disc-quad-card" style="background:${d.color}10;border-color:${d.color}40">
+
+          <div class="disc-quad-bar" style="width:${(d.val/scoreMax)*100}%;background:${d.color}"></div>
+
+          <div class="disc-quad-emoji">${d.emoji}</div>
+
+          <div class="disc-quad-label" style="color:${d.color}">${d.label}</div>
+
+          <div class="disc-quad-val">${d.val} 分</div>
+
+        </div>
+
+      `).join('')}
+
+    </div>
+
+  `;
+
+
+
+  // 特质卡
+
+  document.getElementById('disc-char-cards').innerHTML = mainType.traits.map(t => `
+
+    <div class="disc-char">
+
+      <div class="dci">✨</div>
+
+      <div class="dcn">${t}</div>
+
+    </div>
+
+  `).join('');
+
+
+
+  // 沟通建议
+
+  document.getElementById('disc-advice').innerHTML = `
+
+    <div class="disc-advice-title">💬 与不同类型沟通建议</div>
+
+    ${DISC_TYPES.filter(t=>t.idx!==judge.typeIdx).slice(0,3).map(t => `
+
+      <div class="disc-advice-item">
+
+        <div class="disc-advice-icon">${t.name.split(' ')[0]}</div>
+
+        <div class="disc-advice-text">
+
+          <strong>${t.short}型</strong>：${t.advice.split('。')[1]||t.advice.split('。')[0]+'。'}
+
+        </div>
+
+      </div>
+
+    `).join('')}
+
+  `;
+
+
+
+  // 保存 DISC 记录
+
+  saveDiscRecord(judge, scores, chameleonScore);
+
+}
+
+
+
+function discRestart(){
+
+  discIdx = 0; discAns = {};
+
+  document.getElementById('disc-page-report').style.display = 'none';
+
+  document.getElementById('disc-page-test').style.display = 'none';
+
+  discRenderQ();
+
+}
+
+
+
+// === 历史记录全屏页 ===
+
+function showHistoryPage() {
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+  const hp = document.getElementById('p-history');
+
+  hp.classList.add('active');
+
+  hp.classList.remove('showing-report');
+
+  renderHistoryPage();
+
+}
+
+
+
+function renderHistoryPage() {
+
+  const tcm = getRecords().slice(0, 20);
+
+  const disc = getDiscRecords().slice(0, 20);
+
+
+
+  // 合并按时间排序
+
+  const all = [
+
+    ...tcm.map(r => ({...r, _sort: new Date(r.date)})),
+
+    ...disc.map(r => ({...r, _sort: new Date(r.date)}))
+
+  ].sort((a,b) => b._sort - a._sort);
+
+
+
+  const container = document.getElementById('hist-all-list');
+
+  if (all.length === 0) {
+
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--tl);font-size:14px">'+i18nPick('hist_empty')+'</div>';
+
+    return;
+
+  }
+
+
+
+  container.innerHTML = all.map(r => {
+
+    if (r.kind === 'disc') {
+
+      const scores = r.discScores;
+
+      return `
+
+        <div class="hist-card hist-disc-card" onclick="loadBaziRecord('${r.id}')">
+
+          <div class="hist-card-left">
+
+            <div class="hist-card-icon" style="background:${r.discColor}20;color:${r.discColor}">${r.discEmoji}</div>
+
+            <div class="hist-card-meta">
+
+              <div class="hist-card-type" style="color:${r.discColor}">${r.discSubLabel}</div>
+
+              <div class="hist-card-date">${r.date.split(' ')[0]}</div>
+
+            </div>
+
+          </div>
+
+          <div class="hist-card-right">
+
+            <div class="hist-disc-bars">
+
+              ${['D','I','S','C'].map(k => `
+
+                <div class="hist-db-row">
+
+                  <span class="hist-db-label">${k}</span>
+
+                  <div class="hist-db-bar"><div style="width:${(scores[k]/30)*100}%;background:${k==='D'?'#E67E22':k==='I'?'#27AE60':k==='S'?'#2980B9':'#8E44AD'}"></div></div>
+
+                  <span class="hist-db-val">${scores[k]}</span>
+
+                </div>
+
+              `).join('')}
+
+            </div>
+
+          </div>
+
+          <button class="hist-del-btn" onclick="event.stopPropagation();deleteDiscRecord(${r.id})" title="删除">✕</button>
+
+        </div>`;
+
+    } else {
+
+      const badge = r.resultType === '平和质' ? '#6B9E7A' : '#C49A6C';
+
+      return `
+
+        <div class="hist-card hist-tcm-card" onclick="showTCMRecordDetail(${r.id})">
+
+          <div class="hist-card-left">
+
+            <div class="hist-card-icon" style="background:#6B9E7A20;color:#4A7C59">🌿</div>
+
+            <div class="hist-card-meta">
+
+              <div class="hist-card-type" style="color:#4A7C59">${r.result}</div>
+
+              <div class="hist-card-date">${r.date.split(' ')[0]}</div>
+
+            </div>
+
+          </div>
+
+          <div class="hist-card-right">
+
+            <div class="hist-tcm-tags">${Object.entries(r.scores||{}).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v]) => `<span style="background:#6B9E7A15;color:#4A7C59;font-size:11px;padding:2px 7px;border-radius:10px">${k} ${v}</span>`).join('')}</div>
+
+          </div>
+
+          <button class="hist-del-btn" onclick="event.stopPropagation();deleteRecord(${r.id})" title="删除">✕</button>
+
+        </div>`;
+
+    }
+
+  }).join('');
+
+}
+
+
+
+function showDiscRecordDetail(id) {
+
+  const r = getDiscRecords().find(x => x.id === id);
+
+  if (!r) return;
+
+  const modal = document.getElementById('hist-modal');
+
+  const body = document.getElementById('hist-modal-body');
+
+  const discColors = {D:'#E67E22',I:'#27AE60',S:'#2980B9',C:'#8E44AD'};
+
+  body.innerHTML = `
+
+    <div style="text-align:center;margin-bottom:16px">
+
+      <div style="font-size:40px">${r.discEmoji}</div>
+
+      <div style="font-size:22px;font-weight:700;color:${r.discColor};margin:6px 0 2px">${r.discSubLabel}</div>
+
+      <div style="font-size:12px;color:var(--tl)">${r.date}</div>
+
+    </div>
+
+    <div style="font-size:13px;color:var(--tl);line-height:1.8;margin-bottom:14px">${r.discDesc}</div>
+
+    <div style="background:#f8f4ee;border-radius:12px;padding:14px;margin-bottom:14px">
+
+      <div style="font-size:12px;font-weight:700;color:#8B6914;margin-bottom:10px">DISC 四项得分</div>
+
+      ${Object.entries(r.discScores).map(([k,v]) => `
+
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+
+          <span style="width:18px;font-weight:700;font-size:13px;color:${discColors[k]}">${k}</span>
+
+          <div style="flex:1;height:8px;background:#eee;border-radius:4px;overflow:hidden"><div style="width:${(v/30)*100}%;height:100%;background:${discColors[k]};border-radius:4px"></div></div>
+
+          <span style="font-size:12px;color:var(--tl);min-width:28px;text-align:right">${v}分</span>
+
+        </div>
+
+      `).join('')}
+
+    </div>
+
+  `;
+
+  modal.style.display = 'flex';
+
+}
+
+
+
+function showTCMRecordDetail(id) {
+
+  const r = getRecords().find(x => x.id === id);
+
+  if (!r) return;
+
+  const modal = document.getElementById('hist-modal');
+
+  const body = document.getElementById('hist-modal-body');
+
+  const sorted = Object.entries(r.scores||{}).sort((a,b)=>b[1]-a[1]);
+
+  const colors = {'平和质':'#6B9E7A','气虚质':'#E67E22','阳虚质':'#2980B9','阴虚质':'#8E44AD','痰湿质':'#16A085','湿热质':'#D35400','血瘀质':'#C0392B','气郁质':'#8E44AD','特禀质':'#7F8C8D'};
+
+  body.innerHTML = `
+
+    <div style="text-align:center;margin-bottom:16px">
+
+      <div style="font-size:40px">🌿</div>
+
+      <div style="font-size:22px;font-weight:700;color:#4A7C59;margin:6px 0 2px">${r.result}</div>
+
+      <div style="font-size:12px;color:var(--tl)">${r.date}</div>
+
+    </div>
+
+    ${r.description ? `<div style="font-size:13px;color:var(--tl);line-height:1.8;margin-bottom:14px">${r.description}</div>` : ''}
+
+    <div style="background:#f8f4ee;border-radius:12px;padding:14px;margin-bottom:14px">
+
+      <div style="font-size:12px;font-weight:700;color:#8B6914;margin-bottom:10px">九大体质得分</div>
+
+      ${sorted.map(([k,v]) => `
+
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+
+          <span style="width:54px;font-size:12px;color:${colors[k]||'#555'}">${k}</span>
+
+          <div style="flex:1;height:8px;background:#eee;border-radius:4px;overflow:hidden"><div style="width:${Math.min(100,v)}%;height:100%;background:${colors[k]||'#aaa'};border-radius:4px"></div></div>
+
+          <span style="font-size:12px;color:var(--tl);min-width:30px;text-align:right">${v}分</span>
+
+        </div>
+
+      `).join('')}
+
+    </div>
+
+  `;
+
+  modal.style.display = 'flex';
+
+}
+
+
+
+function closeHistModal() {
+
+  document.getElementById('hist-modal').style.display = 'none';
+
+}
+
+</script>
+
+
+
+  <!-- 历史记录页 -->
+
+  <div id="p-history" class="page">
+
+    <div class="hist-page-hd">
+
+      <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p0').classList.add('active');" style="float:right;background:none;border:none;cursor:pointer;font-size:20px;color:var(--tl);padding:4px 8px;margin-right:56px">✕</button>
+
+      <h2 data-i18n="hist_title">📋 测试历史记录</h2>
+
+      <p data-i18n="hist_keep">保留最近 20 条记录</p>
+
+    </div>
+
+    <div id="hist-all-list"></div>
+
+  </div>
+
+
+
+  <!-- 历史详情弹窗 -->
+
+  <div id="hist-modal" onclick="if(event.target===this)closeHistModal()">
+
+    <div id="hist-modal-body"></div>
+
+    <button id="hist-modal-close" onclick="closeHistModal()">关闭</button>
+
+  </div>
+
+
+
+<!-- 八字三生页面 -->
+
+<div id="p-bazi" class="page" style="background:#f5f5f0;padding:16px 12px">
 
   <div style="max-width:720px;margin:0 auto">
 
     <div style="text-align:center;margin-bottom:16px">
 
-      <h1 style="font-size:22px;color:#8B4513;margin:4px 0">👶 子女应期推算</h1>
+      <h1 style="font-size:22px;color:#8B4513;margin:4px 0">🔮 前世·今生·未来</h1>
 
-      <p style="font-size:12px;color:#666">子女星与流年窗口分析排盘 · 真太阳时校正 · 大运流年流月流日 · 存档查阅</p>
+      <p style="font-size:12px;color:#666">公历/阴历排盘 · 真太阳时校正 · 大运流年流月流日 · 存档查阅</p>
 
     </div>
 
-    <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p-bazi').classList.add('active');" style="position:fixed;top:12px;right:12px;background:#8B4513;color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;z-index:100">✕ 返回</button>
+    <button onclick="document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('p0').classList.add('active');" style="position:fixed;top:12px;right:12px;background:#8B4513;color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;z-index:100">✕ 返回</button>
 
     
 
@@ -519,13 +3869,6 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
       <div style="margin-top:10px">
 
         <button onclick="runBazi()" id="bz-run-btn" style="width:100%;background:#8B4513;color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:600;cursor:pointer">排盘</button>
-      <div id="children-panel" style="display:none;margin-top:12px;width:100%">
-        <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:14px">
-          <h3 style="font-size:15px;color:#8B4513;margin-bottom:10px">👶 子女应期分析</h3>
-          <div id="children-result" style="font-size:13px;line-height:1.8;color:#333"></div>
-        </div>
-      </div>
-
 
       </div>
 
@@ -674,8 +4017,17 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
       </div>
 
     </div>
-<script src="lunar.js"></script>
+
+  </div>
+
+</div>
+
+
+
+<script src="lunar.js" onerror="window.__lunarLoadErr='lunar.js 加载失败，请检查网络或硬刷 (Ctrl+Shift+R)'"></script>
+
 <script src="bazi-engine.js"></script>
+
 <script>
 
 // 兜底：万一 lunar.js 的 UMD 在浏览器里走 module 分支没挂全局，手动挂一次
@@ -713,7 +4065,35 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
   } catch(e) { console.error('lunar shim err', e); }
 
 })();
+
 </script>
+
+
+
+      
+
+      
+
+      
+
+      
+
+      <div id="bz-protolist"></div>
+
+        
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+
+
 <script>
 
 // 兜底：万一 lunar.js 的 UMD 在浏览器里走 module 分支没挂全局，手动挂一次
@@ -751,8 +4131,28 @@ body { font-family:'PingFang SC','Microsoft YaHei',sans-serif; background:var(--
   } catch(e) { console.error('lunar shim err', e); }
 
 })();
+
 </script>
-<script>
+
+
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <div style="background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+
+        
+
+        
+
+      <script>
 
 // 初始化时间维度状态（确保在 renderBaziPan 之前定义）
 
@@ -3853,8 +7253,8 @@ function renderCaiTotal(r, birthYear) {
   drawBars('bz-chart-ln', lnLabels, lnScores, 5);
 
 }
-</script>
-<script>
+
+</script><script>
 
 // 时间维度切换功能（内联）
 
@@ -4268,7 +7668,9 @@ function renderBaziPanWithHighlight(e,r,birthYear,curDyIdx,liuYearGZ){var bz=r.p
 
 
 var naRow=['纳音'].concat(r.naYin.map(function(n){return'<span style="font-size:7px!important;color:#888">'+n+'</span>'}),[curDy?'<span style="font-size:7px!important;color:#888">'+bzNayin(curDy.ganZhi)+'</span>':'','<span style="font-size:7px!important;color:#888">'+bzNayin(liuYearGZ)+'</span>','<span style="font-size:7px!important;color:#888">'+bzNayin(liuYueGZ)+'</span>','<span style="font-size:7px!important;color:#888">'+bzNayin(liuRiGZ)+'</span>']);html+='<tr>'+naRow.map(function(x,i){return'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center;font-size:10px;color:#666;background:'+colBg[i]+'">'+x+'</td>'}).join('')+'</tr>';var shenRow=['神煞'].concat(bz.map(function(p){return _ssTags(calcShenShaSingle(p,bz))}),[curDy?_ssTags(calcShenShaSingle(curDy.ganZhi.split(''),bz)):[],_ssTags(calcShenShaSingle(liuYearGZ.split(''),bz)),_ssTags(calcShenShaSingle(liuYueGZ.split(''),bz)),_ssTags(calcShenShaSingle(liuRiGZ.split(''),bz))]);html+='<tr>'+shenRow.map(function(x,i){return'<td style="border:1px solid #e0e0d8;padding:5px;text-align:center;vertical-align:top;background:'+colBg[i]+'">'+x+'</td>'}).join('')+'</tr>';var _pp=document.getElementById('bz-pan');if(_pp)_pp.innerHTML=html;var birthDtEl2=document.getElementById('bz-birth-dt-inline');if(birthDtEl2)birthDtEl2.textContent='生日：'+birthDt}
+
 </script>
+
 <script>
 
 (function(){
@@ -4280,7 +7682,9 @@ var naRow=['纳音'].concat(r.naYin.map(function(n){return'<span style="font-siz
     btn.textContent=BZ_MODE_LABELS[BZ_LIUQIN_MODE]||"十神";
 
 })();
+
 </script>
+
 <script>
 function renderSheHuiGuanXi(){
   var box=document.getElementById('bz-social');
@@ -4511,6 +7915,11 @@ for(var i=0;i<rels.length;i++){
   box.style.display='block';
 }
 </script>
+
+
+
+
+
 <script>
 function renderBaziAnalysis(){
   var box=document.getElementById('bz-analysis');
@@ -4638,151 +8047,8 @@ function renderBaziAnalysis(){
     box.style.display='block';
   }
 }window.renderBaziAnalysis=renderBaziAnalysis;
+
 </script>
-
-<script>
-// ============================================================
-// 子女应期增强：在 runBazi 成功后自动展示
-// ============================================================
-
-(function() {
-    // 包装 renderBaziPan：成功后触发子女分析
-    if (typeof renderBaziPan === 'function') {
-        var _orig_renderBaziPan = renderBaziPan;
-        renderBaziPan = function(result) {
-            _orig_renderBaziPan.apply(this, arguments);
-            setTimeout(function() {
-                if (typeof renderChildrenAnalysis === 'function') {
-                    renderChildrenAnalysis(result);
-                }
-            }, 50);
-        };
-    }
-
-    // renderChildrenAnalysis：子女应期矩阵
-    function renderChildrenAnalysis(result) {
-        var panel = document.getElementById('children-panel');
-        var container = document.getElementById('children-result');
-        if (!panel || !container) return;
-
-        try {
-            var gender = result.gender;
-            var dayGan = result.dayGan;
-            var tenGods = result.tenGods;
-            var pillars = result.pillars;
-            var birthYear = result.birthYear;
-            var GAN = '甲乙丙丁戊己庚辛壬癸';
-            var ZHI = '子丑寅卯辰巳午未申酉戌亥';
-
-            // 找子女星
-            var childStarMap = gender === 'M'
-                ? {食神:'孙子', 伤官:'孙女', 正官:'女儿', 七杀:'儿子'}
-                : {食神:'女儿', 伤官:'儿子', 正官:'儿子', 七杀:'女儿'};
-            var childStars = [];
-            for (var i = 0; i < tenGods.length; i++) {
-                if (childStarMap.hasOwnProperty(tenGods[i])) {
-                    childStars.push({ganIdx: i, gan: GAN[i], tg: tenGods[i], role: childStarMap[tenGods[i]]});
-                }
-            }
-
-            var html = '<p><strong>日主：</strong>' + dayGan + ' &nbsp; <strong>性别：</strong>' + (gender === 'M' ? '男' : '女') + '命</p>';
-            html += '<p><strong>子女星：</strong>';
-            if (childStars.length === 0) {
-                html += '原局无明显子女星，需综合全局判断</p>';
-            } else {
-                for (var k = 0; k < childStars.length; k++) {
-                    html += '<span style="display:inline-block;background:#e8f5e9;border-radius:4px;padding:2px 8px;margin:2px">' + childStars[k].gan + childStars[k].tg + ' → ' + childStars[k].role + '</span> ';
-                }
-                html += '</p>';
-            }
-
-            // 大运+流年窗口
-            html += '<p style="margin-top:12px;font-weight:bold">大运·流年子女星引动：</p>';
-            html += '<div style="max-height:400px;overflow-y:auto">';
-            html += '<table style="width:100%;border-collapse:collapse;font-size:12px">';
-            html += '<tr style="background:#6d4c41;color:#fff"><th style="padding:4px 6px">运</th><th style="padding:4px 6px">岁</th><th style="padding:4px 6px">流年</th><th style="padding:4px 6px">天干</th><th style="padding:4px 6px">地支藏干</th><th style="padding:4px 6px">引动</th></tr>';
-
-            var JIAZI_IDX = (birthYear - 4) % 60;
-            var cangGan = typeof BZ_CANG !== 'undefined' ? BZ_CANG : null;
-
-            for (var di = 0; di < 10; di++) {
-                var dyStartYear = birthYear + di * 10;
-                var dyGanIdx = (JIAZI_IDX + di * 10) % 10;
-                var dyZhiIdx = (JIAZI_IDX + di * 10) % 12;
-                var dyName = GAN[dyGanIdx] + ZHI[dyZhiIdx];
-                var rowBg = di % 2 === 0 ? '#fffde7' : '#fff9c4';
-                var hasAny = false;
-                var yearRows = [];
-
-                for (var yi = 0; yi < 10; yi++) {
-                    var ly = dyStartYear + yi;
-                    var yG = (JIAZI_IDX + di * 10 + yi) % 10;
-                    var yZ = (JIAZI_IDX + di * 10 + yi) % 12;
-                    var lyName = String(ly);
-
-                    // 天干子女星
-                    var ganTriggered = '';
-                    for (var c = 0; c < childStars.length; c++) {
-                        if (yG === childStars[c].ganIdx) {
-                            ganTriggered += childStars[c].tg + '透 ';
-                        }
-                    }
-
-                    // 地支藏干子女星
-                    var zhiTriggered = '';
-                    if (cangGan && cangGan[yZ]) {
-                        var cangs = cangGan[yZ];
-                        for (var c2 = 0; c2 < cangs.length; c2++) {
-                            for (var c3 = 0; c3 < childStars.length; c3++) {
-                                if (cangs[c2] === GAN[childStars[c3].ganIdx]) {
-                                    zhiTriggered += GAN[childStars[c3].ganIdx] + childStars[c3].tg + ' ';
-                                }
-                            }
-                        }
-                    }
-
-                    if (ganTriggered || zhiTriggered) {
-                        hasAny = true;
-                        yearRows.push({
-                            age: di * 10 + yi,
-                            lyName: lyName,
-                            ganName: GAN[yG],
-                            zhiTriggered: zhiTriggered || '—',
-                            triggered: ganTriggered + zhiTriggered
-                        });
-                    }
-                }
-
-                if (hasAny) {
-                    // 合并该大运所有命年
-                    for (var r = 0; r < yearRows.length; r++) {
-                        var row = yearRows[r];
-                        html += '<tr style="background:' + rowBg + '">';
-                        html += (r === 0 ? '<td style="padding:3px 6px" rowspan="' + yearRows.length + '" valign="middle">' + dyName + '</td>' : '');
-                        html += '<td style="padding:3px 6px">' + row.age + '岁</td>';
-                        html += '<td style="padding:3px 6px">' + row.lyName + '</td>';
-                        html += '<td style="padding:3px 6px">' + row.ganName + '</td>';
-                        html += '<td style="padding:3px 6px;font-size:11px">' + row.zhiTriggered + '</td>';
-                        html += '<td style="padding:3px 6px;color:#c62828;font-size:11px">' + row.triggered + '</td>';
-                        html += '</tr>';
-                    }
-                }
-            }
-            html += '</table></div>';
-            html += '<p style="margin-top:8px;font-size:11px;color:#888">* 透 = 天干出现；藏 = 地支藏干中出现</p>';
-
-            container.innerHTML = html;
-            panel.style.display = 'block';
-        } catch(e) {
-            container.innerHTML = '<p style="color:red">分析出错：' + e.message + ' — ' + (e.stack||'').split('\n')[0] + '</p>';
-            panel.style.display = 'block';
-        }
-    }
-    // 暴露到全局
-    window.renderChildrenAnalysis = renderChildrenAnalysis;
-})();
-</script>
-
-</div>
 </body>
+
 </html>
