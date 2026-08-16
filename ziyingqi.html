@@ -4769,7 +4769,7 @@ function renderBaziAnalysis(){
                     for (var r = 0; r < yearRows.length; r++) {
                         var row = yearRows[r];
                         html += '<tr style="background:' + rowBg + '">';
-                        html += '<td style="padding:3px 6px" rowspan="' + yearRows.length + '" valign="middle">' + dyName + '</td>' if r === 0 else '';
+                        html += (r === 0 ? '<td style="padding:3px 6px" rowspan="' + yearRows.length + '" valign="middle">' + dyName + '</td>' : '');
                         html += '<td style="padding:3px 6px">' + row.age + '岁</td>';
                         html += '<td style="padding:3px 6px">' + row.lyName + '</td>';
                         html += '<td style="padding:3px 6px">' + row.ganName + '</td>';
